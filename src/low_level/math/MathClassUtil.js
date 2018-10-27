@@ -95,7 +95,12 @@ export default class MathClassUtil {
     }
   }
 
-  static compomentNumberOfVector(element) {
+  /**
+   * discriminate which Vector instance 
+   * @param element any Vector instance  
+   * @return number of Vector instance
+   */
+  static compomentNumberOfVector(element: Vector2 | Vector3 |  Vector4 | Quaternion | Array): number {
     if(element instanceof Vector2) {
       return 2;
     } else if (element instanceof Vector3) {

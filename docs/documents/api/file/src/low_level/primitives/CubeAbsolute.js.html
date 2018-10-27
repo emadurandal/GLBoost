@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -168,7 +170,9 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/low_level/primitives/CubeAbsolute.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import GLBoost from &apos;../../globals&apos;;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/* @flow */
+
+import GLBoost from &apos;../../globals&apos;;
 import Geometry from &apos;../../low_level/geometries/Geometry&apos;;
 import Vector4 from &apos;../../low_level/math/Vector4&apos;;
 import Vector3 from &apos;../../low_level/math/Vector3&apos;;
@@ -176,6 +180,9 @@ import Vector2 from &apos;../../low_level/math/Vector2&apos;;
 import MathUtil from &apos;../../low_level/math/MathUtil&apos;;
 
 export default class CubeAbsolute extends Geometry {
+  _indices: Array&lt;number&gt;;
+  _vertexData: Object;
+
   constructor(glBoostContext) {
     super(glBoostContext);
 
@@ -188,7 +195,7 @@ export default class CubeAbsolute extends Geometry {
     this.setVerticesData(this._vertexData, [this._indices]);
   }
 
-  _setupVertexData(minPosition, maxPosition, vertexColor) {
+  _setupVertexData(minPosition: Object, maxPosition: Object, vertexColor) {
     this._indices = [
       3, 1, 0, 2, 1, 3,
       4, 5, 7, 7, 5, 6,
@@ -339,7 +346,7 @@ export default class CubeAbsolute extends Geometry {
     return this._vertexData;
   }
 
-  update(minPosition, maxPosition) {
+  update(minPosition: Object, maxPosition: Object) {
     this._vertexData = this._setupVertexData(minPosition, maxPosition);
     this.updateVerticesData(this._vertexData, [this._indices]);
   }

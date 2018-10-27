@@ -4,16 +4,14 @@ import GLBoostObject from '../core/GLBoostObject';
 import Vector4 from '../math/Vector4';
 
 /**
- * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
- * [ja] 全てのテクスチャクラスのための抽象クラスです。直接このクラスは使わないでください。
+ * This is the abstract class for all texture classes. Don't use this class directly.
  */
 export default class AbstractTexture extends GLBoostObject {
 
   /**
-   * [en] The constructor of PointLight class. Do not construct this class directly.<br>
-   * [ja] PointLightクラスのコンストラクタ。直接このクラスを生成しようとしないでください。
+   * The constructor of PointLight class. Do not construct this class directly.
    *
-   * * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+   * * @param {HTMLCanvas|string} canvas canvas or canvas' id string.
    */
   constructor(glBoostContext) {
     super(glBoostContext);
@@ -31,18 +29,16 @@ export default class AbstractTexture extends GLBoostObject {
   }
 
   /**
-   * [en] get the WebGL texture resource within this class. <br />
-   * [ja] このクラス内部で管理しているWebGLテクスチャリソースを取得します。
+   * get the WebGL texture resource within this class.
    *
-   * @returns {null|*} [en] WebGL texture resouce. [ja] WebGLテクスチャリソース
+   * @returns WebGL texture resouce.
    */
-  get glTextureResource() {
+  get glTextureResource() : null | *{
     return this._texture;
   }
 
   /**
-   * [en] bind the texture. It calls bindTexture on WebGL only if it has WebGL texture. Otherwise it returns false without doing anything.<br />
-   * [ja] テクスチャをバインドします。自身がWebGLテクスチャを持っている場合のみ、WebGLのbindTextureを呼びます。それ以外は何もせずにfalseを返します。
+   * bind the texture. It calls bindTexture on WebGL only if it has WebGL texture. Otherwise it returns false without doing anything.
    */
   setUp(textureUnitIndex) {
     var gl = this._glContext.gl;
@@ -62,8 +58,7 @@ export default class AbstractTexture extends GLBoostObject {
   }
 
   /**
-   * [en] unbind the texture. <br />
-   * [ja] テクスチャをバインド解除します。
+   * unbind the texture.
    */
   tearDown(textureUnitIndex) {
     var gl = this._glContext.gl;
@@ -114,12 +109,12 @@ export default class AbstractTexture extends GLBoostObject {
   /**
    * Origin is left bottom
    *
-   * @param {number} x horizontal pixel position (0 is left)
-   * @param {number} y virtical pixel position (0 is bottom)
-   * @param {Uint8Array} argByteArray Pixel Data as Uint8Array
-   * @returns {Vector4} Pixel Value in Vector4
+   * @param x horizontal pixel position (0 is left)
+   * @param y virtical pixel position (0 is bottom)
+   * @param argByteArray Pixel Data as Uint8Array
+   * @returns Pixel Value in Vector4
    */
-  getPixelValueAt(x, y, argByteArray) {
+  getPixelValueAt(x: number, y: number, argByteArray: Uint8Array):Vector4 {
     let byteArray = argByteArray;
     if (!byteArray) {
       byteArray = this.getTexturePixelData();
@@ -145,13 +140,12 @@ export default class AbstractTexture extends GLBoostObject {
     return canvas;
   }
   /**
-   * [en] check whether or not this texture size is power of two. <br />
-   * [ja] テクスチャサイズが２の累乗かどうかを返します
+   * check whether or not this texture size is power of two.
    *
-   * @param {number} x [en] texture size. [ja] テクスチャサイズ
-   * @returns {boolean} [en] check whether or not the size x is power of two. [ja] xが２の累乗かどうか
+   * @param x texture size.
+   * @returns check whether or not the size x is power of two.
    */
-  _isPowerOfTwo(x) {
+  _isPowerOfTwo(x: number): boolean {
     return (x & (x - 1)) == 0;
   }
 
@@ -160,13 +154,12 @@ export default class AbstractTexture extends GLBoostObject {
   }
 
   /**
-   * [en] get a value nearest power of two. <br />
-   * [ja] 与えられた数から見て２の累乗に最も近い値を返します。
+   * get a value nearest power of two.
    *
-   * @param {number} x [en] texture size. [ja] テクスチャサイズ
-   * @returns {number} [en] a value nearest power of two. [ja] xに近い２の累乗の値
+   * @param x texture size.
+   * @returns a value nearest power of two.
    */
-  _getNearestPowerOfTwo(x) {
+  _getNearestPowerOfTwo(x: number): number {
     return Math.pow( 2, Math.round( Math.log( x ) / Math.LN2 ) );
   }
 

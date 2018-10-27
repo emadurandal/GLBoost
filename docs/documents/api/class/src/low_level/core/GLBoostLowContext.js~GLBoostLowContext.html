@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -168,13 +170,13 @@
 </nav>
 
 <div class="content" data-ice="content"><div class="header-notice">
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import GLBoostLowContext from &apos;<span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber26">glboost/src/low_level/core/GLBoostLowContext.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import GLBoostLowContext from &apos;<span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber30">glboost/src/low_level/core/GLBoostLowContext.js</a></span>&apos;</code></pre></div>
   <span data-ice="access">public</span>
   <span data-ice="kind">class</span>
   
   
   
-  <span data-ice="source">| <span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber26">source</a></span></span>
+  <span data-ice="source">| <span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber30">source</a></span></span>
 </div>
 
 <div class="self-detail detail">
@@ -206,7 +208,41 @@
   
 </div>
 
-
+<div data-ice="staticMemberSummary"><h2>Static Member Summary</h2><table class="summary" data-ice="summary">
+  <thead><tr><td data-ice="title" colspan="3">Static Private Members</td></tr></thead>
+  <tbody>
+  
+  <tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">private</span>
+      <span data-ice="static">static</span>
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#static-member-_instanceCount">_instanceCount</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+</tbody>
+</table>
+</div>
 
 <div data-ice="constructorSummary"><h2>Constructor Summary</h2><table class="summary" data-ice="summary">
   <thead><tr><td data-ice="title" colspan="3">Public Constructor</td></tr></thead>
@@ -226,7 +262,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-constructor-constructor">constructor</a></span></span><span class="code" data-ice="signature">(canvas: <span>*</span>, initParameter: <span>*</span>, gl: <span>*</span>, width: <span>*</span>, height: <span>*</span>)</span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-constructor-constructor">constructor</a></span></span><span class="code" data-ice="signature">(canvas: <span>HTMLCanvasElement</span>, initParameter: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, gl: <span>WebGLRenderingContext</span>, width: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, height: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>)</span>
         </p>
       </div>
       <div>
@@ -317,7 +353,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-set-currentGlobalStates">currentGlobalStates</a></span></span><span class="code" data-ice="signature">: <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-set-currentGlobalStates">currentGlobalStates</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>&gt;</span>
         </p>
       </div>
       <div>
@@ -485,7 +521,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-set-globalStatesUsage">globalStatesUsage</a></span></span><span class="code" data-ice="signature">: <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-set-globalStatesUsage">globalStatesUsage</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
         </p>
       </div>
       <div>
@@ -547,7 +583,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-member-__system">__system</a></span></span><span class="code" data-ice="signature">: <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-member-__system">__system</a></span></span><span class="code" data-ice="signature">: <span><a href="class/src/low_level/core/GLBoostSystem.js~GLBoostSystem.html">GLBoostSystem</a></span></span>
         </p>
       </div>
       <div>
@@ -575,7 +611,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-member-_instanceName">_instanceName</a></span></span><span class="code" data-ice="signature">: <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-member-_instanceName">_instanceName</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
         </p>
       </div>
       <div>
@@ -610,7 +646,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createAxis">createAxis</a></span></span><span class="code" data-ice="signature">(length: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createAxis">createAxis</a></span></span><span class="code" data-ice="signature">(length: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -666,7 +702,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createCameraController">createCameraController</a></span></span><span class="code" data-ice="signature">(options: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createCameraController">createCameraController</a></span></span><span class="code" data-ice="signature">(options: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -722,7 +758,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createCube">createCube</a></span></span><span class="code" data-ice="signature">(widthVector: <span>*</span>, vertexColor: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createCube">createCube</a></span></span><span class="code" data-ice="signature">(widthVector: <span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span>, vertexColor: <span><a href="class/src/low_level/math/Vector4.js~Vector4.html">Vector4</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -750,7 +786,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createCubeTexture">createCubeTexture</a></span></span><span class="code" data-ice="signature">(userFlavorName: <span>*</span>, parameters: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createCubeTexture">createCubeTexture</a></span></span><span class="code" data-ice="signature">(userFlavorName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, parameters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -778,7 +814,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createDepthTexturesForRenderTarget">createDepthTexturesForRenderTarget</a></span></span><span class="code" data-ice="signature">(width: <span>*</span>, height: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createDepthTexturesForRenderTarget">createDepthTexturesForRenderTarget</a></span></span><span class="code" data-ice="signature">(width: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, height: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -806,7 +842,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createFrustumCamera">createFrustumCamera</a></span></span><span class="code" data-ice="signature">(lookat: <span>*</span>, perspective: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createFrustumCamera">createFrustumCamera</a></span></span><span class="code" data-ice="signature">(lookat: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, perspective: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -862,7 +898,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createOrthoCamera">createOrthoCamera</a></span></span><span class="code" data-ice="signature">(lookat: <span>*</span>, ortho: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createOrthoCamera">createOrthoCamera</a></span></span><span class="code" data-ice="signature">(lookat: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, ortho: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -918,7 +954,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createParticle">createParticle</a></span></span><span class="code" data-ice="signature">(centerPointData: <span>*</span>, particleWidth: <span>*</span>, particleHeight: <span>*</span>, customVertexAttributes: <span>*</span>, performanceHint: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createParticle">createParticle</a></span></span><span class="code" data-ice="signature">(centerPointData: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, particleWidth: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, particleHeight: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, customVertexAttributes: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, performanceHint: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -946,7 +982,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createPerspectiveCamera">createPerspectiveCamera</a></span></span><span class="code" data-ice="signature">(lookat: <span>*</span>, perspective: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createPerspectiveCamera">createPerspectiveCamera</a></span></span><span class="code" data-ice="signature">(lookat: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, perspective: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -974,7 +1010,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createPhinaTexture">createPhinaTexture</a></span></span><span class="code" data-ice="signature">(width: <span>*</span>, height: <span>*</span>, fillStyle: <span>*</span>, parameters: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createPhinaTexture">createPhinaTexture</a></span></span><span class="code" data-ice="signature">(width: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, height: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, fillStyle: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, parameters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -1002,7 +1038,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createPlane">createPlane</a></span></span><span class="code" data-ice="signature">(width: <span>*</span>, height: <span>*</span>, uSpan: <span>*</span>, vSpan: <span>*</span>, customVertexAttributes: <span>*</span>, isUVRepeat: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createPlane">createPlane</a></span></span><span class="code" data-ice="signature">(width: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, height: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, uSpan: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, vSpan: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, customVertexAttributes: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, isUVRepeat: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -1030,7 +1066,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createScreen">createScreen</a></span></span><span class="code" data-ice="signature">(screen: <span>*</span>, customVertexAttributes: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createScreen">createScreen</a></span></span><span class="code" data-ice="signature">(screen: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, customVertexAttributes: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -1058,7 +1094,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createSphere">createSphere</a></span></span><span class="code" data-ice="signature">(radius: <span>*</span>, widthSegments: <span>*</span>, heightSegments: <span>*</span>, vertexColor: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createSphere">createSphere</a></span></span><span class="code" data-ice="signature">(radius: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, widthSegments: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, heightSegments: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, vertexColor: <span><a href="class/src/low_level/math/Vector4.js~Vector4.html">Vector4</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -1086,7 +1122,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createTexture">createTexture</a></span></span><span class="code" data-ice="signature">(src: <span>*</span>, userFlavorName: <span>*</span>, parameters: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createTexture">createTexture</a></span></span><span class="code" data-ice="signature">(src: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, userFlavorName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, parameters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -1143,7 +1179,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createWalkThroughCameraController">createWalkThroughCameraController</a></span></span><span class="code" data-ice="signature">(options: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-createWalkThroughCameraController">createWalkThroughCameraController</a></span></span><span class="code" data-ice="signature">(options: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -1255,7 +1291,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-setPropertiesFromJson">setPropertiesFromJson</a></span></span><span class="code" data-ice="signature">(arg: <span>*</span>, queryType: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-method-setPropertiesFromJson">setPropertiesFromJson</a></span></span><span class="code" data-ice="signature">(arg: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, queryType: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -1337,7 +1373,52 @@
 
 
 
+<div data-ice="staticMemberDetails"><h2 data-ice="title">Static Private Members</h2>
 
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="static-member-_instanceCount">
+    <span class="access" data-ice="access">private</span>
+    <span data-ice="static">static</span>
+    
+    
+    
+    
+    <span class="code" data-ice="name">_instanceCount</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber32">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+</div>
 
 <div data-ice="constructorDetails"><h2 data-ice="title">Public Constructors</h2>
 
@@ -1349,11 +1430,11 @@
     
     
     
-    <span class="code" data-ice="name">constructor</span><span class="code" data-ice="signature">(canvas: <span>*</span>, initParameter: <span>*</span>, gl: <span>*</span>, width: <span>*</span>, height: <span>*</span>)</span>
+    <span class="code" data-ice="name">constructor</span><span class="code" data-ice="signature">(canvas: <span>HTMLCanvasElement</span>, initParameter: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, gl: <span>WebGLRenderingContext</span>, width: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, height: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber27">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber35">source</a></span></span>
     </span>
   </h3>
 
@@ -1374,31 +1455,31 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">canvas</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span>HTMLCanvasElement</span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">initParameter</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">gl</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span>WebGLRenderingContext</span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">width</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">height</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -1439,7 +1520,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber263">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber271">source</a></span></span>
     </span>
   </h3>
 
@@ -1482,7 +1563,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber64">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber72">source</a></span></span>
     </span>
   </h3>
 
@@ -1521,11 +1602,11 @@
     
     
     
-    <span class="code" data-ice="name">currentGlobalStates</span><span class="code" data-ice="signature">: <span>*</span></span>
+    <span class="code" data-ice="name">currentGlobalStates</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>&gt;</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber308">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber318">source</a></span></span>
     </span>
   </h3>
 
@@ -1568,7 +1649,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber312">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber322">source</a></span></span>
     </span>
   </h3>
 
@@ -1611,7 +1692,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber56">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber64">source</a></span></span>
     </span>
   </h3>
 
@@ -1654,7 +1735,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber60">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber68">source</a></span></span>
     </span>
   </h3>
 
@@ -1697,7 +1778,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber320">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber330">source</a></span></span>
     </span>
   </h3>
 
@@ -1740,7 +1821,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber77">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber85">source</a></span></span>
     </span>
   </h3>
 
@@ -1779,11 +1860,11 @@
     
     
     
-    <span class="code" data-ice="name">globalStatesUsage</span><span class="code" data-ice="signature">: <span>*</span></span>
+    <span class="code" data-ice="name">globalStatesUsage</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber267">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber275">source</a></span></span>
     </span>
   </h3>
 
@@ -1826,7 +1907,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber271">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber279">source</a></span></span>
     </span>
   </h3>
 
@@ -1867,11 +1948,11 @@
     
     
     
-    <span class="code" data-ice="name">__system</span><span class="code" data-ice="signature">: <span>*</span></span>
+    <span class="code" data-ice="name">__system</span><span class="code" data-ice="signature">: <span><a href="class/src/low_level/core/GLBoostSystem.js~GLBoostSystem.html">GLBoostSystem</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber30">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber31">source</a></span></span>
     </span>
   </h3>
 
@@ -1910,11 +1991,11 @@
     
     
     
-    <span class="code" data-ice="name">_instanceName</span><span class="code" data-ice="signature">: <span>*</span></span>
+    <span class="code" data-ice="name">_instanceName</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber70">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber33">source</a></span></span>
     </span>
   </h3>
 
@@ -1956,11 +2037,11 @@
     
     
     
-    <span class="code" data-ice="name">createAxis</span><span class="code" data-ice="signature">(length: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">createAxis</span><span class="code" data-ice="signature">(length: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber101">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber109">source</a></span></span>
     </span>
   </h3>
 
@@ -1981,7 +2062,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">length</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -2031,7 +2112,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber85">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber93">source</a></span></span>
     </span>
   </h3>
 
@@ -2082,11 +2163,11 @@
     
     
     
-    <span class="code" data-ice="name">createCameraController</span><span class="code" data-ice="signature">(options: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">createCameraController</span><span class="code" data-ice="signature">(options: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber129">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber137">source</a></span></span>
     </span>
   </h3>
 
@@ -2107,7 +2188,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">options</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -2157,7 +2238,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber109">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber117">source</a></span></span>
     </span>
   </h3>
 
@@ -2208,11 +2289,11 @@
     
     
     
-    <span class="code" data-ice="name">createCube</span><span class="code" data-ice="signature">(widthVector: <span>*</span>, vertexColor: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">createCube</span><span class="code" data-ice="signature">(widthVector: <span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span>, vertexColor: <span><a href="class/src/low_level/math/Vector4.js~Vector4.html">Vector4</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber89">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber97">source</a></span></span>
     </span>
   </h3>
 
@@ -2233,13 +2314,13 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">widthVector</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">vertexColor</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="class/src/low_level/math/Vector4.js~Vector4.html">Vector4</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -2285,11 +2366,11 @@
     
     
     
-    <span class="code" data-ice="name">createCubeTexture</span><span class="code" data-ice="signature">(userFlavorName: <span>*</span>, parameters: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">createCubeTexture</span><span class="code" data-ice="signature">(userFlavorName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, parameters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber145">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber153">source</a></span></span>
     </span>
   </h3>
 
@@ -2310,13 +2391,13 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">userFlavorName</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">parameters</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -2362,11 +2443,11 @@
     
     
     
-    <span class="code" data-ice="name">createDepthTexturesForRenderTarget</span><span class="code" data-ice="signature">(width: <span>*</span>, height: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">createDepthTexturesForRenderTarget</span><span class="code" data-ice="signature">(width: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, height: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber200">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber208">source</a></span></span>
     </span>
   </h3>
 
@@ -2387,13 +2468,13 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">width</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">height</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -2439,11 +2520,11 @@
     
     
     
-    <span class="code" data-ice="name">createFrustumCamera</span><span class="code" data-ice="signature">(lookat: <span>*</span>, perspective: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">createFrustumCamera</span><span class="code" data-ice="signature">(lookat: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, perspective: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber121">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber129">source</a></span></span>
     </span>
   </h3>
 
@@ -2464,13 +2545,13 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">lookat</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">perspective</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -2520,7 +2601,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber81">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber89">source</a></span></span>
     </span>
   </h3>
 
@@ -2571,11 +2652,11 @@
     
     
     
-    <span class="code" data-ice="name">createOrthoCamera</span><span class="code" data-ice="signature">(lookat: <span>*</span>, ortho: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">createOrthoCamera</span><span class="code" data-ice="signature">(lookat: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, ortho: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber125">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber133">source</a></span></span>
     </span>
   </h3>
 
@@ -2596,13 +2677,13 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">lookat</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">ortho</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -2652,7 +2733,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber113">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber121">source</a></span></span>
     </span>
   </h3>
 
@@ -2703,11 +2784,11 @@
     
     
     
-    <span class="code" data-ice="name">createParticle</span><span class="code" data-ice="signature">(centerPointData: <span>*</span>, particleWidth: <span>*</span>, particleHeight: <span>*</span>, customVertexAttributes: <span>*</span>, performanceHint: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">createParticle</span><span class="code" data-ice="signature">(centerPointData: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, particleWidth: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, particleHeight: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, customVertexAttributes: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, performanceHint: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber105">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber113">source</a></span></span>
     </span>
   </h3>
 
@@ -2728,31 +2809,31 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">centerPointData</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">particleWidth</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">particleHeight</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">customVertexAttributes</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">performanceHint</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -2798,11 +2879,11 @@
     
     
     
-    <span class="code" data-ice="name">createPerspectiveCamera</span><span class="code" data-ice="signature">(lookat: <span>*</span>, perspective: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">createPerspectiveCamera</span><span class="code" data-ice="signature">(lookat: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, perspective: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber117">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber125">source</a></span></span>
     </span>
   </h3>
 
@@ -2823,13 +2904,13 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">lookat</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">perspective</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -2875,11 +2956,11 @@
     
     
     
-    <span class="code" data-ice="name">createPhinaTexture</span><span class="code" data-ice="signature">(width: <span>*</span>, height: <span>*</span>, fillStyle: <span>*</span>, parameters: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">createPhinaTexture</span><span class="code" data-ice="signature">(width: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, height: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, fillStyle: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, parameters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber141">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber149">source</a></span></span>
     </span>
   </h3>
 
@@ -2900,27 +2981,28 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">width</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">height</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">fillStyle</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">parameters</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"><ul><li>optional</li>
-<li>default: undefined</li></ul></td>
+<li>default: undefined</li>
+<li>nullable: true</li></ul></td>
       <td data-ice="description"></td>
     </tr>
 </tbody>
@@ -2965,11 +3047,11 @@
     
     
     
-    <span class="code" data-ice="name">createPlane</span><span class="code" data-ice="signature">(width: <span>*</span>, height: <span>*</span>, uSpan: <span>*</span>, vSpan: <span>*</span>, customVertexAttributes: <span>*</span>, isUVRepeat: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">createPlane</span><span class="code" data-ice="signature">(width: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, height: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, uSpan: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, vSpan: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, customVertexAttributes: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, isUVRepeat: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber93">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber101">source</a></span></span>
     </span>
   </h3>
 
@@ -2990,37 +3072,37 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">width</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">height</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">uSpan</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">vSpan</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">customVertexAttributes</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">isUVRepeat</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -3066,11 +3148,11 @@
     
     
     
-    <span class="code" data-ice="name">createScreen</span><span class="code" data-ice="signature">(screen: <span>*</span>, customVertexAttributes: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">createScreen</span><span class="code" data-ice="signature">(screen: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, customVertexAttributes: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber149">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber157">source</a></span></span>
     </span>
   </h3>
 
@@ -3091,13 +3173,13 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">screen</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">customVertexAttributes</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -3143,11 +3225,11 @@
     
     
     
-    <span class="code" data-ice="name">createSphere</span><span class="code" data-ice="signature">(radius: <span>*</span>, widthSegments: <span>*</span>, heightSegments: <span>*</span>, vertexColor: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">createSphere</span><span class="code" data-ice="signature">(radius: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, widthSegments: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, heightSegments: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, vertexColor: <span><a href="class/src/low_level/math/Vector4.js~Vector4.html">Vector4</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber97">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber105">source</a></span></span>
     </span>
   </h3>
 
@@ -3168,25 +3250,25 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">radius</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">widthSegments</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">heightSegments</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">vertexColor</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="class/src/low_level/math/Vector4.js~Vector4.html">Vector4</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -3232,11 +3314,11 @@
     
     
     
-    <span class="code" data-ice="name">createTexture</span><span class="code" data-ice="signature">(src: <span>*</span>, userFlavorName: <span>*</span>, parameters: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">createTexture</span><span class="code" data-ice="signature">(src: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, userFlavorName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, parameters: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber137">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber145">source</a></span></span>
     </span>
   </h3>
 
@@ -3257,21 +3339,22 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">src</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">userFlavorName</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">parameters</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"><ul><li>optional</li>
-<li>default: undefined</li></ul></td>
+<li>default: undefined</li>
+<li>nullable: true</li></ul></td>
       <td data-ice="description"></td>
     </tr>
 </tbody>
@@ -3320,14 +3403,14 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber160">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber168">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  <div data-ice="description"><p>create textures as render target. (and attach it to framebuffer object internally.)<br> </p>
+  <div data-ice="description"><p>create textures as render target. (and attach it to framebuffer object internally.)<br>  </p>
 </div>
 
   
@@ -3344,21 +3427,21 @@
       <td data-ice="name" class="code" data-depth="0">width</td>
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"><p>width of texture</p>
+      <td data-ice="description"><p>width - width of texture</p>
 </td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">height</td>
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"><p>height of texture</p>
+      <td data-ice="description"><p>height - height of texture</p>
 </td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">textureNum</td>
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"><p>the number of creation.</p>
+      <td data-ice="description"><p>textureNum - the number of creation.</p>
 </td>
     </tr>
 </tbody>
@@ -3404,11 +3487,11 @@
     
     
     
-    <span class="code" data-ice="name">createWalkThroughCameraController</span><span class="code" data-ice="signature">(options: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">createWalkThroughCameraController</span><span class="code" data-ice="signature">(options: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber133">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber141">source</a></span></span>
     </span>
   </h3>
 
@@ -3429,7 +3512,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">options</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -3479,7 +3562,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber291">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber301">source</a></span></span>
     </span>
   </h3>
 
@@ -3522,7 +3605,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber275">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber283">source</a></span></span>
     </span>
   </h3>
 
@@ -3565,7 +3648,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber316">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber326">source</a></span></span>
     </span>
   </h3>
 
@@ -3604,11 +3687,11 @@
     
     
     
-    <span class="code" data-ice="name">setPropertiesFromJson</span><span class="code" data-ice="signature">(arg: <span>*</span>, queryType: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">setPropertiesFromJson</span><span class="code" data-ice="signature">(arg: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, queryType: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber324">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber334">source</a></span></span>
     </span>
   </h3>
 
@@ -3629,13 +3712,13 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">arg</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">queryType</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"><ul><li>optional</li>
 <li>default: undefined</li></ul></td>
       <td data-ice="description"></td>
@@ -3686,7 +3769,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber73">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber81">source</a></span></span>
     </span>
   </h3>
 
@@ -3743,7 +3826,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber68">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/GLBoostLowContext.js.html#lineNumber76">source</a></span></span>
     </span>
   </h3>
 

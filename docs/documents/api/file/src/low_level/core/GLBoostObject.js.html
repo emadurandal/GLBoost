@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -178,6 +180,9 @@ import type GLBoostSystem from &apos;./GLBoostSystem&apos;;
 import GLContext from &apos;./GLContext&apos;;
 
 export default class GLBoostObject {
+  static classInfoDic: Object;
+  static _objectExistArray: Array&lt;any&gt;;
+  static __entities: Array&lt;any&gt;;
   _glBoostSystem: GLBoostSystem;
   _glContext: GLContext;
   _toRegister: boolean;
@@ -223,15 +228,16 @@ export default class GLBoostObject {
     this._objectIndex = -1;
 
     const seekSpaceOfArrayAndSetIndexThere = (typeName)=&gt;{
+      const that:any = this;
       let array = GLBoostObject[&apos;_&apos; + typeName + &apos;ExistArray&apos;];
       for (let i=0; i&lt;array.length; i++) {
         if (array[i] === void 0) {
-          this[&apos;_&apos; + typeName + &apos;Index&apos;] = i;
+          that[&apos;_&apos; + typeName + &apos;Index&apos;] = i;
           array[i] = true;
           return;
         }
       }
-      this[&apos;_&apos; + typeName + &apos;Index&apos;] = array.length;
+      that[&apos;_&apos; + typeName + &apos;Index&apos;] = array.length;
       array[array.length] = true;
     };
 
@@ -244,8 +250,9 @@ export default class GLBoostObject {
   tearDownExistIndexAndArray() {
     const deleteIndex = (typeName)=&gt;{
       let array = GLBoostObject[&apos;_&apos; + typeName + &apos;ExistArray&apos;];
-      delete array[this[&apos;_&apos; + typeName + &apos;Index&apos;]];
-      this[&apos;_&apos; + typeName + &apos;Index&apos;] = -1;
+      const that: any = this;
+      delete array[that[&apos;_&apos; + typeName + &apos;Index&apos;]];
+      that[&apos;_&apos; + typeName + &apos;Index&apos;] = -1;
     };
 
     if (this.className.indexOf(&apos;Mesh&apos;) !== -1) {
@@ -269,9 +276,8 @@ export default class GLBoostObject {
   }
 
   /**
-   * [en] Return instance name.
-   * [ja] &#x30A4;&#x30F3;&#x30B9;&#x30BF;&#x30F3;&#x30B9;&#x540D;&#x3092;&#x8FD4;&#x3057;&#x307E;&#x3059;&#x3002;
-   * @returns {string} [en] the instance name. [ja] &#x30A4;&#x30F3;&#x30B9;&#x30BF;&#x30F3;&#x30B9;&#x540D;
+   * Return instance name.
+   * @returns the instance name.
    */
   toString():string {
     return this._instanceName;
@@ -293,7 +299,7 @@ export default class GLBoostObject {
   }
 
   get belongingCanvasId() {
-    return this._glBoostSystem.belongingCanvasId;
+    return this._glContext.belongingCanvasId;
   }
 
   set userFlavorName(name:string) {

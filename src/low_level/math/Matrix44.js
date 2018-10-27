@@ -115,7 +115,7 @@ export default class Matrix44 {
   }
 
   /**
-   * 単位行列にする
+   * to the identity matrix
    */
   identity() {
     this.setComponents(
@@ -128,7 +128,7 @@ export default class Matrix44 {
   }
 
   /**
-   * 単位行列にする（static版）
+   * to the identity matrix（static版）
    */
   static identity() {
     return new Matrix44(
@@ -373,7 +373,7 @@ export default class Matrix44 {
   }
 
   /**
-   * 転置
+   * transpose
    */
   transpose() {
     this._swap(1, 4);
@@ -387,7 +387,7 @@ export default class Matrix44 {
   }
 
   /**
-   * 転置（static版）
+   * transpose(static version)
    */
   static transpose(mat) {
 
@@ -411,7 +411,7 @@ export default class Matrix44 {
   }
 
   /**
-   * 行列同士の乗算
+   * multiply zero matrix and zero matrix
    */
   multiply(mat) {
     var m00 = this.m00*mat.m00 + this.m01*mat.m10 + this.m02*mat.m20 + this.m03*mat.m30;
@@ -472,7 +472,7 @@ export default class Matrix44 {
   }
 
   /**
-   * 行列同士の乗算（static版）
+   * multiply zero matrix and zero matrix(static version)
    */
   static multiply(l_m, r_m) {
     var m00 = l_m.m00*r_m.m00 + l_m.m01*r_m.m10 + l_m.m02*r_m.m20 + l_m.m03*r_m.m30;

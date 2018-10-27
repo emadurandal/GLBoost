@@ -198,6 +198,12 @@ window.esdocSearchIndex = [
     "class"
   ],
   [
+    "glboost/src/middle_level/loader/glboostgltfloaderextension.js~glboostgltfloaderextension",
+    "class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html",
+    "<span>GLBoostGLTFLoaderExtension</span> <span class=\"search-result-import-path\">glboost/src/middle_level/loader/GLBoostGLTFLoaderExtension.js</span>",
+    "class"
+  ],
+  [
     "glboost/src/low_level/core/glboostlowcontext.js~glboostlowcontext",
     "class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html",
     "<span>GLBoostLowContext</span> <span class=\"search-result-import-path\">glboost/src/low_level/core/GLBoostLowContext.js</span>",
@@ -249,6 +255,12 @@ window.esdocSearchIndex = [
     "glboost/src/low_level/core/glextensionsmanager.js~glextensionsmanager",
     "class/src/low_level/core/GLExtensionsManager.js~GLExtensionsManager.html",
     "<span>GLExtensionsManager</span> <span class=\"search-result-import-path\">glboost/src/low_level/core/GLExtensionsManager.js</span>",
+    "class"
+  ],
+  [
+    "glboost/src/middle_level/loader/gltf2exporter.js~gltf2exporter",
+    "class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html",
+    "<span>GLTF2Exporter</span> <span class=\"search-result-import-path\">glboost/src/middle_level/loader/GLTF2Exporter.js</span>",
     "class"
   ],
   [
@@ -1585,13 +1597,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/auxiliaries/camera_controllers/l_cameracontroller.js~l_cameracontroller#roty",
-    "class/src/low_level/auxiliaries/camera_controllers/L_CameraController.js~L_CameraController.html#instance-get-rotY",
+    "class/src/low_level/auxiliaries/camera_controllers/L_CameraController.js~L_CameraController.html#instance-set-rotY",
     "src/low_level/auxiliaries/camera_controllers/L_CameraController.js~L_CameraController#rotY",
     "member"
   ],
   [
     "src/low_level/auxiliaries/camera_controllers/l_cameracontroller.js~l_cameracontroller#roty",
-    "class/src/low_level/auxiliaries/camera_controllers/L_CameraController.js~L_CameraController.html#instance-set-rotY",
+    "class/src/low_level/auxiliaries/camera_controllers/L_CameraController.js~L_CameraController.html#instance-get-rotY",
     "src/low_level/auxiliaries/camera_controllers/L_CameraController.js~L_CameraController#rotY",
     "member"
   ],
@@ -1861,13 +1873,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/auxiliaries/camera_controllers/l_walkthroughcameracontroller.js~l_walkthroughcameracontroller#allinfo",
-    "class/src/low_level/auxiliaries/camera_controllers/L_WalkThroughCameraController.js~L_WalkThroughCameraController.html#instance-set-allInfo",
+    "class/src/low_level/auxiliaries/camera_controllers/L_WalkThroughCameraController.js~L_WalkThroughCameraController.html#instance-get-allInfo",
     "src/low_level/auxiliaries/camera_controllers/L_WalkThroughCameraController.js~L_WalkThroughCameraController#allInfo",
     "member"
   ],
   [
     "src/low_level/auxiliaries/camera_controllers/l_walkthroughcameracontroller.js~l_walkthroughcameracontroller#allinfo",
-    "class/src/low_level/auxiliaries/camera_controllers/L_WalkThroughCameraController.js~L_WalkThroughCameraController.html#instance-get-allInfo",
+    "class/src/low_level/auxiliaries/camera_controllers/L_WalkThroughCameraController.js~L_WalkThroughCameraController.html#instance-set-allInfo",
     "src/low_level/auxiliaries/camera_controllers/L_WalkThroughCameraController.js~L_WalkThroughCameraController#allInfo",
     "member"
   ],
@@ -1933,13 +1945,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/auxiliaries/camera_controllers/l_walkthroughcameracontroller.js~l_walkthroughcameracontroller#virticalspeed",
-    "class/src/low_level/auxiliaries/camera_controllers/L_WalkThroughCameraController.js~L_WalkThroughCameraController.html#instance-get-virticalSpeed",
+    "class/src/low_level/auxiliaries/camera_controllers/L_WalkThroughCameraController.js~L_WalkThroughCameraController.html#instance-set-virticalSpeed",
     "src/low_level/auxiliaries/camera_controllers/L_WalkThroughCameraController.js~L_WalkThroughCameraController#virticalSpeed",
     "member"
   ],
   [
     "src/low_level/auxiliaries/camera_controllers/l_walkthroughcameracontroller.js~l_walkthroughcameracontroller#virticalspeed",
-    "class/src/low_level/auxiliaries/camera_controllers/L_WalkThroughCameraController.js~L_WalkThroughCameraController.html#instance-set-virticalSpeed",
+    "class/src/low_level/auxiliaries/camera_controllers/L_WalkThroughCameraController.js~L_WalkThroughCameraController.html#instance-get-virticalSpeed",
     "src/low_level/auxiliaries/camera_controllers/L_WalkThroughCameraController.js~L_WalkThroughCameraController#virticalSpeed",
     "member"
   ],
@@ -2025,18 +2037,6 @@ window.esdocSearchIndex = [
     "src/low_level/components/transformcomponent.js~transformcomponent#$updatelogic",
     "class/src/low_level/components/TransformComponent.js~TransformComponent.html#instance-method-$updateLogic",
     "src/low_level/components/TransformComponent.js~TransformComponent#$updateLogic",
-    "method"
-  ],
-  [
-    "src/low_level/components/transformcomponent.js~transformcomponent#[key]",
-    "class/src/low_level/components/TransformComponent.js~TransformComponent.html#instance-member-[key]",
-    "src/low_level/components/TransformComponent.js~TransformComponent#[key]",
-    "member"
-  ],
-  [
-    "src/low_level/components/transformcomponent.js~transformcomponent#__updatematrix",
-    "class/src/low_level/components/TransformComponent.js~TransformComponent.html#instance-method-__updateMatrix",
-    "src/low_level/components/TransformComponent.js~TransformComponent#__updateMatrix",
     "method"
   ],
   [
@@ -2257,20 +2257,14 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/components/transformcomponent.js~transformcomponent#rotatematrix33",
-    "class/src/low_level/components/TransformComponent.js~TransformComponent.html#instance-get-rotateMatrix33",
-    "src/low_level/components/TransformComponent.js~TransformComponent#rotateMatrix33",
-    "member"
-  ],
-  [
-    "src/low_level/components/transformcomponent.js~transformcomponent#rotatematrix33",
     "class/src/low_level/components/TransformComponent.js~TransformComponent.html#instance-set-rotateMatrix33",
     "src/low_level/components/TransformComponent.js~TransformComponent#rotateMatrix33",
     "member"
   ],
   [
-    "src/low_level/components/transformcomponent.js~transformcomponent#scale",
-    "class/src/low_level/components/TransformComponent.js~TransformComponent.html#instance-set-scale",
-    "src/low_level/components/TransformComponent.js~TransformComponent#scale",
+    "src/low_level/components/transformcomponent.js~transformcomponent#rotatematrix33",
+    "class/src/low_level/components/TransformComponent.js~TransformComponent.html#instance-get-rotateMatrix33",
+    "src/low_level/components/TransformComponent.js~TransformComponent#rotateMatrix33",
     "member"
   ],
   [
@@ -2280,16 +2274,16 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "src/low_level/components/transformcomponent.js~transformcomponent#scale",
+    "class/src/low_level/components/TransformComponent.js~TransformComponent.html#instance-set-scale",
+    "src/low_level/components/TransformComponent.js~TransformComponent#scale",
+    "member"
+  ],
+  [
     "src/low_level/components/transformcomponent.js~transformcomponent#scaleinner",
     "class/src/low_level/components/TransformComponent.js~TransformComponent.html#instance-get-scaleInner",
     "src/low_level/components/TransformComponent.js~TransformComponent#scaleInner",
     "member"
-  ],
-  [
-    "src/low_level/components/transformcomponent.js~transformcomponent#setpropertiesfromjson",
-    "class/src/low_level/components/TransformComponent.js~TransformComponent.html#instance-method-setPropertiesFromJson",
-    "src/low_level/components/TransformComponent.js~TransformComponent#setPropertiesFromJson",
-    "method"
   ],
   [
     "src/low_level/components/transformcomponent.js~transformcomponent#setrotationfromnewupandfront",
@@ -2725,13 +2719,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/core/glboostlowcontext.js~glboostlowcontext#currentglobalstates",
-    "class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-get-currentGlobalStates",
+    "class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-set-currentGlobalStates",
     "src/low_level/core/GLBoostLowContext.js~GLBoostLowContext#currentGlobalStates",
     "member"
   ],
   [
     "src/low_level/core/glboostlowcontext.js~glboostlowcontext#currentglobalstates",
-    "class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-set-currentGlobalStates",
+    "class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-get-currentGlobalStates",
     "src/low_level/core/GLBoostLowContext.js~GLBoostLowContext#currentGlobalStates",
     "member"
   ],
@@ -2767,13 +2761,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/core/glboostlowcontext.js~glboostlowcontext#globalstatesusage",
-    "class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-set-globalStatesUsage",
+    "class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-get-globalStatesUsage",
     "src/low_level/core/GLBoostLowContext.js~GLBoostLowContext#globalStatesUsage",
     "member"
   ],
   [
     "src/low_level/core/glboostlowcontext.js~glboostlowcontext#globalstatesusage",
-    "class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-get-globalStatesUsage",
+    "class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#instance-set-globalStatesUsage",
     "src/low_level/core/GLBoostLowContext.js~GLBoostLowContext#globalStatesUsage",
     "member"
   ],
@@ -2802,16 +2796,16 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/low_level/core/glboostlowcontext.js~glboostlowcontext._instancecount",
+    "class/src/low_level/core/GLBoostLowContext.js~GLBoostLowContext.html#static-member-_instanceCount",
+    "src/low_level/core/GLBoostLowContext.js~GLBoostLowContext._instanceCount",
+    "member"
+  ],
+  [
     "src/low_level/core/glboostobject.js",
     "file/src/low_level/core/GLBoostObject.js.html",
     "src/low_level/core/GLBoostObject.js",
     "file"
-  ],
-  [
-    "src/low_level/core/glboostobject.js~glboostobject#['_' + typename + 'index']",
-    "class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#instance-member-['_' + typeName + 'Index']",
-    "src/low_level/core/GLBoostObject.js~GLBoostObject#['_' + typeName + 'Index']",
-    "member"
   ],
   [
     "src/low_level/core/glboostobject.js~glboostobject#_classuniquenumber",
@@ -2971,14 +2965,32 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/core/glboostobject.js~glboostobject#userflavorname",
-    "class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#instance-set-userFlavorName",
+    "class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#instance-get-userFlavorName",
     "src/low_level/core/GLBoostObject.js~GLBoostObject#userFlavorName",
     "member"
   ],
   [
     "src/low_level/core/glboostobject.js~glboostobject#userflavorname",
-    "class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#instance-get-userFlavorName",
+    "class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#instance-set-userFlavorName",
     "src/low_level/core/GLBoostObject.js~GLBoostObject#userFlavorName",
+    "member"
+  ],
+  [
+    "src/low_level/core/glboostobject.js~glboostobject.__entities",
+    "class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#static-member-__entities",
+    "src/low_level/core/GLBoostObject.js~GLBoostObject.__entities",
+    "member"
+  ],
+  [
+    "src/low_level/core/glboostobject.js~glboostobject._objectexistarray",
+    "class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#static-member-_objectExistArray",
+    "src/low_level/core/GLBoostObject.js~GLBoostObject._objectExistArray",
+    "member"
+  ],
+  [
+    "src/low_level/core/glboostobject.js~glboostobject.classinfodic",
+    "class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#static-member-classInfoDic",
+    "src/low_level/core/GLBoostObject.js~GLBoostObject.classInfoDic",
     "member"
   ],
   [
@@ -2988,15 +3000,39 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/low_level/core/glboostsystem.js~glboostsystem#_brdfluttexture",
+    "class/src/low_level/core/GLBoostSystem.js~GLBoostSystem.html#instance-member-_brdfLutTexture",
+    "src/low_level/core/GLBoostSystem.js~GLBoostSystem#_brdfLutTexture",
+    "member"
+  ],
+  [
     "src/low_level/core/glboostsystem.js~glboostsystem#_currentglobalstates",
     "class/src/low_level/core/GLBoostSystem.js~GLBoostSystem.html#instance-member-_currentGlobalStates",
     "src/low_level/core/GLBoostSystem.js~GLBoostSystem#_currentGlobalStates",
     "member"
   ],
   [
+    "src/low_level/core/glboostsystem.js~glboostsystem#_defaultdummytexture",
+    "class/src/low_level/core/GLBoostSystem.js~GLBoostSystem.html#instance-member-_defaultDummyTexture",
+    "src/low_level/core/GLBoostSystem.js~GLBoostSystem#_defaultDummyTexture",
+    "member"
+  ],
+  [
+    "src/low_level/core/glboostsystem.js~glboostsystem#_defaultdummytexturecube",
+    "class/src/low_level/core/GLBoostSystem.js~GLBoostSystem.html#instance-member-_defaultDummyTextureCube",
+    "src/low_level/core/GLBoostSystem.js~GLBoostSystem#_defaultDummyTextureCube",
+    "member"
+  ],
+  [
     "src/low_level/core/glboostsystem.js~glboostsystem#_defaultglobalstates",
     "class/src/low_level/core/GLBoostSystem.js~GLBoostSystem.html#instance-member-_defaultGlobalStates",
     "src/low_level/core/GLBoostSystem.js~GLBoostSystem#_defaultGlobalStates",
+    "member"
+  ],
+  [
+    "src/low_level/core/glboostsystem.js~glboostsystem#_defaultmaterial",
+    "class/src/low_level/core/GLBoostSystem.js~GLBoostSystem.html#instance-member-_defaultMaterial",
+    "src/low_level/core/GLBoostSystem.js~GLBoostSystem#_defaultMaterial",
     "member"
   ],
   [
@@ -3546,9 +3582,9 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/low_level/core/l_glboostmonitor.js~l_glboostmonitor.[singleton]",
-    "class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#static-member-[singleton]",
-    "src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.[singleton]",
+    "src/low_level/core/l_glboostmonitor.js~l_glboostmonitor._singletonenforcer",
+    "class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#static-member-_singletonEnforcer",
+    "src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor._singletonEnforcer",
     "member"
   ],
   [
@@ -3877,13 +3913,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/elements/l_element.js~l_element#matrix",
-    "class/src/low_level/elements/L_Element.js~L_Element.html#instance-get-matrix",
+    "class/src/low_level/elements/L_Element.js~L_Element.html#instance-set-matrix",
     "src/low_level/elements/L_Element.js~L_Element#matrix",
     "member"
   ],
   [
     "src/low_level/elements/l_element.js~l_element#matrix",
-    "class/src/low_level/elements/L_Element.js~L_Element.html#instance-set-matrix",
+    "class/src/low_level/elements/L_Element.js~L_Element.html#instance-get-matrix",
     "src/low_level/elements/L_Element.js~L_Element#matrix",
     "member"
   ],
@@ -3931,13 +3967,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/elements/l_element.js~l_element#rotatematrix33",
-    "class/src/low_level/elements/L_Element.js~L_Element.html#instance-get-rotateMatrix33",
+    "class/src/low_level/elements/L_Element.js~L_Element.html#instance-set-rotateMatrix33",
     "src/low_level/elements/L_Element.js~L_Element#rotateMatrix33",
     "member"
   ],
   [
     "src/low_level/elements/l_element.js~l_element#rotatematrix33",
-    "class/src/low_level/elements/L_Element.js~L_Element.html#instance-set-rotateMatrix33",
+    "class/src/low_level/elements/L_Element.js~L_Element.html#instance-get-rotateMatrix33",
     "src/low_level/elements/L_Element.js~L_Element#rotateMatrix33",
     "member"
   ],
@@ -3991,13 +4027,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/elements/l_element.js~l_element#translate",
-    "class/src/low_level/elements/L_Element.js~L_Element.html#instance-get-translate",
+    "class/src/low_level/elements/L_Element.js~L_Element.html#instance-set-translate",
     "src/low_level/elements/L_Element.js~L_Element#translate",
     "member"
   ],
   [
     "src/low_level/elements/l_element.js~l_element#translate",
-    "class/src/low_level/elements/L_Element.js~L_Element.html#instance-set-translate",
+    "class/src/low_level/elements/L_Element.js~L_Element.html#instance-get-translate",
     "src/low_level/elements/L_Element.js~L_Element#translate",
     "member"
   ],
@@ -4159,25 +4195,25 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/elements/cameras/l_abstractcamera.js~l_abstractcamera#cameracontroller",
-    "class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html#instance-get-cameraController",
-    "src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera#cameraController",
-    "member"
-  ],
-  [
-    "src/low_level/elements/cameras/l_abstractcamera.js~l_abstractcamera#cameracontroller",
     "class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html#instance-set-cameraController",
     "src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera#cameraController",
     "member"
   ],
   [
-    "src/low_level/elements/cameras/l_abstractcamera.js~l_abstractcamera#center",
-    "class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html#instance-get-center",
-    "src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera#center",
+    "src/low_level/elements/cameras/l_abstractcamera.js~l_abstractcamera#cameracontroller",
+    "class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html#instance-get-cameraController",
+    "src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera#cameraController",
     "member"
   ],
   [
     "src/low_level/elements/cameras/l_abstractcamera.js~l_abstractcamera#center",
     "class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html#instance-set-center",
+    "src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera#center",
+    "member"
+  ],
+  [
+    "src/low_level/elements/cameras/l_abstractcamera.js~l_abstractcamera#center",
+    "class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html#instance-get-center",
     "src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera#center",
     "member"
   ],
@@ -4237,25 +4273,25 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/elements/cameras/l_abstractcamera.js~l_abstractcamera#texture",
-    "class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html#instance-get-texture",
-    "src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera#texture",
-    "member"
-  ],
-  [
-    "src/low_level/elements/cameras/l_abstractcamera.js~l_abstractcamera#texture",
     "class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html#instance-set-texture",
     "src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera#texture",
     "member"
   ],
   [
-    "src/low_level/elements/cameras/l_abstractcamera.js~l_abstractcamera#translate",
-    "class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html#instance-get-translate",
-    "src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera#translate",
+    "src/low_level/elements/cameras/l_abstractcamera.js~l_abstractcamera#texture",
+    "class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html#instance-get-texture",
+    "src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera#texture",
     "member"
   ],
   [
     "src/low_level/elements/cameras/l_abstractcamera.js~l_abstractcamera#translate",
     "class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html#instance-set-translate",
+    "src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera#translate",
+    "member"
+  ],
+  [
+    "src/low_level/elements/cameras/l_abstractcamera.js~l_abstractcamera#translate",
+    "class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html#instance-get-translate",
     "src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera#translate",
     "member"
   ],
@@ -4267,13 +4303,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/elements/cameras/l_abstractcamera.js~l_abstractcamera#up",
-    "class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html#instance-set-up",
+    "class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html#instance-get-up",
     "src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera#up",
     "member"
   ],
   [
     "src/low_level/elements/cameras/l_abstractcamera.js~l_abstractcamera#up",
-    "class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html#instance-get-up",
+    "class/src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera.html#instance-set-up",
     "src/low_level/elements/cameras/L_AbstractCamera.js~L_AbstractCamera#up",
     "member"
   ],
@@ -4369,13 +4405,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/elements/cameras/l_frustumcamera.js~l_frustumcamera#allinfo",
-    "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-set-allInfo",
+    "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-get-allInfo",
     "src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera#allInfo",
     "member"
   ],
   [
     "src/low_level/elements/cameras/l_frustumcamera.js~l_frustumcamera#allinfo",
-    "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-get-allInfo",
+    "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-set-allInfo",
     "src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera#allInfo",
     "member"
   ],
@@ -4399,13 +4435,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/elements/cameras/l_frustumcamera.js~l_frustumcamera#bottom",
-    "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-set-bottom",
+    "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-get-bottom",
     "src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera#bottom",
     "member"
   ],
   [
     "src/low_level/elements/cameras/l_frustumcamera.js~l_frustumcamera#bottom",
-    "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-get-bottom",
+    "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-set-bottom",
     "src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera#bottom",
     "member"
   ],
@@ -4416,14 +4452,20 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/low_level/elements/cameras/l_frustumcamera.js~l_frustumcamera#left",
-    "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-get-left",
-    "src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera#left",
+    "src/low_level/elements/cameras/l_frustumcamera.js~l_frustumcamera#fovy",
+    "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-get-fovy",
+    "src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera#fovy",
     "member"
   ],
   [
     "src/low_level/elements/cameras/l_frustumcamera.js~l_frustumcamera#left",
     "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-set-left",
+    "src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera#left",
+    "member"
+  ],
+  [
+    "src/low_level/elements/cameras/l_frustumcamera.js~l_frustumcamera#left",
+    "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-get-left",
     "src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera#left",
     "member"
   ],
@@ -4465,25 +4507,25 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/elements/cameras/l_frustumcamera.js~l_frustumcamera#zfar",
-    "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-set-zFar",
-    "src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera#zFar",
-    "member"
-  ],
-  [
-    "src/low_level/elements/cameras/l_frustumcamera.js~l_frustumcamera#zfar",
     "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-get-zFar",
     "src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera#zFar",
     "member"
   ],
   [
-    "src/low_level/elements/cameras/l_frustumcamera.js~l_frustumcamera#znear",
-    "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-get-zNear",
-    "src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera#zNear",
+    "src/low_level/elements/cameras/l_frustumcamera.js~l_frustumcamera#zfar",
+    "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-set-zFar",
+    "src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera#zFar",
     "member"
   ],
   [
     "src/low_level/elements/cameras/l_frustumcamera.js~l_frustumcamera#znear",
     "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-set-zNear",
+    "src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera#zNear",
+    "member"
+  ],
+  [
+    "src/low_level/elements/cameras/l_frustumcamera.js~l_frustumcamera#znear",
+    "class/src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera.html#instance-get-zNear",
     "src/low_level/elements/cameras/L_FrustumCamera.js~L_FrustumCamera#zNear",
     "member"
   ],
@@ -4573,13 +4615,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/elements/cameras/l_orthocamera.js~l_orthocamera#allinfo",
-    "class/src/low_level/elements/cameras/L_OrthoCamera.js~L_OrthoCamera.html#instance-set-allInfo",
+    "class/src/low_level/elements/cameras/L_OrthoCamera.js~L_OrthoCamera.html#instance-get-allInfo",
     "src/low_level/elements/cameras/L_OrthoCamera.js~L_OrthoCamera#allInfo",
     "member"
   ],
   [
     "src/low_level/elements/cameras/l_orthocamera.js~l_orthocamera#allinfo",
-    "class/src/low_level/elements/cameras/L_OrthoCamera.js~L_OrthoCamera.html#instance-get-allInfo",
+    "class/src/low_level/elements/cameras/L_OrthoCamera.js~L_OrthoCamera.html#instance-set-allInfo",
     "src/low_level/elements/cameras/L_OrthoCamera.js~L_OrthoCamera#allInfo",
     "member"
   ],
@@ -4764,6 +4806,18 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "src/low_level/elements/cameras/l_perspectivecamera.js~l_perspectivecamera#_xscale",
+    "class/src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera.html#instance-member-_xscale",
+    "src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera#_xscale",
+    "member"
+  ],
+  [
+    "src/low_level/elements/cameras/l_perspectivecamera.js~l_perspectivecamera#_yscale",
+    "class/src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera.html#instance-member-_yscale",
+    "src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera#_yscale",
+    "member"
+  ],
+  [
     "src/low_level/elements/cameras/l_perspectivecamera.js~l_perspectivecamera#_zfar",
     "class/src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera.html#instance-member-_zFar",
     "src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera#_zFar",
@@ -4789,13 +4843,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/elements/cameras/l_perspectivecamera.js~l_perspectivecamera#allinfo",
-    "class/src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera.html#instance-get-allInfo",
+    "class/src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera.html#instance-set-allInfo",
     "src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera#allInfo",
     "member"
   ],
   [
     "src/low_level/elements/cameras/l_perspectivecamera.js~l_perspectivecamera#allinfo",
-    "class/src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera.html#instance-set-allInfo",
+    "class/src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera.html#instance-get-allInfo",
     "src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera#allInfo",
     "member"
   ],
@@ -4891,13 +4945,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/elements/cameras/l_perspectivecamera.js~l_perspectivecamera#znear",
-    "class/src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera.html#instance-get-zNear",
+    "class/src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera.html#instance-set-zNear",
     "src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera#zNear",
     "member"
   ],
   [
     "src/low_level/elements/cameras/l_perspectivecamera.js~l_perspectivecamera#znear",
-    "class/src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera.html#instance-set-zNear",
+    "class/src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera.html#instance-get-zNear",
     "src/low_level/elements/cameras/L_PerspectiveCamera.js~L_PerspectiveCamera#zNear",
     "member"
   ],
@@ -4992,6 +5046,12 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#_glcontext",
+    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-member-_glContext",
+    "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#_glContext",
+    "member"
+  ],
+  [
     "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#_materialforblend",
     "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-member-_materialForBlend",
     "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#_materialForBlend",
@@ -5005,25 +5065,25 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#blendweight_1",
-    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-get-blendWeight_1",
-    "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#blendWeight_1",
-    "member"
-  ],
-  [
-    "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#blendweight_1",
     "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-set-blendWeight_1",
     "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#blendWeight_1",
     "member"
   ],
   [
-    "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#blendweight_10",
-    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-set-blendWeight_10",
-    "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#blendWeight_10",
+    "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#blendweight_1",
+    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-get-blendWeight_1",
+    "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#blendWeight_1",
     "member"
   ],
   [
     "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#blendweight_10",
     "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-get-blendWeight_10",
+    "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#blendWeight_10",
+    "member"
+  ],
+  [
+    "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#blendweight_10",
+    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-set-blendWeight_10",
     "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#blendWeight_10",
     "member"
   ],
@@ -5053,13 +5113,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#blendweight_4",
-    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-get-blendWeight_4",
+    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-set-blendWeight_4",
     "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#blendWeight_4",
     "member"
   ],
   [
     "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#blendweight_4",
-    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-set-blendWeight_4",
+    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-get-blendWeight_4",
     "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#blendWeight_4",
     "member"
   ],
@@ -5077,13 +5137,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#blendweight_6",
-    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-set-blendWeight_6",
+    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-get-blendWeight_6",
     "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#blendWeight_6",
     "member"
   ],
   [
     "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#blendweight_6",
-    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-get-blendWeight_6",
+    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-set-blendWeight_6",
     "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#blendWeight_6",
     "member"
   ],
@@ -5101,25 +5161,25 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#blendweight_8",
-    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-set-blendWeight_8",
-    "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#blendWeight_8",
-    "member"
-  ],
-  [
-    "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#blendweight_8",
     "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-get-blendWeight_8",
     "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#blendWeight_8",
     "member"
   ],
   [
-    "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#blendweight_9",
-    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-get-blendWeight_9",
-    "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#blendWeight_9",
+    "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#blendweight_8",
+    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-set-blendWeight_8",
+    "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#blendWeight_8",
     "member"
   ],
   [
     "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#blendweight_9",
     "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-set-blendWeight_9",
+    "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#blendWeight_9",
+    "member"
+  ],
+  [
+    "src/low_level/geometries/blendshapegeometry.js~blendshapegeometry#blendweight_9",
+    "class/src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry.html#instance-get-blendWeight_9",
     "src/low_level/geometries/BlendShapeGeometry.js~BlendShapeGeometry#blendWeight_9",
     "member"
   ],
@@ -5383,13 +5443,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/geometries/geometry.js~geometry#materials",
-    "class/src/low_level/geometries/Geometry.js~Geometry.html#instance-get-materials",
+    "class/src/low_level/geometries/Geometry.js~Geometry.html#instance-set-materials",
     "src/low_level/geometries/Geometry.js~Geometry#materials",
     "member"
   ],
   [
     "src/low_level/geometries/geometry.js~geometry#materials",
-    "class/src/low_level/geometries/Geometry.js~Geometry.html#instance-set-materials",
+    "class/src/low_level/geometries/Geometry.js~Geometry.html#instance-get-materials",
     "src/low_level/geometries/Geometry.js~Geometry#materials",
     "member"
   ],
@@ -5599,25 +5659,25 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/materials/classicmaterial.js~classicmaterial#ambientcolor",
-    "class/src/low_level/materials/ClassicMaterial.js~ClassicMaterial.html#instance-set-ambientColor",
-    "src/low_level/materials/ClassicMaterial.js~ClassicMaterial#ambientColor",
-    "member"
-  ],
-  [
-    "src/low_level/materials/classicmaterial.js~classicmaterial#ambientcolor",
     "class/src/low_level/materials/ClassicMaterial.js~ClassicMaterial.html#instance-get-ambientColor",
     "src/low_level/materials/ClassicMaterial.js~ClassicMaterial#ambientColor",
     "member"
   ],
   [
-    "src/low_level/materials/classicmaterial.js~classicmaterial#basecolor",
-    "class/src/low_level/materials/ClassicMaterial.js~ClassicMaterial.html#instance-set-baseColor",
-    "src/low_level/materials/ClassicMaterial.js~ClassicMaterial#baseColor",
+    "src/low_level/materials/classicmaterial.js~classicmaterial#ambientcolor",
+    "class/src/low_level/materials/ClassicMaterial.js~ClassicMaterial.html#instance-set-ambientColor",
+    "src/low_level/materials/ClassicMaterial.js~ClassicMaterial#ambientColor",
     "member"
   ],
   [
     "src/low_level/materials/classicmaterial.js~classicmaterial#basecolor",
     "class/src/low_level/materials/ClassicMaterial.js~ClassicMaterial.html#instance-get-baseColor",
+    "src/low_level/materials/ClassicMaterial.js~ClassicMaterial#baseColor",
+    "member"
+  ],
+  [
+    "src/low_level/materials/classicmaterial.js~classicmaterial#basecolor",
+    "class/src/low_level/materials/ClassicMaterial.js~ClassicMaterial.html#instance-set-baseColor",
     "src/low_level/materials/ClassicMaterial.js~ClassicMaterial#baseColor",
     "member"
   ],
@@ -5647,13 +5707,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/materials/classicmaterial.js~classicmaterial#specularcolor",
-    "class/src/low_level/materials/ClassicMaterial.js~ClassicMaterial.html#instance-get-specularColor",
+    "class/src/low_level/materials/ClassicMaterial.js~ClassicMaterial.html#instance-set-specularColor",
     "src/low_level/materials/ClassicMaterial.js~ClassicMaterial#specularColor",
     "member"
   ],
   [
     "src/low_level/materials/classicmaterial.js~classicmaterial#specularcolor",
-    "class/src/low_level/materials/ClassicMaterial.js~ClassicMaterial.html#instance-set-specularColor",
+    "class/src/low_level/materials/ClassicMaterial.js~ClassicMaterial.html#instance-get-specularColor",
     "src/low_level/materials/ClassicMaterial.js~ClassicMaterial#specularColor",
     "member"
   ],
@@ -5668,6 +5728,12 @@ window.esdocSearchIndex = [
     "file/src/low_level/materials/L_AbstractMaterial.js.html",
     "src/low_level/materials/L_AbstractMaterial.js",
     "file"
+  ],
+  [
+    "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#_alphacutoff",
+    "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-member-_alphaCutoff",
+    "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#_alphaCutoff",
+    "member"
   ],
   [
     "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#_countofupdate",
@@ -5685,6 +5751,12 @@ window.esdocSearchIndex = [
     "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#_globalstatesusage",
     "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-member-_globalStatesUsage",
     "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#_globalStatesUsage",
+    "member"
+  ],
+  [
+    "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#_isalphatestenable",
+    "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-member-_isAlphaTestEnable",
+    "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#_isAlphaTestEnable",
     "member"
   ],
   [
@@ -5790,6 +5862,18 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#alphacutoff",
+    "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-set-alphaCutoff",
+    "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#alphaCutoff",
+    "member"
+  ],
+  [
+    "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#alphacutoff",
+    "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-get-alphaCutoff",
+    "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#alphaCutoff",
+    "member"
+  ],
+  [
     "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#clone",
     "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-method-clone",
     "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#clone",
@@ -5869,13 +5953,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#globalstatesusage",
-    "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-set-globalStatesUsage",
+    "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-get-globalStatesUsage",
     "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#globalStatesUsage",
     "member"
   ],
   [
     "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#globalstatesusage",
-    "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-get-globalStatesUsage",
+    "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-set-globalStatesUsage",
     "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#globalStatesUsage",
     "member"
   ],
@@ -5884,6 +5968,18 @@ window.esdocSearchIndex = [
     "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-method-hasAnyTextures",
     "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#hasAnyTextures",
     "method"
+  ],
+  [
+    "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#isalphatest",
+    "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-set-isAlphaTest",
+    "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#isAlphaTest",
+    "member"
+  ],
+  [
+    "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#isalphatest",
+    "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-get-isAlphaTest",
+    "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#isAlphaTest",
+    "member"
   ],
   [
     "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#istransparent",
@@ -6019,25 +6115,25 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#shaderparameters",
-    "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-get-shaderParameters",
-    "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#shaderParameters",
-    "member"
-  ],
-  [
-    "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#shaderparameters",
     "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-set-shaderParameters",
     "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#shaderParameters",
     "member"
   ],
   [
-    "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#states",
-    "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-get-states",
-    "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#states",
+    "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#shaderparameters",
+    "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-get-shaderParameters",
+    "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#shaderParameters",
     "member"
   ],
   [
     "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#states",
     "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-set-states",
+    "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#states",
+    "member"
+  ],
+  [
+    "src/low_level/materials/l_abstractmaterial.js~l_abstractmaterial#states",
+    "class/src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial.html#instance-get-states",
     "src/low_level/materials/L_AbstractMaterial.js~L_AbstractMaterial#states",
     "member"
   ],
@@ -6067,13 +6163,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/materials/pbrmetallicroughnessmaterial.js~pbrmetallicroughnessmaterial#ibldiffusecontribution",
-    "class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html#instance-get-IBLDiffuseContribution",
+    "class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html#instance-set-IBLDiffuseContribution",
     "src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial#IBLDiffuseContribution",
     "member"
   ],
   [
     "src/low_level/materials/pbrmetallicroughnessmaterial.js~pbrmetallicroughnessmaterial#ibldiffusecontribution",
-    "class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html#instance-set-IBLDiffuseContribution",
+    "class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html#instance-get-IBLDiffuseContribution",
     "src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial#IBLDiffuseContribution",
     "member"
   ],
@@ -6120,6 +6216,12 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "src/low_level/materials/pbrmetallicroughnessmaterial.js~pbrmetallicroughnessmaterial#_alphacutoff",
+    "class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html#instance-member-_alphaCutoff",
+    "src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial#_alphaCutoff",
+    "member"
+  ],
+  [
     "src/low_level/materials/pbrmetallicroughnessmaterial.js~pbrmetallicroughnessmaterial#_basecolorfactor",
     "class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html#instance-member-_baseColorFactor",
     "src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial#_baseColorFactor",
@@ -6129,6 +6231,12 @@ window.esdocSearchIndex = [
     "src/low_level/materials/pbrmetallicroughnessmaterial.js~pbrmetallicroughnessmaterial#_emissivefactor",
     "class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html#instance-member-_emissiveFactor",
     "src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial#_emissiveFactor",
+    "member"
+  ],
+  [
+    "src/low_level/materials/pbrmetallicroughnessmaterial.js~pbrmetallicroughnessmaterial#_isalphatestenable",
+    "class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html#instance-member-_isAlphaTestEnable",
+    "src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial#_isAlphaTestEnable",
     "member"
   ],
   [
@@ -6163,13 +6271,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/materials/pbrmetallicroughnessmaterial.js~pbrmetallicroughnessmaterial#basecolor",
-    "class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html#instance-set-baseColor",
+    "class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html#instance-get-baseColor",
     "src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial#baseColor",
     "member"
   ],
   [
     "src/low_level/materials/pbrmetallicroughnessmaterial.js~pbrmetallicroughnessmaterial#basecolor",
-    "class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html#instance-get-baseColor",
+    "class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html#instance-set-baseColor",
     "src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial#baseColor",
     "member"
   ],
@@ -6217,13 +6325,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/materials/pbrmetallicroughnessmaterial.js~pbrmetallicroughnessmaterial#occlusionratefordirectionallight",
-    "class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html#instance-get-occlusionRateForDirectionalLight",
+    "class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html#instance-set-occlusionRateForDirectionalLight",
     "src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial#occlusionRateForDirectionalLight",
     "member"
   ],
   [
     "src/low_level/materials/pbrmetallicroughnessmaterial.js~pbrmetallicroughnessmaterial#occlusionratefordirectionallight",
-    "class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html#instance-set-occlusionRateForDirectionalLight",
+    "class/src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial.html#instance-get-occlusionRateForDirectionalLight",
     "src/low_level/materials/PBRMetallicRoughnessMaterial.js~PBRMetallicRoughnessMaterial#occlusionRateForDirectionalLight",
     "member"
   ],
@@ -6541,13 +6649,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/math/matrix33.js~matrix33#m00",
-    "class/src/low_level/math/Matrix33.js~Matrix33.html#instance-set-m00",
+    "class/src/low_level/math/Matrix33.js~Matrix33.html#instance-get-m00",
     "src/low_level/math/Matrix33.js~Matrix33#m00",
     "member"
   ],
   [
     "src/low_level/math/matrix33.js~matrix33#m00",
-    "class/src/low_level/math/Matrix33.js~Matrix33.html#instance-get-m00",
+    "class/src/low_level/math/Matrix33.js~Matrix33.html#instance-set-m00",
     "src/low_level/math/Matrix33.js~Matrix33#m00",
     "member"
   ],
@@ -6565,13 +6673,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/math/matrix33.js~matrix33#m02",
-    "class/src/low_level/math/Matrix33.js~Matrix33.html#instance-get-m02",
+    "class/src/low_level/math/Matrix33.js~Matrix33.html#instance-set-m02",
     "src/low_level/math/Matrix33.js~Matrix33#m02",
     "member"
   ],
   [
     "src/low_level/math/matrix33.js~matrix33#m02",
-    "class/src/low_level/math/Matrix33.js~Matrix33.html#instance-set-m02",
+    "class/src/low_level/math/Matrix33.js~Matrix33.html#instance-get-m02",
     "src/low_level/math/Matrix33.js~Matrix33#m02",
     "member"
   ],
@@ -6601,13 +6709,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/math/matrix33.js~matrix33#m12",
-    "class/src/low_level/math/Matrix33.js~Matrix33.html#instance-set-m12",
+    "class/src/low_level/math/Matrix33.js~Matrix33.html#instance-get-m12",
     "src/low_level/math/Matrix33.js~Matrix33#m12",
     "member"
   ],
   [
     "src/low_level/math/matrix33.js~matrix33#m12",
-    "class/src/low_level/math/Matrix33.js~Matrix33.html#instance-get-m12",
+    "class/src/low_level/math/Matrix33.js~Matrix33.html#instance-set-m12",
     "src/low_level/math/Matrix33.js~Matrix33#m12",
     "member"
   ],
@@ -6637,13 +6745,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/math/matrix33.js~matrix33#m22",
-    "class/src/low_level/math/Matrix33.js~Matrix33.html#instance-set-m22",
+    "class/src/low_level/math/Matrix33.js~Matrix33.html#instance-get-m22",
     "src/low_level/math/Matrix33.js~Matrix33#m22",
     "member"
   ],
   [
     "src/low_level/math/matrix33.js~matrix33#m22",
-    "class/src/low_level/math/Matrix33.js~Matrix33.html#instance-get-m22",
+    "class/src/low_level/math/Matrix33.js~Matrix33.html#instance-set-m22",
     "src/low_level/math/Matrix33.js~Matrix33#m22",
     "member"
   ],
@@ -6889,20 +6997,14 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/math/matrix44.js~matrix44#m00",
-    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-get-m00",
-    "src/low_level/math/Matrix44.js~Matrix44#m00",
-    "member"
-  ],
-  [
-    "src/low_level/math/matrix44.js~matrix44#m00",
     "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-set-m00",
     "src/low_level/math/Matrix44.js~Matrix44#m00",
     "member"
   ],
   [
-    "src/low_level/math/matrix44.js~matrix44#m01",
-    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-set-m01",
-    "src/low_level/math/Matrix44.js~Matrix44#m01",
+    "src/low_level/math/matrix44.js~matrix44#m00",
+    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-get-m00",
+    "src/low_level/math/Matrix44.js~Matrix44#m00",
     "member"
   ],
   [
@@ -6912,14 +7014,20 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "src/low_level/math/matrix44.js~matrix44#m02",
-    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-set-m02",
-    "src/low_level/math/Matrix44.js~Matrix44#m02",
+    "src/low_level/math/matrix44.js~matrix44#m01",
+    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-set-m01",
+    "src/low_level/math/Matrix44.js~Matrix44#m01",
     "member"
   ],
   [
     "src/low_level/math/matrix44.js~matrix44#m02",
     "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-get-m02",
+    "src/low_level/math/Matrix44.js~Matrix44#m02",
+    "member"
+  ],
+  [
+    "src/low_level/math/matrix44.js~matrix44#m02",
+    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-set-m02",
     "src/low_level/math/Matrix44.js~Matrix44#m02",
     "member"
   ],
@@ -6949,13 +7057,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/math/matrix44.js~matrix44#m11",
-    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-set-m11",
+    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-get-m11",
     "src/low_level/math/Matrix44.js~Matrix44#m11",
     "member"
   ],
   [
     "src/low_level/math/matrix44.js~matrix44#m11",
-    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-get-m11",
+    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-set-m11",
     "src/low_level/math/Matrix44.js~Matrix44#m11",
     "member"
   ],
@@ -6973,13 +7081,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/math/matrix44.js~matrix44#m13",
-    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-get-m13",
+    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-set-m13",
     "src/low_level/math/Matrix44.js~Matrix44#m13",
     "member"
   ],
   [
     "src/low_level/math/matrix44.js~matrix44#m13",
-    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-set-m13",
+    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-get-m13",
     "src/low_level/math/Matrix44.js~Matrix44#m13",
     "member"
   ],
@@ -7021,20 +7129,14 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/math/matrix44.js~matrix44#m23",
-    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-set-m23",
-    "src/low_level/math/Matrix44.js~Matrix44#m23",
-    "member"
-  ],
-  [
-    "src/low_level/math/matrix44.js~matrix44#m23",
     "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-get-m23",
     "src/low_level/math/Matrix44.js~Matrix44#m23",
     "member"
   ],
   [
-    "src/low_level/math/matrix44.js~matrix44#m30",
-    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-get-m30",
-    "src/low_level/math/Matrix44.js~Matrix44#m30",
+    "src/low_level/math/matrix44.js~matrix44#m23",
+    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-set-m23",
+    "src/low_level/math/Matrix44.js~Matrix44#m23",
     "member"
   ],
   [
@@ -7044,14 +7146,20 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "src/low_level/math/matrix44.js~matrix44#m31",
-    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-set-m31",
-    "src/low_level/math/Matrix44.js~Matrix44#m31",
+    "src/low_level/math/matrix44.js~matrix44#m30",
+    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-get-m30",
+    "src/low_level/math/Matrix44.js~Matrix44#m30",
     "member"
   ],
   [
     "src/low_level/math/matrix44.js~matrix44#m31",
     "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-get-m31",
+    "src/low_level/math/Matrix44.js~Matrix44#m31",
+    "member"
+  ],
+  [
+    "src/low_level/math/matrix44.js~matrix44#m31",
+    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-set-m31",
     "src/low_level/math/Matrix44.js~Matrix44#m31",
     "member"
   ],
@@ -7069,13 +7177,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/math/matrix44.js~matrix44#m33",
-    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-get-m33",
+    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-set-m33",
     "src/low_level/math/Matrix44.js~Matrix44#m33",
     "member"
   ],
   [
     "src/low_level/math/matrix44.js~matrix44#m33",
-    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-set-m33",
+    "class/src/low_level/math/Matrix44.js~Matrix44.html#instance-get-m33",
     "src/low_level/math/Matrix44.js~Matrix44#m33",
     "member"
   ],
@@ -7597,13 +7705,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/math/vector3.js~vector3#z",
-    "class/src/low_level/math/Vector3.js~Vector3.html#instance-get-z",
+    "class/src/low_level/math/Vector3.js~Vector3.html#instance-set-z",
     "src/low_level/math/Vector3.js~Vector3#z",
     "member"
   ],
   [
     "src/low_level/math/vector3.js~vector3#z",
-    "class/src/low_level/math/Vector3.js~Vector3.html#instance-set-z",
+    "class/src/low_level/math/Vector3.js~Vector3.html#instance-get-z",
     "src/low_level/math/Vector3.js~Vector3#z",
     "member"
   ],
@@ -7825,13 +7933,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/math/vector4.js~vector4#z",
-    "class/src/low_level/math/Vector4.js~Vector4.html#instance-get-z",
+    "class/src/low_level/math/Vector4.js~Vector4.html#instance-set-z",
     "src/low_level/math/Vector4.js~Vector4#z",
     "member"
   ],
   [
     "src/low_level/math/vector4.js~vector4#z",
-    "class/src/low_level/math/Vector4.js~Vector4.html#instance-set-z",
+    "class/src/low_level/math/Vector4.js~Vector4.html#instance-get-z",
     "src/low_level/math/Vector4.js~Vector4#z",
     "member"
   ],
@@ -8335,13 +8443,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/primitives/jointprimitive.js~jointprimitive#color",
-    "class/src/low_level/primitives/JointPrimitive.js~JointPrimitive.html#instance-get-color",
+    "class/src/low_level/primitives/JointPrimitive.js~JointPrimitive.html#instance-set-color",
     "src/low_level/primitives/JointPrimitive.js~JointPrimitive#color",
     "member"
   ],
   [
     "src/low_level/primitives/jointprimitive.js~jointprimitive#color",
-    "class/src/low_level/primitives/JointPrimitive.js~JointPrimitive.html#instance-set-color",
+    "class/src/low_level/primitives/JointPrimitive.js~JointPrimitive.html#instance-get-color",
     "src/low_level/primitives/JointPrimitive.js~JointPrimitive#color",
     "member"
   ],
@@ -8377,13 +8485,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/primitives/jointprimitive.js~jointprimitive#worldpositionofparentjoint",
-    "class/src/low_level/primitives/JointPrimitive.js~JointPrimitive.html#instance-get-worldPositionOfParentJoint",
+    "class/src/low_level/primitives/JointPrimitive.js~JointPrimitive.html#instance-set-worldPositionOfParentJoint",
     "src/low_level/primitives/JointPrimitive.js~JointPrimitive#worldPositionOfParentJoint",
     "member"
   ],
   [
     "src/low_level/primitives/jointprimitive.js~jointprimitive#worldpositionofparentjoint",
-    "class/src/low_level/primitives/JointPrimitive.js~JointPrimitive.html#instance-set-worldPositionOfParentJoint",
+    "class/src/low_level/primitives/JointPrimitive.js~JointPrimitive.html#instance-get-worldPositionOfParentJoint",
     "src/low_level/primitives/JointPrimitive.js~JointPrimitive#worldPositionOfParentJoint",
     "member"
   ],
@@ -8467,13 +8575,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/primitives/line.js~line#endposition",
-    "class/src/low_level/primitives/Line.js~Line.html#instance-set-endPosition",
+    "class/src/low_level/primitives/Line.js~Line.html#instance-get-endPosition",
     "src/low_level/primitives/Line.js~Line#endPosition",
     "member"
   ],
   [
     "src/low_level/primitives/line.js~line#endposition",
-    "class/src/low_level/primitives/Line.js~Line.html#instance-get-endPosition",
+    "class/src/low_level/primitives/Line.js~Line.html#instance-set-endPosition",
     "src/low_level/primitives/Line.js~Line#endPosition",
     "member"
   ],
@@ -8964,6 +9072,12 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/low_level/textures/abstracttexture.js~abstracttexture#_ispoweroftwotexture",
+    "class/src/low_level/textures/AbstractTexture.js~AbstractTexture.html#instance-method-_isPowerOfTwoTexture",
+    "src/low_level/textures/AbstractTexture.js~AbstractTexture#_isPowerOfTwoTexture",
+    "method"
+  ],
+  [
     "src/low_level/textures/abstracttexture.js~abstracttexture#_textureunitindex",
     "class/src/low_level/textures/AbstractTexture.js~AbstractTexture.html#instance-member-_textureUnitIndex",
     "src/low_level/textures/AbstractTexture.js~AbstractTexture#_textureUnitIndex",
@@ -9031,13 +9145,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/textures/abstracttexture.js~abstracttexture#textureunitindex",
-    "class/src/low_level/textures/AbstractTexture.js~AbstractTexture.html#instance-set-textureUnitIndex",
+    "class/src/low_level/textures/AbstractTexture.js~AbstractTexture.html#instance-get-textureUnitIndex",
     "src/low_level/textures/AbstractTexture.js~AbstractTexture#textureUnitIndex",
     "member"
   ],
   [
     "src/low_level/textures/abstracttexture.js~abstracttexture#textureunitindex",
-    "class/src/low_level/textures/AbstractTexture.js~AbstractTexture.html#instance-get-textureUnitIndex",
+    "class/src/low_level/textures/AbstractTexture.js~AbstractTexture.html#instance-set-textureUnitIndex",
     "src/low_level/textures/AbstractTexture.js~AbstractTexture#textureUnitIndex",
     "member"
   ],
@@ -9373,25 +9487,25 @@ window.esdocSearchIndex = [
   ],
   [
     "src/low_level/textures/mutabletexture.js~mutabletexture#depthattachment",
-    "class/src/low_level/textures/MutableTexture.js~MutableTexture.html#instance-get-depthAttachment",
-    "src/low_level/textures/MutableTexture.js~MutableTexture#depthAttachment",
-    "member"
-  ],
-  [
-    "src/low_level/textures/mutabletexture.js~mutabletexture#depthattachment",
     "class/src/low_level/textures/MutableTexture.js~MutableTexture.html#instance-set-depthAttachment",
     "src/low_level/textures/MutableTexture.js~MutableTexture#depthAttachment",
     "member"
   ],
   [
-    "src/low_level/textures/mutabletexture.js~mutabletexture#framebufferobject",
-    "class/src/low_level/textures/MutableTexture.js~MutableTexture.html#instance-set-frameBufferObject",
-    "src/low_level/textures/MutableTexture.js~MutableTexture#frameBufferObject",
+    "src/low_level/textures/mutabletexture.js~mutabletexture#depthattachment",
+    "class/src/low_level/textures/MutableTexture.js~MutableTexture.html#instance-get-depthAttachment",
+    "src/low_level/textures/MutableTexture.js~MutableTexture#depthAttachment",
     "member"
   ],
   [
     "src/low_level/textures/mutabletexture.js~mutabletexture#framebufferobject",
     "class/src/low_level/textures/MutableTexture.js~MutableTexture.html#instance-get-frameBufferObject",
+    "src/low_level/textures/MutableTexture.js~MutableTexture#frameBufferObject",
+    "member"
+  ],
+  [
+    "src/low_level/textures/mutabletexture.js~mutabletexture#framebufferobject",
+    "class/src/low_level/textures/MutableTexture.js~MutableTexture.html#instance-set-frameBufferObject",
     "src/low_level/textures/MutableTexture.js~MutableTexture#frameBufferObject",
     "member"
   ],
@@ -10489,13 +10603,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/m_element.js~m_element#isaffectedbyviewmatrix",
-    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-set-isAffectedByViewMatrix",
+    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-get-isAffectedByViewMatrix",
     "src/middle_level/elements/M_Element.js~M_Element#isAffectedByViewMatrix",
     "member"
   ],
   [
     "src/middle_level/elements/m_element.js~m_element#isaffectedbyviewmatrix",
-    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-get-isAffectedByViewMatrix",
+    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-set-isAffectedByViewMatrix",
     "src/middle_level/elements/M_Element.js~M_Element#isAffectedByViewMatrix",
     "member"
   ],
@@ -10513,13 +10627,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/m_element.js~m_element#isaffectedbyworldmatrixaccumulatedancestry",
-    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-get-isAffectedByWorldMatrixAccumulatedAncestry",
+    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-set-isAffectedByWorldMatrixAccumulatedAncestry",
     "src/middle_level/elements/M_Element.js~M_Element#isAffectedByWorldMatrixAccumulatedAncestry",
     "member"
   ],
   [
     "src/middle_level/elements/m_element.js~m_element#isaffectedbyworldmatrixaccumulatedancestry",
-    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-set-isAffectedByWorldMatrixAccumulatedAncestry",
+    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-get-isAffectedByWorldMatrixAccumulatedAncestry",
     "src/middle_level/elements/M_Element.js~M_Element#isAffectedByWorldMatrixAccumulatedAncestry",
     "member"
   ],
@@ -10542,9 +10656,9 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "src/middle_level/elements/m_element.js~m_element#istransparentforce",
-    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-set-isTransparentForce",
-    "src/middle_level/elements/M_Element.js~M_Element#isTransparentForce",
+    "src/middle_level/elements/m_element.js~m_element#istransparent",
+    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-set-isTransparent",
+    "src/middle_level/elements/M_Element.js~M_Element#isTransparent",
     "member"
   ],
   [
@@ -10561,13 +10675,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/m_element.js~m_element#masterelement",
-    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-set-masterElement",
+    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-get-masterElement",
     "src/middle_level/elements/M_Element.js~M_Element#masterElement",
     "member"
   ],
   [
     "src/middle_level/elements/m_element.js~m_element#masterelement",
-    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-get-masterElement",
+    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-set-masterElement",
     "src/middle_level/elements/M_Element.js~M_Element#masterElement",
     "member"
   ],
@@ -10615,13 +10729,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/m_element.js~m_element#toinheritcurrentanimationinputvalue",
-    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-get-toInheritCurrentAnimationInputValue",
+    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-set-toInheritCurrentAnimationInputValue",
     "src/middle_level/elements/M_Element.js~M_Element#toInheritCurrentAnimationInputValue",
     "member"
   ],
   [
     "src/middle_level/elements/m_element.js~m_element#toinheritcurrentanimationinputvalue",
-    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-set-toInheritCurrentAnimationInputValue",
+    "class/src/middle_level/elements/M_Element.js~M_Element.html#instance-get-toInheritCurrentAnimationInputValue",
     "src/middle_level/elements/M_Element.js~M_Element#toInheritCurrentAnimationInputValue",
     "member"
   ],
@@ -10686,6 +10800,18 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "src/middle_level/elements/m_group.js~m_group#_gizmos",
+    "class/src/middle_level/elements/M_Group.js~M_Group.html#instance-member-_gizmos",
+    "src/middle_level/elements/M_Group.js~M_Group#_gizmos",
+    "member"
+  ],
+  [
+    "src/middle_level/elements/m_group.js~m_group#_glboostsystem",
+    "class/src/middle_level/elements/M_Group.js~M_Group.html#instance-member-_glBoostSystem",
+    "src/middle_level/elements/M_Group.js~M_Group#_glBoostSystem",
+    "member"
+  ],
+  [
     "src/middle_level/elements/m_group.js~m_group#_isrootjointgroup",
     "class/src/middle_level/elements/M_Group.js~M_Group.html#instance-member-_isRootJointGroup",
     "src/middle_level/elements/M_Group.js~M_Group#_isRootJointGroup",
@@ -10737,6 +10863,12 @@ window.esdocSearchIndex = [
     "src/middle_level/elements/m_group.js~m_group#constructor",
     "class/src/middle_level/elements/M_Group.js~M_Group.html#instance-constructor-constructor",
     "src/middle_level/elements/M_Group.js~M_Group#constructor",
+    "method"
+  ],
+  [
+    "src/middle_level/elements/m_group.js~m_group#executespecifiedfunctionrecursively",
+    "class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-executeSpecifiedFunctionRecursively",
+    "src/middle_level/elements/M_Group.js~M_Group#executeSpecifiedFunctionRecursively",
     "method"
   ],
   [
@@ -10833,6 +10965,12 @@ window.esdocSearchIndex = [
     "src/middle_level/elements/m_group.js~m_group#searchglboostobjectsbynameandtype",
     "class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-searchGLBoostObjectsByNameAndType",
     "src/middle_level/elements/M_Group.js~M_Group#searchGLBoostObjectsByNameAndType",
+    "method"
+  ],
+  [
+    "src/middle_level/elements/m_group.js~m_group#setspecifiedpropertyrecursively",
+    "class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-setSpecifiedPropertyRecursively",
+    "src/middle_level/elements/M_Group.js~M_Group#setSpecifiedPropertyRecursively",
     "method"
   ],
   [
@@ -11047,13 +11185,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/cameras/m_abstractcamera.js~m_abstractcamera#cameracontroller",
-    "class/src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html#instance-get-cameraController",
+    "class/src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html#instance-set-cameraController",
     "src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera#cameraController",
     "member"
   ],
   [
     "src/middle_level/elements/cameras/m_abstractcamera.js~m_abstractcamera#cameracontroller",
-    "class/src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html#instance-set-cameraController",
+    "class/src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html#instance-get-cameraController",
     "src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera#cameraController",
     "member"
   ],
@@ -11083,13 +11221,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/cameras/m_abstractcamera.js~m_abstractcamera#eye",
-    "class/src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html#instance-get-eye",
+    "class/src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html#instance-set-eye",
     "src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera#eye",
     "member"
   ],
   [
     "src/middle_level/elements/cameras/m_abstractcamera.js~m_abstractcamera#eye",
-    "class/src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html#instance-set-eye",
+    "class/src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html#instance-get-eye",
     "src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera#eye",
     "member"
   ],
@@ -11125,25 +11263,25 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/cameras/m_abstractcamera.js~m_abstractcamera#texture",
-    "class/src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html#instance-set-texture",
-    "src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera#texture",
-    "member"
-  ],
-  [
-    "src/middle_level/elements/cameras/m_abstractcamera.js~m_abstractcamera#texture",
     "class/src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html#instance-get-texture",
     "src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera#texture",
     "member"
   ],
   [
-    "src/middle_level/elements/cameras/m_abstractcamera.js~m_abstractcamera#translate",
-    "class/src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html#instance-set-translate",
-    "src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera#translate",
+    "src/middle_level/elements/cameras/m_abstractcamera.js~m_abstractcamera#texture",
+    "class/src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html#instance-set-texture",
+    "src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera#texture",
     "member"
   ],
   [
     "src/middle_level/elements/cameras/m_abstractcamera.js~m_abstractcamera#translate",
     "class/src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html#instance-get-translate",
+    "src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera#translate",
+    "member"
+  ],
+  [
+    "src/middle_level/elements/cameras/m_abstractcamera.js~m_abstractcamera#translate",
+    "class/src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera.html#instance-set-translate",
     "src/middle_level/elements/cameras/M_AbstractCamera.js~M_AbstractCamera#translate",
     "member"
   ],
@@ -11203,13 +11341,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/cameras/m_frustumcamera.js~m_frustumcamera#bottom",
-    "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-set-bottom",
+    "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-get-bottom",
     "src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera#bottom",
     "member"
   ],
   [
     "src/middle_level/elements/cameras/m_frustumcamera.js~m_frustumcamera#bottom",
-    "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-get-bottom",
+    "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-set-bottom",
     "src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera#bottom",
     "member"
   ],
@@ -11220,14 +11358,20 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/middle_level/elements/cameras/m_frustumcamera.js~m_frustumcamera#left",
-    "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-get-left",
-    "src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera#left",
+    "src/middle_level/elements/cameras/m_frustumcamera.js~m_frustumcamera#fovy",
+    "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-get-fovy",
+    "src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera#fovy",
     "member"
   ],
   [
     "src/middle_level/elements/cameras/m_frustumcamera.js~m_frustumcamera#left",
     "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-set-left",
+    "src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera#left",
+    "member"
+  ],
+  [
+    "src/middle_level/elements/cameras/m_frustumcamera.js~m_frustumcamera#left",
+    "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-get-left",
     "src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera#left",
     "member"
   ],
@@ -11251,13 +11395,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/cameras/m_frustumcamera.js~m_frustumcamera#top",
-    "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-set-top",
+    "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-get-top",
     "src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera#top",
     "member"
   ],
   [
     "src/middle_level/elements/cameras/m_frustumcamera.js~m_frustumcamera#top",
-    "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-get-top",
+    "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-set-top",
     "src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera#top",
     "member"
   ],
@@ -11269,25 +11413,25 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/cameras/m_frustumcamera.js~m_frustumcamera#zfar",
-    "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-get-zFar",
-    "src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera#zFar",
-    "member"
-  ],
-  [
-    "src/middle_level/elements/cameras/m_frustumcamera.js~m_frustumcamera#zfar",
     "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-set-zFar",
     "src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera#zFar",
     "member"
   ],
   [
-    "src/middle_level/elements/cameras/m_frustumcamera.js~m_frustumcamera#znear",
-    "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-set-zNear",
-    "src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera#zNear",
+    "src/middle_level/elements/cameras/m_frustumcamera.js~m_frustumcamera#zfar",
+    "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-get-zFar",
+    "src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera#zFar",
     "member"
   ],
   [
     "src/middle_level/elements/cameras/m_frustumcamera.js~m_frustumcamera#znear",
     "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-get-zNear",
+    "src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera#zNear",
+    "member"
+  ],
+  [
+    "src/middle_level/elements/cameras/m_frustumcamera.js~m_frustumcamera#znear",
+    "class/src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera.html#instance-set-zNear",
     "src/middle_level/elements/cameras/M_FrustumCamera.js~M_FrustumCamera#zNear",
     "member"
   ],
@@ -11335,13 +11479,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/cameras/m_orthocamera.js~m_orthocamera#left",
-    "class/src/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera.html#instance-set-left",
+    "class/src/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera.html#instance-get-left",
     "src/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera#left",
     "member"
   ],
   [
     "src/middle_level/elements/cameras/m_orthocamera.js~m_orthocamera#left",
-    "class/src/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera.html#instance-get-left",
+    "class/src/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera.html#instance-set-left",
     "src/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera#left",
     "member"
   ],
@@ -11407,13 +11551,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/cameras/m_orthocamera.js~m_orthocamera#zfar",
-    "class/src/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera.html#instance-set-zFar",
+    "class/src/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera.html#instance-get-zFar",
     "src/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera#zFar",
     "member"
   ],
   [
     "src/middle_level/elements/cameras/m_orthocamera.js~m_orthocamera#zfar",
-    "class/src/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera.html#instance-get-zFar",
+    "class/src/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera.html#instance-set-zFar",
     "src/middle_level/elements/cameras/M_OrthoCamera.js~M_OrthoCamera#zFar",
     "member"
   ],
@@ -11467,13 +11611,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/cameras/m_perspectivecamera.js~m_perspectivecamera#fovy",
-    "class/src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera.html#instance-get-fovy",
+    "class/src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera.html#instance-set-fovy",
     "src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera#fovy",
     "member"
   ],
   [
     "src/middle_level/elements/cameras/m_perspectivecamera.js~m_perspectivecamera#fovy",
-    "class/src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera.html#instance-set-fovy",
+    "class/src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera.html#instance-get-fovy",
     "src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera#fovy",
     "member"
   ],
@@ -11491,25 +11635,25 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/cameras/m_perspectivecamera.js~m_perspectivecamera#zfar",
-    "class/src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera.html#instance-get-zFar",
-    "src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera#zFar",
-    "member"
-  ],
-  [
-    "src/middle_level/elements/cameras/m_perspectivecamera.js~m_perspectivecamera#zfar",
     "class/src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera.html#instance-set-zFar",
     "src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera#zFar",
     "member"
   ],
   [
-    "src/middle_level/elements/cameras/m_perspectivecamera.js~m_perspectivecamera#znear",
-    "class/src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera.html#instance-get-zNear",
-    "src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera#zNear",
+    "src/middle_level/elements/cameras/m_perspectivecamera.js~m_perspectivecamera#zfar",
+    "class/src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera.html#instance-get-zFar",
+    "src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera#zFar",
     "member"
   ],
   [
     "src/middle_level/elements/cameras/m_perspectivecamera.js~m_perspectivecamera#znear",
     "class/src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera.html#instance-set-zNear",
+    "src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera#zNear",
+    "member"
+  ],
+  [
+    "src/middle_level/elements/cameras/m_perspectivecamera.js~m_perspectivecamera#znear",
+    "class/src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera.html#instance-get-zNear",
     "src/middle_level/elements/cameras/M_PerspectiveCamera.js~M_PerspectiveCamera#zNear",
     "member"
   ],
@@ -11599,13 +11743,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/gizmos/m_directionallightgizmo.js~m_directionallightgizmo#rotate",
-    "class/src/middle_level/elements/gizmos/M_DirectionalLightGizmo.js~M_DirectionalLightGizmo.html#instance-set-rotate",
+    "class/src/middle_level/elements/gizmos/M_DirectionalLightGizmo.js~M_DirectionalLightGizmo.html#instance-get-rotate",
     "src/middle_level/elements/gizmos/M_DirectionalLightGizmo.js~M_DirectionalLightGizmo#rotate",
     "member"
   ],
   [
     "src/middle_level/elements/gizmos/m_directionallightgizmo.js~m_directionallightgizmo#rotate",
-    "class/src/middle_level/elements/gizmos/M_DirectionalLightGizmo.js~M_DirectionalLightGizmo.html#instance-get-rotate",
+    "class/src/middle_level/elements/gizmos/M_DirectionalLightGizmo.js~M_DirectionalLightGizmo.html#instance-set-rotate",
     "src/middle_level/elements/gizmos/M_DirectionalLightGizmo.js~M_DirectionalLightGizmo#rotate",
     "member"
   ],
@@ -11647,13 +11791,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/gizmos/m_gizmo.js~m_gizmo#ispredraw",
-    "class/src/middle_level/elements/gizmos/M_Gizmo.js~M_Gizmo.html#instance-set-isPreDraw",
+    "class/src/middle_level/elements/gizmos/M_Gizmo.js~M_Gizmo.html#instance-get-isPreDraw",
     "src/middle_level/elements/gizmos/M_Gizmo.js~M_Gizmo#isPreDraw",
     "member"
   ],
   [
     "src/middle_level/elements/gizmos/m_gizmo.js~m_gizmo#ispredraw",
-    "class/src/middle_level/elements/gizmos/M_Gizmo.js~M_Gizmo.html#instance-get-isPreDraw",
+    "class/src/middle_level/elements/gizmos/M_Gizmo.js~M_Gizmo.html#instance-set-isPreDraw",
     "src/middle_level/elements/gizmos/M_Gizmo.js~M_Gizmo#isPreDraw",
     "member"
   ],
@@ -11749,13 +11893,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/gizmos/m_heightlinegizmo.js~m_heightlinegizmo#isvisible",
-    "class/src/middle_level/elements/gizmos/M_HeightLineGizmo.js~M_HeightLineGizmo.html#instance-set-isVisible",
+    "class/src/middle_level/elements/gizmos/M_HeightLineGizmo.js~M_HeightLineGizmo.html#instance-get-isVisible",
     "src/middle_level/elements/gizmos/M_HeightLineGizmo.js~M_HeightLineGizmo#isVisible",
     "member"
   ],
   [
     "src/middle_level/elements/gizmos/m_heightlinegizmo.js~m_heightlinegizmo#isvisible",
-    "class/src/middle_level/elements/gizmos/M_HeightLineGizmo.js~M_HeightLineGizmo.html#instance-get-isVisible",
+    "class/src/middle_level/elements/gizmos/M_HeightLineGizmo.js~M_HeightLineGizmo.html#instance-set-isVisible",
     "src/middle_level/elements/gizmos/M_HeightLineGizmo.js~M_HeightLineGizmo#isVisible",
     "member"
   ],
@@ -11827,13 +11971,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/gizmos/m_jointgizmo.js~m_jointgizmo#isvisible",
-    "class/src/middle_level/elements/gizmos/M_JointGizmo.js~M_JointGizmo.html#instance-set-isVisible",
+    "class/src/middle_level/elements/gizmos/M_JointGizmo.js~M_JointGizmo.html#instance-get-isVisible",
     "src/middle_level/elements/gizmos/M_JointGizmo.js~M_JointGizmo#isVisible",
     "member"
   ],
   [
     "src/middle_level/elements/gizmos/m_jointgizmo.js~m_jointgizmo#isvisible",
-    "class/src/middle_level/elements/gizmos/M_JointGizmo.js~M_JointGizmo.html#instance-get-isVisible",
+    "class/src/middle_level/elements/gizmos/M_JointGizmo.js~M_JointGizmo.html#instance-set-isVisible",
     "src/middle_level/elements/gizmos/M_JointGizmo.js~M_JointGizmo#isVisible",
     "member"
   ],
@@ -12013,13 +12157,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/lights/m_abstractlight.js~m_abstractlight#camera",
-    "class/src/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight.html#instance-get-camera",
+    "class/src/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight.html#instance-set-camera",
     "src/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight#camera",
     "member"
   ],
   [
     "src/middle_level/elements/lights/m_abstractlight.js~m_abstractlight#camera",
-    "class/src/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight.html#instance-set-camera",
+    "class/src/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight.html#instance-get-camera",
     "src/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight#camera",
     "member"
   ],
@@ -12031,13 +12175,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/lights/m_abstractlight.js~m_abstractlight#iscastingshadow",
-    "class/src/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight.html#instance-set-isCastingShadow",
+    "class/src/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight.html#instance-get-isCastingShadow",
     "src/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight#isCastingShadow",
     "member"
   ],
   [
     "src/middle_level/elements/lights/m_abstractlight.js~m_abstractlight#iscastingshadow",
-    "class/src/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight.html#instance-get-isCastingShadow",
+    "class/src/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight.html#instance-set-isCastingShadow",
     "src/middle_level/elements/lights/M_AbstractLight.js~M_AbstractLight#isCastingShadow",
     "member"
   ],
@@ -12103,13 +12247,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/lights/m_ambientlight.js~m_ambientlight#intensity",
-    "class/src/middle_level/elements/lights/M_AmbientLight.js~M_AmbientLight.html#instance-set-intensity",
+    "class/src/middle_level/elements/lights/M_AmbientLight.js~M_AmbientLight.html#instance-get-intensity",
     "src/middle_level/elements/lights/M_AmbientLight.js~M_AmbientLight#intensity",
     "member"
   ],
   [
     "src/middle_level/elements/lights/m_ambientlight.js~m_ambientlight#intensity",
-    "class/src/middle_level/elements/lights/M_AmbientLight.js~M_AmbientLight.html#instance-get-intensity",
+    "class/src/middle_level/elements/lights/M_AmbientLight.js~M_AmbientLight.html#instance-set-intensity",
     "src/middle_level/elements/lights/M_AmbientLight.js~M_AmbientLight#intensity",
     "member"
   ],
@@ -12157,13 +12301,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/lights/m_directionallight.js~m_directionallight#direction",
-    "class/src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html#instance-set-direction",
+    "class/src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html#instance-get-direction",
     "src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight#direction",
     "member"
   ],
   [
     "src/middle_level/elements/lights/m_directionallight.js~m_directionallight#direction",
-    "class/src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html#instance-get-direction",
+    "class/src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html#instance-set-direction",
     "src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight#direction",
     "member"
   ],
@@ -12187,25 +12331,25 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/lights/m_directionallight.js~m_directionallight#matrix",
-    "class/src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html#instance-set-matrix",
-    "src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight#matrix",
-    "member"
-  ],
-  [
-    "src/middle_level/elements/lights/m_directionallight.js~m_directionallight#matrix",
     "class/src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html#instance-get-matrix",
     "src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight#matrix",
     "member"
   ],
   [
-    "src/middle_level/elements/lights/m_directionallight.js~m_directionallight#multiplymatrixgizmo",
-    "class/src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html#instance-set-multiplyMatrixGizmo",
-    "src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight#multiplyMatrixGizmo",
+    "src/middle_level/elements/lights/m_directionallight.js~m_directionallight#matrix",
+    "class/src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html#instance-set-matrix",
+    "src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight#matrix",
     "member"
   ],
   [
     "src/middle_level/elements/lights/m_directionallight.js~m_directionallight#multiplymatrixgizmo",
     "class/src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html#instance-get-multiplyMatrixGizmo",
+    "src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight#multiplyMatrixGizmo",
+    "member"
+  ],
+  [
+    "src/middle_level/elements/lights/m_directionallight.js~m_directionallight#multiplymatrixgizmo",
+    "class/src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html#instance-set-multiplyMatrixGizmo",
     "src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight#multiplyMatrixGizmo",
     "member"
   ],
@@ -12223,13 +12367,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/lights/m_directionallight.js~m_directionallight#rotate",
-    "class/src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html#instance-set-rotate",
+    "class/src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html#instance-get-rotate",
     "src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight#rotate",
     "member"
   ],
   [
     "src/middle_level/elements/lights/m_directionallight.js~m_directionallight#rotate",
-    "class/src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html#instance-get-rotate",
+    "class/src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight.html#instance-set-rotate",
     "src/middle_level/elements/lights/M_DirectionalLight.js~M_DirectionalLight#rotate",
     "member"
   ],
@@ -12271,13 +12415,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/lights/m_pointlight.js~m_pointlight#intensity",
-    "class/src/middle_level/elements/lights/M_PointLight.js~M_PointLight.html#instance-get-intensity",
+    "class/src/middle_level/elements/lights/M_PointLight.js~M_PointLight.html#instance-set-intensity",
     "src/middle_level/elements/lights/M_PointLight.js~M_PointLight#intensity",
     "member"
   ],
   [
     "src/middle_level/elements/lights/m_pointlight.js~m_pointlight#intensity",
-    "class/src/middle_level/elements/lights/M_PointLight.js~M_PointLight.html#instance-set-intensity",
+    "class/src/middle_level/elements/lights/M_PointLight.js~M_PointLight.html#instance-get-intensity",
     "src/middle_level/elements/lights/M_PointLight.js~M_PointLight#intensity",
     "member"
   ],
@@ -12331,19 +12475,19 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/lights/m_spotlight.js~m_spotlight#direction",
-    "class/src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight.html#instance-set-direction",
-    "src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight#direction",
-    "member"
-  ],
-  [
-    "src/middle_level/elements/lights/m_spotlight.js~m_spotlight#direction",
-    "class/src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight.html#instance-set-direction",
-    "src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight#direction",
-    "member"
-  ],
-  [
-    "src/middle_level/elements/lights/m_spotlight.js~m_spotlight#direction",
     "class/src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight.html#instance-get-direction",
+    "src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight#direction",
+    "member"
+  ],
+  [
+    "src/middle_level/elements/lights/m_spotlight.js~m_spotlight#direction",
+    "class/src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight.html#instance-set-direction",
+    "src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight#direction",
+    "member"
+  ],
+  [
+    "src/middle_level/elements/lights/m_spotlight.js~m_spotlight#direction",
+    "class/src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight.html#instance-set-direction",
     "src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight#direction",
     "member"
   ],
@@ -12391,13 +12535,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/lights/m_spotlight.js~m_spotlight#rotate",
-    "class/src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight.html#instance-get-rotate",
+    "class/src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight.html#instance-set-rotate",
     "src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight#rotate",
     "member"
   ],
   [
     "src/middle_level/elements/lights/m_spotlight.js~m_spotlight#rotate",
-    "class/src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight.html#instance-set-rotate",
+    "class/src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight.html#instance-get-rotate",
     "src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight#rotate",
     "member"
   ],
@@ -12409,13 +12553,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/lights/m_spotlight.js~m_spotlight#spotcutoffindegree",
-    "class/src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight.html#instance-set-spotCutoffInDegree",
+    "class/src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight.html#instance-get-spotCutoffInDegree",
     "src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight#spotCutoffInDegree",
     "member"
   ],
   [
     "src/middle_level/elements/lights/m_spotlight.js~m_spotlight#spotcutoffindegree",
-    "class/src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight.html#instance-get-spotCutoffInDegree",
+    "class/src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight.html#instance-set-spotCutoffInDegree",
     "src/middle_level/elements/lights/M_SpotLight.js~M_SpotLight#spotCutoffInDegree",
     "member"
   ],
@@ -12474,6 +12618,18 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "src/middle_level/elements/meshes/m_mesh.js~m_mesh#_gizmos",
+    "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-member-_gizmos",
+    "src/middle_level/elements/meshes/M_Mesh.js~M_Mesh#_gizmos",
+    "member"
+  ],
+  [
+    "src/middle_level/elements/meshes/m_mesh.js~m_mesh#_glboostsystem",
+    "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-member-_glBoostSystem",
+    "src/middle_level/elements/meshes/M_Mesh.js~M_Mesh#_glBoostSystem",
+    "member"
+  ],
+  [
     "src/middle_level/elements/meshes/m_mesh.js~m_mesh#_ispickable",
     "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-member-_isPickable",
     "src/middle_level/elements/meshes/M_Mesh.js~M_Mesh#_isPickable",
@@ -12498,6 +12654,12 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
+    "src/middle_level/elements/meshes/m_mesh.js~m_mesh#_opacity",
+    "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-member-_opacity",
+    "src/middle_level/elements/meshes/M_Mesh.js~M_Mesh#_opacity",
+    "member"
+  ],
+  [
     "src/middle_level/elements/meshes/m_mesh.js~m_mesh#_outlinegizmo",
     "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-member-_outlineGizmo",
     "src/middle_level/elements/meshes/M_Mesh.js~M_Mesh#_outlineGizmo",
@@ -12520,6 +12682,12 @@ window.esdocSearchIndex = [
     "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-method-bakeTransformToGeometry",
     "src/middle_level/elements/meshes/M_Mesh.js~M_Mesh#bakeTransformToGeometry",
     "method"
+  ],
+  [
+    "src/middle_level/elements/meshes/m_mesh.js~m_mesh#bindshapematrix",
+    "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-member-bindShapeMatrix",
+    "src/middle_level/elements/meshes/M_Mesh.js~M_Mesh#bindShapeMatrix",
+    "member"
   ],
   [
     "src/middle_level/elements/meshes/m_mesh.js~m_mesh#calctransformeddepth",
@@ -12571,20 +12739,14 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/meshes/m_mesh.js~m_mesh#isoutlinevisible",
-    "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-set-isOutlineVisible",
-    "src/middle_level/elements/meshes/M_Mesh.js~M_Mesh#isOutlineVisible",
-    "member"
-  ],
-  [
-    "src/middle_level/elements/meshes/m_mesh.js~m_mesh#isoutlinevisible",
     "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-get-isOutlineVisible",
     "src/middle_level/elements/meshes/M_Mesh.js~M_Mesh#isOutlineVisible",
     "member"
   ],
   [
-    "src/middle_level/elements/meshes/m_mesh.js~m_mesh#ispickable",
-    "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-set-isPickable",
-    "src/middle_level/elements/meshes/M_Mesh.js~M_Mesh#isPickable",
+    "src/middle_level/elements/meshes/m_mesh.js~m_mesh#isoutlinevisible",
+    "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-set-isOutlineVisible",
+    "src/middle_level/elements/meshes/M_Mesh.js~M_Mesh#isOutlineVisible",
     "member"
   ],
   [
@@ -12594,21 +12756,21 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
+    "src/middle_level/elements/meshes/m_mesh.js~m_mesh#ispickable",
+    "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-set-isPickable",
+    "src/middle_level/elements/meshes/M_Mesh.js~M_Mesh#isPickable",
+    "member"
+  ],
+  [
     "src/middle_level/elements/meshes/m_mesh.js~m_mesh#istransparent",
-    "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-get-isTransparent",
+    "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-set-isTransparent",
     "src/middle_level/elements/meshes/M_Mesh.js~M_Mesh#isTransparent",
     "member"
   ],
   [
-    "src/middle_level/elements/meshes/m_mesh.js~m_mesh#istransparentforce",
-    "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-set-isTransparentForce",
-    "src/middle_level/elements/meshes/M_Mesh.js~M_Mesh#isTransparentForce",
-    "member"
-  ],
-  [
-    "src/middle_level/elements/meshes/m_mesh.js~m_mesh#istransparentforce",
-    "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-get-isTransparentForce",
-    "src/middle_level/elements/meshes/M_Mesh.js~M_Mesh#isTransparentForce",
+    "src/middle_level/elements/meshes/m_mesh.js~m_mesh#istransparent",
+    "class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html#instance-get-isTransparent",
+    "src/middle_level/elements/meshes/M_Mesh.js~M_Mesh#isTransparent",
     "member"
   ],
   [
@@ -12721,13 +12883,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/meshes/m_screenmesh.js~m_screenmesh#material",
-    "class/src/middle_level/elements/meshes/M_ScreenMesh.js~M_ScreenMesh.html#instance-set-material",
+    "class/src/middle_level/elements/meshes/M_ScreenMesh.js~M_ScreenMesh.html#instance-get-material",
     "src/middle_level/elements/meshes/M_ScreenMesh.js~M_ScreenMesh#material",
     "member"
   ],
   [
     "src/middle_level/elements/meshes/m_screenmesh.js~m_screenmesh#material",
-    "class/src/middle_level/elements/meshes/M_ScreenMesh.js~M_ScreenMesh.html#instance-get-material",
+    "class/src/middle_level/elements/meshes/M_ScreenMesh.js~M_ScreenMesh.html#instance-set-material",
     "src/middle_level/elements/meshes/M_ScreenMesh.js~M_ScreenMesh#material",
     "member"
   ],
@@ -12817,13 +12979,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/meshes/m_skeletalmesh.js~m_skeletalmesh#bindshapematrix",
-    "class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html#instance-get-bindShapeMatrix",
+    "class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html#instance-set-bindShapeMatrix",
     "src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh#bindShapeMatrix",
     "member"
   ],
   [
     "src/middle_level/elements/meshes/m_skeletalmesh.js~m_skeletalmesh#bindshapematrix",
-    "class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html#instance-set-bindShapeMatrix",
+    "class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html#instance-get-bindShapeMatrix",
     "src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh#bindShapeMatrix",
     "member"
   ],
@@ -12847,20 +13009,14 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/meshes/m_skeletalmesh.js~m_skeletalmesh#gltfjointindices",
-    "class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html#instance-set-gltfJointIndices",
-    "src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh#gltfJointIndices",
-    "member"
-  ],
-  [
-    "src/middle_level/elements/meshes/m_skeletalmesh.js~m_skeletalmesh#gltfjointindices",
     "class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html#instance-get-gltfJointIndices",
     "src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh#gltfJointIndices",
     "member"
   ],
   [
-    "src/middle_level/elements/meshes/m_skeletalmesh.js~m_skeletalmesh#inversebindmatrices",
-    "class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html#instance-get-inverseBindMatrices",
-    "src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh#inverseBindMatrices",
+    "src/middle_level/elements/meshes/m_skeletalmesh.js~m_skeletalmesh#gltfjointindices",
+    "class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html#instance-set-gltfJointIndices",
+    "src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh#gltfJointIndices",
     "member"
   ],
   [
@@ -12870,9 +13026,9 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "src/middle_level/elements/meshes/m_skeletalmesh.js~m_skeletalmesh#isskeletonvisible",
-    "class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html#instance-set-isSkeletonVisible",
-    "src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh#isSkeletonVisible",
+    "src/middle_level/elements/meshes/m_skeletalmesh.js~m_skeletalmesh#inversebindmatrices",
+    "class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html#instance-get-inverseBindMatrices",
+    "src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh#inverseBindMatrices",
     "member"
   ],
   [
@@ -12882,9 +13038,9 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "src/middle_level/elements/meshes/m_skeletalmesh.js~m_skeletalmesh#jointnames",
-    "class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html#instance-get-jointNames",
-    "src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh#jointNames",
+    "src/middle_level/elements/meshes/m_skeletalmesh.js~m_skeletalmesh#isskeletonvisible",
+    "class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html#instance-set-isSkeletonVisible",
+    "src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh#isSkeletonVisible",
     "member"
   ],
   [
@@ -12894,14 +13050,20 @@ window.esdocSearchIndex = [
     "member"
   ],
   [
-    "src/middle_level/elements/meshes/m_skeletalmesh.js~m_skeletalmesh#jointshierarchy",
-    "class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html#instance-set-jointsHierarchy",
-    "src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh#jointsHierarchy",
+    "src/middle_level/elements/meshes/m_skeletalmesh.js~m_skeletalmesh#jointnames",
+    "class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html#instance-get-jointNames",
+    "src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh#jointNames",
     "member"
   ],
   [
     "src/middle_level/elements/meshes/m_skeletalmesh.js~m_skeletalmesh#jointshierarchy",
     "class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html#instance-get-jointsHierarchy",
+    "src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh#jointsHierarchy",
+    "member"
+  ],
+  [
+    "src/middle_level/elements/meshes/m_skeletalmesh.js~m_skeletalmesh#jointshierarchy",
+    "class/src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh.html#instance-set-jointsHierarchy",
     "src/middle_level/elements/meshes/M_SkeletalMesh.js~M_SkeletalMesh#jointsHierarchy",
     "member"
   ],
@@ -13045,13 +13207,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/skeletons/m_joint.js~m_joint#isvisible",
-    "class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html#instance-set-isVisible",
+    "class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html#instance-get-isVisible",
     "src/middle_level/elements/skeletons/M_Joint.js~M_Joint#isVisible",
     "member"
   ],
   [
     "src/middle_level/elements/skeletons/m_joint.js~m_joint#isvisible",
-    "class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html#instance-get-isVisible",
+    "class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html#instance-set-isVisible",
     "src/middle_level/elements/skeletons/M_Joint.js~M_Joint#isVisible",
     "member"
   ],
@@ -13069,13 +13231,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/skeletons/m_joint.js~m_joint#jointsofparenthierarchies",
-    "class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html#instance-set-jointsOfParentHierarchies",
+    "class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html#instance-get-jointsOfParentHierarchies",
     "src/middle_level/elements/skeletons/M_Joint.js~M_Joint#jointsOfParentHierarchies",
     "member"
   ],
   [
     "src/middle_level/elements/skeletons/m_joint.js~m_joint#jointsofparenthierarchies",
-    "class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html#instance-get-jointsOfParentHierarchies",
+    "class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html#instance-set-jointsOfParentHierarchies",
     "src/middle_level/elements/skeletons/M_Joint.js~M_Joint#jointsOfParentHierarchies",
     "member"
   ],
@@ -13129,13 +13291,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/elements/skeletons/m_joint.js~m_joint#worldpositionofthisjoint",
-    "class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html#instance-set-worldPositionOfThisJoint",
+    "class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html#instance-get-worldPositionOfThisJoint",
     "src/middle_level/elements/skeletons/M_Joint.js~M_Joint#worldPositionOfThisJoint",
     "member"
   ],
   [
     "src/middle_level/elements/skeletons/m_joint.js~m_joint#worldpositionofthisjoint",
-    "class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html#instance-get-worldPositionOfThisJoint",
+    "class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html#instance-set-worldPositionOfThisJoint",
     "src/middle_level/elements/skeletons/M_Joint.js~M_Joint#worldPositionOfThisJoint",
     "member"
   ],
@@ -13477,25 +13639,25 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/expressions/renderpass.js~renderpass#customfunctionwhenpostrender",
-    "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-get-customFunctionWhenPostRender",
-    "src/middle_level/expressions/RenderPass.js~RenderPass#customFunctionWhenPostRender",
-    "member"
-  ],
-  [
-    "src/middle_level/expressions/renderpass.js~renderpass#customfunctionwhenpostrender",
     "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-set-customFunctionWhenPostRender",
     "src/middle_level/expressions/RenderPass.js~RenderPass#customFunctionWhenPostRender",
     "member"
   ],
   [
-    "src/middle_level/expressions/renderpass.js~renderpass#customfunctionwhenprerender",
-    "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-set-customFunctionWhenPreRender",
-    "src/middle_level/expressions/RenderPass.js~RenderPass#customFunctionWhenPreRender",
+    "src/middle_level/expressions/renderpass.js~renderpass#customfunctionwhenpostrender",
+    "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-get-customFunctionWhenPostRender",
+    "src/middle_level/expressions/RenderPass.js~RenderPass#customFunctionWhenPostRender",
     "member"
   ],
   [
     "src/middle_level/expressions/renderpass.js~renderpass#customfunctionwhenprerender",
     "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-get-customFunctionWhenPreRender",
+    "src/middle_level/expressions/RenderPass.js~RenderPass#customFunctionWhenPreRender",
+    "member"
+  ],
+  [
+    "src/middle_level/expressions/renderpass.js~renderpass#customfunctionwhenprerender",
+    "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-set-customFunctionWhenPreRender",
     "src/middle_level/expressions/RenderPass.js~RenderPass#customFunctionWhenPreRender",
     "member"
   ],
@@ -13513,25 +13675,25 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/expressions/renderpass.js~renderpass#dopostrender",
-    "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-set-doPostRender",
-    "src/middle_level/expressions/RenderPass.js~RenderPass#doPostRender",
-    "member"
-  ],
-  [
-    "src/middle_level/expressions/renderpass.js~renderpass#dopostrender",
     "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-get-doPostRender",
     "src/middle_level/expressions/RenderPass.js~RenderPass#doPostRender",
     "member"
   ],
   [
-    "src/middle_level/expressions/renderpass.js~renderpass#doprerender",
-    "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-get-doPreRender",
-    "src/middle_level/expressions/RenderPass.js~RenderPass#doPreRender",
+    "src/middle_level/expressions/renderpass.js~renderpass#dopostrender",
+    "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-set-doPostRender",
+    "src/middle_level/expressions/RenderPass.js~RenderPass#doPostRender",
     "member"
   ],
   [
     "src/middle_level/expressions/renderpass.js~renderpass#doprerender",
     "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-set-doPreRender",
+    "src/middle_level/expressions/RenderPass.js~RenderPass#doPreRender",
+    "member"
+  ],
+  [
+    "src/middle_level/expressions/renderpass.js~renderpass#doprerender",
+    "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-get-doPreRender",
     "src/middle_level/expressions/RenderPass.js~RenderPass#doPreRender",
     "member"
   ],
@@ -13549,13 +13711,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/expressions/renderpass.js~renderpass#isenabletodraw",
-    "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-get-isEnableToDraw",
+    "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-set-isEnableToDraw",
     "src/middle_level/expressions/RenderPass.js~RenderPass#isEnableToDraw",
     "member"
   ],
   [
     "src/middle_level/expressions/renderpass.js~renderpass#isenabletodraw",
-    "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-set-isEnableToDraw",
+    "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-get-isEnableToDraw",
     "src/middle_level/expressions/RenderPass.js~RenderPass#isEnableToDraw",
     "member"
   ],
@@ -13627,13 +13789,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/expressions/renderpass.js~renderpass#scene",
-    "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-get-scene",
+    "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-set-scene",
     "src/middle_level/expressions/RenderPass.js~RenderPass#scene",
     "member"
   ],
   [
     "src/middle_level/expressions/renderpass.js~renderpass#scene",
-    "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-set-scene",
+    "class/src/middle_level/expressions/RenderPass.js~RenderPass.html#instance-get-scene",
     "src/middle_level/expressions/RenderPass.js~RenderPass#scene",
     "member"
   ],
@@ -13794,6 +13956,78 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/middle_level/loader/glboostgltfloaderextension.js",
+    "file/src/middle_level/loader/GLBoostGLTFLoaderExtension.js.html",
+    "src/middle_level/loader/GLBoostGLTFLoaderExtension.js",
+    "file"
+  ],
+  [
+    "src/middle_level/loader/glboostgltfloaderextension.js~glboostgltfloaderextension#constructor",
+    "class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html#instance-constructor-constructor",
+    "src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension#constructor",
+    "method"
+  ],
+  [
+    "src/middle_level/loader/glboostgltfloaderextension.js~glboostgltfloaderextension#loadextensioninfoandsettorootgroup",
+    "class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html#instance-method-loadExtensionInfoAndSetToRootGroup",
+    "src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension#loadExtensionInfoAndSetToRootGroup",
+    "method"
+  ],
+  [
+    "src/middle_level/loader/glboostgltfloaderextension.js~glboostgltfloaderextension#setassetpropertiestorootgroup",
+    "class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html#instance-method-setAssetPropertiesToRootGroup",
+    "src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension#setAssetPropertiesToRootGroup",
+    "method"
+  ],
+  [
+    "src/middle_level/loader/glboostgltfloaderextension.js~glboostgltfloaderextension#setuvtransformtotexture",
+    "class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html#instance-method-setUVTransformToTexture",
+    "src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension#setUVTransformToTexture",
+    "method"
+  ],
+  [
+    "src/middle_level/loader/glboostgltfloaderextension.js~glboostgltfloaderextension.[singleton]",
+    "class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html#static-member-[singleton]",
+    "src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.[singleton]",
+    "member"
+  ],
+  [
+    "src/middle_level/loader/glboostgltfloaderextension.js~glboostgltfloaderextension.getinstance",
+    "class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html#static-method-getInstance",
+    "src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.getInstance",
+    "method"
+  ],
+  [
+    "src/middle_level/loader/gltf2exporter.js",
+    "file/src/middle_level/loader/GLTF2Exporter.js.html",
+    "src/middle_level/loader/GLTF2Exporter.js",
+    "file"
+  ],
+  [
+    "src/middle_level/loader/gltf2exporter.js~gltf2exporter#constructor",
+    "class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html#instance-constructor-constructor",
+    "src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter#constructor",
+    "method"
+  ],
+  [
+    "src/middle_level/loader/gltf2exporter.js~gltf2exporter#export",
+    "class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html#instance-method-export",
+    "src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter#export",
+    "method"
+  ],
+  [
+    "src/middle_level/loader/gltf2exporter.js~gltf2exporter.[singleton]",
+    "class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html#static-member-[singleton]",
+    "src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.[singleton]",
+    "member"
+  ],
+  [
+    "src/middle_level/loader/gltf2exporter.js~gltf2exporter.getinstance",
+    "class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html#static-method-getInstance",
+    "src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.getInstance",
+    "method"
+  ],
+  [
     "src/middle_level/loader/gltf2loader.js",
     "file/src/middle_level/loader/GLTF2Loader.js.html",
     "src/middle_level/loader/GLTF2Loader.js",
@@ -13918,6 +14152,12 @@ window.esdocSearchIndex = [
     "class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html#instance-member-_materials",
     "src/middle_level/loader/GLTF2Loader.js~GLTF2Loader#_materials",
     "member"
+  ],
+  [
+    "src/middle_level/loader/gltf2loader.js~gltf2loader#_mergeextendedjson",
+    "class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html#instance-method-_mergeExtendedJson",
+    "src/middle_level/loader/GLTF2Loader.js~GLTF2Loader#_mergeExtendedJson",
+    "method"
   ],
   [
     "src/middle_level/loader/gltf2loader.js~gltf2loader#_slicebufferviewtoarraybuffer",
@@ -14395,13 +14635,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/plugins/effekseerelement.js~effekseerelement#playspeed",
-    "class/src/middle_level/plugins/EffekseerElement.js~EffekseerElement.html#instance-set-playSpeed",
+    "class/src/middle_level/plugins/EffekseerElement.js~EffekseerElement.html#instance-get-playSpeed",
     "src/middle_level/plugins/EffekseerElement.js~EffekseerElement#playSpeed",
     "member"
   ],
   [
     "src/middle_level/plugins/effekseerelement.js~effekseerelement#playspeed",
-    "class/src/middle_level/plugins/EffekseerElement.js~EffekseerElement.html#instance-get-playSpeed",
+    "class/src/middle_level/plugins/EffekseerElement.js~EffekseerElement.html#instance-set-playSpeed",
     "src/middle_level/plugins/EffekseerElement.js~EffekseerElement#playSpeed",
     "member"
   ],
@@ -14431,13 +14671,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/plugins/effekseerelement.js~effekseerelement#translate",
-    "class/src/middle_level/plugins/EffekseerElement.js~EffekseerElement.html#instance-set-translate",
+    "class/src/middle_level/plugins/EffekseerElement.js~EffekseerElement.html#instance-get-translate",
     "src/middle_level/plugins/EffekseerElement.js~EffekseerElement#translate",
     "member"
   ],
   [
     "src/middle_level/plugins/effekseerelement.js~effekseerelement#translate",
-    "class/src/middle_level/plugins/EffekseerElement.js~EffekseerElement.html#instance-get-translate",
+    "class/src/middle_level/plugins/EffekseerElement.js~EffekseerElement.html#instance-set-translate",
     "src/middle_level/plugins/EffekseerElement.js~EffekseerElement#translate",
     "member"
   ],
@@ -14497,13 +14737,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/shaders/blinnphongshader.js~blinnphongshader#kd",
-    "class/src/middle_level/shaders/BlinnPhongShader.js~BlinnPhongShader.html#instance-get-Kd",
+    "class/src/middle_level/shaders/BlinnPhongShader.js~BlinnPhongShader.html#instance-set-Kd",
     "src/middle_level/shaders/BlinnPhongShader.js~BlinnPhongShader#Kd",
     "member"
   ],
   [
     "src/middle_level/shaders/blinnphongshader.js~blinnphongshader#kd",
-    "class/src/middle_level/shaders/BlinnPhongShader.js~BlinnPhongShader.html#instance-set-Kd",
+    "class/src/middle_level/shaders/BlinnPhongShader.js~BlinnPhongShader.html#instance-get-Kd",
     "src/middle_level/shaders/BlinnPhongShader.js~BlinnPhongShader#Kd",
     "member"
   ],
@@ -14545,13 +14785,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/shaders/blinnphongshader.js~blinnphongshader#power",
-    "class/src/middle_level/shaders/BlinnPhongShader.js~BlinnPhongShader.html#instance-set-power",
+    "class/src/middle_level/shaders/BlinnPhongShader.js~BlinnPhongShader.html#instance-get-power",
     "src/middle_level/shaders/BlinnPhongShader.js~BlinnPhongShader#power",
     "member"
   ],
   [
     "src/middle_level/shaders/blinnphongshader.js~blinnphongshader#power",
-    "class/src/middle_level/shaders/BlinnPhongShader.js~BlinnPhongShader.html#instance-get-power",
+    "class/src/middle_level/shaders/BlinnPhongShader.js~BlinnPhongShader.html#instance-set-power",
     "src/middle_level/shaders/BlinnPhongShader.js~BlinnPhongShader#power",
     "member"
   ],
@@ -14599,13 +14839,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/shaders/decalshader.js~decalshader#lut",
-    "class/src/middle_level/shaders/DecalShader.js~DecalShader.html#instance-set-lut",
+    "class/src/middle_level/shaders/DecalShader.js~DecalShader.html#instance-get-lut",
     "src/middle_level/shaders/DecalShader.js~DecalShader#lut",
     "member"
   ],
   [
     "src/middle_level/shaders/decalshader.js~decalshader#lut",
-    "class/src/middle_level/shaders/DecalShader.js~DecalShader.html#instance-get-lut",
+    "class/src/middle_level/shaders/DecalShader.js~DecalShader.html#instance-set-lut",
     "src/middle_level/shaders/DecalShader.js~DecalShader#lut",
     "member"
   ],
@@ -14625,6 +14865,12 @@ window.esdocSearchIndex = [
     "src/middle_level/shaders/decalshader.js~decalshadersource#fsdefine_decalshadersource",
     "class/src/middle_level/shaders/DecalShader.js~DecalShaderSource.html#instance-method-FSDefine_DecalShaderSource",
     "src/middle_level/shaders/DecalShader.js~DecalShaderSource#FSDefine_DecalShaderSource",
+    "method"
+  ],
+  [
+    "src/middle_level/shaders/decalshader.js~decalshadersource#fsfinalize_decalshadersource",
+    "class/src/middle_level/shaders/DecalShader.js~DecalShaderSource.html#instance-method-FSFinalize_DecalShaderSource",
+    "src/middle_level/shaders/DecalShader.js~DecalShaderSource#FSFinalize_DecalShaderSource",
     "method"
   ],
   [
@@ -14755,13 +15001,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/shaders/fragmentsimpleshader.js~fragmentsimpleshader#isneededtomultiplyalphatocolorofpixeloutput",
-    "class/src/middle_level/shaders/FragmentSimpleShader.js~FragmentSimpleShader.html#instance-set-isNeededToMultiplyAlphaToColorOfPixelOutput",
+    "class/src/middle_level/shaders/FragmentSimpleShader.js~FragmentSimpleShader.html#instance-get-isNeededToMultiplyAlphaToColorOfPixelOutput",
     "src/middle_level/shaders/FragmentSimpleShader.js~FragmentSimpleShader#isNeededToMultiplyAlphaToColorOfPixelOutput",
     "member"
   ],
   [
     "src/middle_level/shaders/fragmentsimpleshader.js~fragmentsimpleshader#isneededtomultiplyalphatocolorofpixeloutput",
-    "class/src/middle_level/shaders/FragmentSimpleShader.js~FragmentSimpleShader.html#instance-get-isNeededToMultiplyAlphaToColorOfPixelOutput",
+    "class/src/middle_level/shaders/FragmentSimpleShader.js~FragmentSimpleShader.html#instance-set-isNeededToMultiplyAlphaToColorOfPixelOutput",
     "src/middle_level/shaders/FragmentSimpleShader.js~FragmentSimpleShader#isNeededToMultiplyAlphaToColorOfPixelOutput",
     "member"
   ],
@@ -15331,13 +15577,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/shaders/wireframeshader.js~wireframeshader#aabb",
-    "class/src/middle_level/shaders/WireframeShader.js~WireframeShader.html#instance-get-AABB",
+    "class/src/middle_level/shaders/WireframeShader.js~WireframeShader.html#instance-set-AABB",
     "src/middle_level/shaders/WireframeShader.js~WireframeShader#AABB",
     "member"
   ],
   [
     "src/middle_level/shaders/wireframeshader.js~wireframeshader#aabb",
-    "class/src/middle_level/shaders/WireframeShader.js~WireframeShader.html#instance-set-AABB",
+    "class/src/middle_level/shaders/WireframeShader.js~WireframeShader.html#instance-get-AABB",
     "src/middle_level/shaders/WireframeShader.js~WireframeShader#AABB",
     "member"
   ],
@@ -15367,13 +15613,13 @@ window.esdocSearchIndex = [
   ],
   [
     "src/middle_level/shaders/wireframeshader.js~wireframeshader#unfolduvratio",
-    "class/src/middle_level/shaders/WireframeShader.js~WireframeShader.html#instance-get-unfoldUVRatio",
+    "class/src/middle_level/shaders/WireframeShader.js~WireframeShader.html#instance-set-unfoldUVRatio",
     "src/middle_level/shaders/WireframeShader.js~WireframeShader#unfoldUVRatio",
     "member"
   ],
   [
     "src/middle_level/shaders/wireframeshader.js~wireframeshader#unfolduvratio",
-    "class/src/middle_level/shaders/WireframeShader.js~WireframeShader.html#instance-set-unfoldUVRatio",
+    "class/src/middle_level/shaders/WireframeShader.js~WireframeShader.html#instance-get-unfoldUVRatio",
     "src/middle_level/shaders/WireframeShader.js~WireframeShader#unfoldUVRatio",
     "member"
   ],

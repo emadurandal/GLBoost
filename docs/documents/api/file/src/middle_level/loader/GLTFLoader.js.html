@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -194,28 +196,25 @@ let singleton = Symbol();
 let singletonEnforcer = Symbol();
 
 /**
- * [en] This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .&lt;br&gt;
- * [ja] glTF&#x30D5;&#x30A1;&#x30A4;&#x30EB;&#x3092;&#x8AAD;&#x307F;&#x8FBC;&#x3080;&#x305F;&#x3081;&#x306E;&#x30ED;&#x30FC;&#x30C0;&#x30FC;&#x30AF;&#x30E9;&#x30B9;&#x3067;&#x3059;&#x3002;glTF&#x30D5;&#x30A1;&#x30A4;&#x30EB;&#x30D5;&#x30A9;&#x30FC;&#x30DE;&#x30C3;&#x30C8;&#x306B;&#x3064;&#x3044;&#x3066;&#x306E;&#x8A73;&#x7D30;&#x306F; https://github.com/KhronosGroup/glTF &#x3092;&#x3054;&#x89A7;&#x304F;&#x3060;&#x3055;&#x3044;&#x3002;
+ * This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .
  */
 export default class GLTFLoader {
 
   /**
-   * [en] The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.&lt;br&gt;
-   * [ja] GLTFLoader&#x30AF;&#x30E9;&#x30B9;&#x306E;&#x30B3;&#x30F3;&#x30B9;&#x30C8;&#x30E9;&#x30AF;&#x30BF;&#x3067;&#x3059;&#x3002;&#x3057;&#x304B;&#x3057;&#x672C;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x30B7;&#x30F3;&#x30B0;&#x30EB;&#x30C8;&#x30F3;&#x3067;&#x3042;&#x308B;&#x305F;&#x3081;&#x3001;&#x3053;&#x306E;&#x30B3;&#x30F3;&#x30B9;&#x30C8;&#x30E9;&#x30AF;&#x30BF;&#x306F;&#x76F4;&#x63A5;&#x547C;&#x3073;&#x51FA;&#x305B;&#x307E;&#x305B;&#x3093;&#x3002;getInstance()&#x9759;&#x7684;&#x30E1;&#x30BD;&#x30C3;&#x30C9;&#x3092;&#x4F7F;&#x3063;&#x3066;&#x304F;&#x3060;&#x3055;&#x3044;&#x3002;
-   * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] &#x3053;&#x306E;&#x30B3;&#x30F3;&#x30B9;&#x30C8;&#x30E9;&#x30AF;&#x30BF;&#x306E;&#x76F4;&#x63A5;&#x547C;&#x3073;&#x51FA;&#x3057;&#x3092;&#x7981;&#x6B62;&#x3059;&#x308B;&#x305F;&#x3081;&#x306E;&#x30B7;&#x30F3;&#x30DC;&#x30EB;
+   * The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+   * @param enforcer a Symbol to forbid calling this constructor directly
    */
-  constructor(enforcer) {
+  constructor(enforcer: Symbol) {
     if (enforcer !== singletonEnforcer) {
       throw new Error(&quot;This is a Singleton class. get the instance using &apos;getInstance&apos; static method.&quot;);
     }
   }
 
   /**
-   * [en] The static method to get singleton instance of this class.&lt;br&gt;
-   * [ja] &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306E;&#x30B7;&#x30F3;&#x30B0;&#x30EB;&#x30C8;&#x30F3;&#x30A4;&#x30F3;&#x30B9;&#x30BF;&#x30F3;&#x30B9;&#x3092;&#x53D6;&#x5F97;&#x3059;&#x308B;&#x305F;&#x3081;&#x306E;&#x9759;&#x7684;&#x30E1;&#x30BD;&#x30C3;&#x30C9;&#x3002;
-   * @return {GLTFLoader} [en] the singleton instance of GLTFLoader class [ja] GLTFLoader&#x30AF;&#x30E9;&#x30B9;&#x306E;&#x30B7;&#x30F3;&#x30B0;&#x30EB;&#x30C8;&#x30F3;&#x30A4;&#x30F3;&#x30B9;&#x30BF;&#x30F3;&#x30B9;
+   * The static method to get singleton instance of this class.&lt;br&gt;
+   * @return The singleton instance of GLTFLoader class
    */
-  static getInstance() {
+  static getInstance(): GLTFLoader {
     if (!this[singleton]) {
       this[singleton] = new GLTFLoader(singletonEnforcer);
     }
@@ -282,12 +281,12 @@ export default class GLTFLoader {
 
   /**
    * the method to load glTF file.
-   * @param {glBoostContext} glBoostContext - glBoostContext instance
-   * @param {string} url - url of glTF file
-   * @param {Object} options - option data for loading
-   * @return {Promise} a promise object
+   * @param glBoostContext - glBoostContext instance
+   * @param url - url of glTF file
+   * @param options - option data for loading
+   * @return a promise object
    */
-  loadGLTF(glBoostContext, url, options) {
+  loadGLTF(glBoostContext: glBoostContext, url: string, options: Object): Promise {
     let defaultOptions = {
       files: { 
         //        &quot;foo.gltf&quot;: content of file as ArrayBuffer, 
@@ -303,6 +302,7 @@ export default class GLTFLoader {
       defaultMaterial: ClassicMaterial,
       defaultShaderClass: null,
       isMeshTransparentAsDefault: false,
+      ignoreMeshList: [],
       defaultStates: {
         states: {
           enable: [
@@ -583,6 +583,8 @@ export default class GLTFLoader {
       this._IterateNodeOfScene(glBoostContext, buffers, json, defaultShader, shaders, textures, glTFVer, resolve, options);
     }
 
+    
+
   }
 
   _IterateNodeOfScene(glBoostContext, buffers, json, defaultShader, shaders, textures, glTFVer, resolve, options) {
@@ -620,15 +622,18 @@ export default class GLTFLoader {
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer, options);
 
-      if (options &amp;&amp; options.loaderExtension &amp;&amp; options.loaderExtension.setAssetPropertiesToRootGroup) {
-        options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
-      }
-
       rootGroup.addChild(group);
 
     }
 
     rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
+
+    if (options &amp;&amp; options.loaderExtension &amp;&amp; options.loaderExtension.setAssetPropertiesToRootGroup) {
+      options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
+    }
+    if (options &amp;&amp; options.loaderExtension &amp;&amp; options.loaderExtension.loadExtensionInfoAndSetToRootGroup) {
+      options.loaderExtension.loadExtensionInfoAndSetToRootGroup(rootGroup, json, glBoostContext);
+    }
 
     resolve(rootGroup);
   }
@@ -677,12 +682,18 @@ export default class GLTFLoader {
       let cameraStr = nodeJson.camera;
       let cameraJson = json.cameras[cameraStr];
       let camera = null;
+
+      let centerVec = new Vector3(0.0, 0.0, -1.0);
+      if (json.asset &amp;&amp; json.asset.LastSaved_ApplicationVendor) {
+        // For backwards compatibility
+        centerVec = new Vector3(1.0, 0.0, 0.0);
+      }
       if (cameraJson.type === &apos;perspective&apos;) {
         let perspective = cameraJson.perspective;
         camera = glBoostContext.createPerspectiveCamera(
           {
             eye: new Vector3(0.0, 0.0, 0),
-            center: new Vector3(1.0, 0.0, 0.0),
+            center: centerVec,
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
@@ -697,7 +708,7 @@ export default class GLTFLoader {
         camera = glBoostContext.createOrthoCamera(
           {
             eye: new Vector3(0.0, 0.0, 0),
-            center: new Vector3(1.0, 0.0, 0.0),
+            center: centerVec,
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
@@ -774,10 +785,14 @@ export default class GLTFLoader {
       mesh = glBoostContext.createMesh(geometry);
     }
     mesh.userFlavorName = meshStr;
-    group.addChild(mesh);
 
-    if (options &amp;&amp; options.isMeshTransparentAsDefault) {
-      mesh.isTransparentForce = true;
+    if (!(options.ignoreMeshList != null) || options.ignoreMeshList.indexOf(mesh.userFlavorName) === -1) {
+      // if the mesh name is not in ignore list, add it to the group.
+      group.addChild(mesh);
+    }
+
+    if (options &amp;&amp; options.isMeshTransparentAsDefault || options &amp;&amp; options.defaultStates &amp;&amp; options.defaultStates.isTransparent) {
+      mesh.isTransparent = true;
     }
 
     let _indicesArray = [];
@@ -919,7 +934,7 @@ export default class GLTFLoader {
                 group.getChildren().forEach((elem)=&gt;{
                   let isMatch = this.isTargetMatch(statesInfo, elem, target);
                   if (isMatch) {
-                    elem.isTransparentForce = statesInfo.isTransparent !== void 0 ? statesInfo.isTransparent : false;
+                    elem.isTransparent = statesInfo.isTransparent !== void 0 ? statesInfo.isTransparent : false;
                     if (statesInfo.states) {
                       material.states = statesInfo.states;
                     }
@@ -1237,6 +1252,17 @@ export default class GLTFLoader {
       if (typeof value !== &apos;string&apos;) {
         material[valueName + &apos;Color&apos;] = MathClassUtil.arrayToVectorOrMatrix(value);
       }
+      if (valueName === &apos;transparent&apos;) {
+        material.isTransparent = value;
+        let enables = [3042];
+        material.states.enable = material.states.enable.concat(enables);
+      }
+      if (valueName === &apos;transparency&apos;) {
+        material.baseColor.w = 1.0 - value;
+        material.diffuseColor.w = 1.0 - value;
+        material.specularColor.w = 1.0 - value;
+        material.ambientColor.w = 1.0 - value;
+      }
     }
 
     if (indices !== null) {
@@ -1491,7 +1517,7 @@ export default class GLTFLoader {
 
   _sliceBufferViewToArrayBuffer(json, bufferViewStr, arrayBuffer) {
     let bufferViewJson = json.bufferViews[bufferViewStr];
-    let byteOffset = bufferViewJson.byteOffset;
+    let byteOffset = (bufferViewJson.byteOffset != null) ? bufferViewJson.byteOffset : 0;
     let byteLength = bufferViewJson.byteLength;
     let arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
     return arrayBufferSliced;

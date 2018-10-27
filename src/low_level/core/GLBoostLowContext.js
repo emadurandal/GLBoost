@@ -160,12 +160,12 @@ export default class GLBoostLowContext {
 
   /**
    * create textures as render target. (and attach it to framebuffer object internally.)<br>
-   * @param {number} width - width of texture
-   * @param {number} height - height of texture
-   * @param {number} textureNum - the number of creation.
-   * @returns {Array} an array of created textures.
+   * @param  width - width of texture
+   * @param  height - height of texture
+   * @param  textureNum - the number of creation.
+   * @returns  an array of created textures.
    */
-  createTexturesForRenderTarget(width: number, height:number, textureNum:number) {
+  createTexturesForRenderTarget(width: number, height:number, textureNum:number): Array {
     var glContext = this.__system._glContext;
     var gl = glContext.gl;
 

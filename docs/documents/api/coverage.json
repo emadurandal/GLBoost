@@ -1,14 +1,14 @@
 {
-  "coverage": "58.63%",
-  "expectCount": 2415,
-  "actualCount": 1416,
+  "coverage": "61.63%",
+  "expectCount": 2458,
+  "actualCount": 1515,
   "files": {
     "src/auxiliaries/AnimationPlayer.js": {
       "expectCount": 23,
       "actualCount": 21,
       "undocumentLines": [
         5,
-        114
+        113
       ]
     },
     "src/globals.js": {
@@ -129,30 +129,29 @@
       ]
     },
     "src/low_level/components/TransformComponent.js": {
-      "expectCount": 56,
-      "actualCount": 35,
+      "expectCount": 53,
+      "actualCount": 33,
       "undocumentLines": [
-        14,
-        35,
-        59,
-        63,
-        67,
-        82,
-        100,
-        104,
-        128,
-        132,
-        155,
-        159,
-        184,
-        222,
-        226,
-        250,
-        254,
-        262,
-        266,
-        405,
-        451
+        15,
+        36,
+        60,
+        64,
+        68,
+        83,
+        101,
+        105,
+        129,
+        133,
+        156,
+        160,
+        185,
+        223,
+        227,
+        251,
+        255,
+        263,
+        267,
+        453
       ]
     },
     "src/low_level/core/Component.js": {
@@ -192,43 +191,34 @@
       ]
     },
     "src/low_level/core/GLBoostLowContext.js": {
-      "expectCount": 40,
-      "actualCount": 29,
+      "expectCount": 41,
+      "actualCount": 32,
       "undocumentLines": [
-        26,
         30,
-        56,
-        60,
         64,
-        70,
-        77,
-        263,
+        68,
+        72,
+        85,
         271,
-        312,
-        320
+        279,
+        322,
+        330
       ]
     },
     "src/low_level/core/GLBoostObject.js": {
-      "expectCount": 30,
-      "actualCount": 26,
+      "expectCount": 32,
+      "actualCount": 29,
       "undocumentLines": [
         10,
-        59,
-        125,
-        172
+        129,
+        176
       ]
     },
     "src/low_level/core/GLBoostSystem.js": {
-      "expectCount": 8,
-      "actualCount": 1,
+      "expectCount": 12,
+      "actualCount": 11,
       "undocumentLines": [
-        6,
-        10,
-        15,
-        17,
-        19,
-        24,
-        26
+        13
       ]
     },
     "src/low_level/core/GLContext.js": {
@@ -281,13 +271,10 @@
     },
     "src/low_level/core/L_GLBoostMonitor.js": {
       "expectCount": 21,
-      "actualCount": 16,
+      "actualCount": 19,
       "undocumentLines": [
-        4,
         6,
-        12,
-        13,
-        19
+        8
       ]
     },
     "src/low_level/core/MemoryManager.js": {
@@ -303,16 +290,16 @@
       "undocumentLines": [
         15,
         63,
-        194,
-        227,
-        272,
-        320,
-        361,
-        421,
-        461,
-        469,
-        583,
-        629
+        195,
+        228,
+        273,
+        324,
+        365,
+        425,
+        465,
+        473,
+        587,
+        633
       ]
     },
     "src/low_level/elements/cameras/L_AbstractCamera.js": {
@@ -355,122 +342,81 @@
       ]
     },
     "src/low_level/elements/cameras/L_FrustumCamera.js": {
-      "expectCount": 34,
-      "actualCount": 11,
+      "expectCount": 35,
+      "actualCount": 22,
       "undocumentLines": [
-        4,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        15,
-        16,
-        18,
-        19,
-        27,
-        33,
-        58,
-        70,
-        82,
-        94,
-        106,
-        118,
-        122,
-        126,
+        7,
+        42,
+        73,
+        85,
+        97,
+        109,
+        121,
+        133,
+        137,
         141,
-        154
+        145,
+        160,
+        173
       ]
     },
     "src/low_level/elements/cameras/L_OrthoCamera.js": {
       "expectCount": 38,
-      "actualCount": 13,
+      "actualCount": 24,
       "undocumentLines": [
-        4,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        17,
-        18,
-        26,
-        32,
-        67,
-        79,
-        91,
-        103,
-        115,
-        127,
-        139,
-        151,
+        6,
+        42,
+        83,
+        95,
+        107,
+        119,
+        131,
+        143,
         155,
-        159,
-        176,
-        191
+        167,
+        171,
+        175,
+        192,
+        207
       ]
     },
     "src/low_level/elements/cameras/L_PerspectiveCamera.js": {
-      "expectCount": 33,
-      "actualCount": 9,
+      "expectCount": 35,
+      "actualCount": 19,
       "undocumentLines": [
-        4,
-        8,
-        9,
-        10,
-        11,
-        13,
-        14,
-        16,
-        17,
-        25,
-        31,
-        60,
-        61,
-        72,
-        84,
-        96,
-        108,
-        112,
-        119,
-        123,
-        127,
-        134,
+        6,
+        38,
+        44,
+        73,
+        74,
+        85,
+        97,
+        109,
+        121,
+        125,
+        132,
+        136,
+        140,
         147,
-        158
+        160,
+        171
       ]
     },
     "src/low_level/geometries/BlendShapeGeometry.js": {
-      "expectCount": 37,
-      "actualCount": 14,
+      "expectCount": 38,
+      "actualCount": 27,
       "undocumentLines": [
-        5,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15,
-        16,
-        17,
-        18,
-        20,
-        21,
-        78,
-        90,
-        102,
-        114,
-        126,
-        138,
-        150,
-        162,
-        174,
-        186
+        7,
+        94,
+        106,
+        118,
+        130,
+        142,
+        154,
+        166,
+        178,
+        190,
+        202
       ]
     },
     "src/low_level/geometries/Geometry.js": {
@@ -524,24 +470,19 @@
     },
     "src/low_level/materials/ClassicMaterial.js": {
       "expectCount": 17,
-      "actualCount": 6,
+      "actualCount": 11,
       "undocumentLines": [
-        5,
-        9,
-        10,
-        11,
-        12,
-        13,
-        16,
-        39,
-        52,
-        65,
-        78
+        7,
+        24,
+        47,
+        60,
+        73,
+        86
       ]
     },
     "src/low_level/materials/L_AbstractMaterial.js": {
-      "expectCount": 66,
-      "actualCount": 41,
+      "expectCount": 72,
+      "actualCount": 43,
       "undocumentLines": [
         8,
         16,
@@ -560,31 +501,37 @@
         33,
         34,
         36,
+        52,
         53,
-        92,
-        101,
-        217,
-        241,
-        356,
-        365,
-        369
+        55,
+        94,
+        103,
+        219,
+        243,
+        363,
+        372,
+        376,
+        447,
+        455
       ]
     },
     "src/low_level/materials/PBRMetallicRoughnessMaterial.js": {
-      "expectCount": 31,
+      "expectCount": 33,
       "actualCount": 20,
       "undocumentLines": [
         10,
-        39,
-        47,
-        55,
-        63,
-        71,
-        79,
-        87,
-        95,
-        103,
-        111
+        35,
+        36,
+        41,
+        49,
+        57,
+        65,
+        73,
+        81,
+        89,
+        97,
+        105,
+        113
       ]
     },
     "src/low_level/math/AABB.js": {
@@ -610,7 +557,7 @@
       "actualCount": 9,
       "undocumentLines": [
         9,
-        113
+        118
       ]
     },
     "src/low_level/math/MathUtil.js": {
@@ -627,15 +574,15 @@
         5,
         10,
         77,
-        409,
-        417,
-        425,
-        434,
-        442,
-        450,
-        458,
-        466,
-        474
+        412,
+        420,
+        428,
+        437,
+        445,
+        453,
+        461,
+        469,
+        477
       ]
     },
     "src/low_level/math/Matrix44.js": {
@@ -692,10 +639,10 @@
       "undocumentLines": [
         12,
         50,
-        295,
-        303,
-        311,
-        319
+        316,
+        324,
+        332,
+        340
       ]
     },
     "src/low_level/math/Vector4.js": {
@@ -769,30 +716,28 @@
       "expectCount": 3,
       "actualCount": 2,
       "undocumentLines": [
-        6
+        8
       ]
     },
     "src/low_level/primitives/Axis.js": {
       "expectCount": 3,
       "actualCount": 2,
       "undocumentLines": [
-        6
+        8
       ]
     },
     "src/low_level/primitives/Cube.js": {
       "expectCount": 3,
       "actualCount": 2,
       "undocumentLines": [
-        8
+        10
       ]
     },
     "src/low_level/primitives/CubeAbsolute.js": {
       "expectCount": 6,
-      "actualCount": 3,
+      "actualCount": 5,
       "undocumentLines": [
-        8,
-        15,
-        22
+        10
       ]
     },
     "src/low_level/primitives/Grid.js": {
@@ -882,17 +827,17 @@
       ]
     },
     "src/low_level/textures/AbstractTexture.js": {
-      "expectCount": 22,
-      "actualCount": 14,
+      "expectCount": 23,
+      "actualCount": 15,
       "undocumentLines": [
-        25,
+        23,
+        26,
         28,
-        30,
-        80,
-        84,
-        92,
-        191,
-        199
+        75,
+        79,
+        87,
+        188,
+        196
       ]
     },
     "src/low_level/textures/CubeTexture.js": {
@@ -904,7 +849,7 @@
         13,
         15,
         20,
-        147
+        134
       ]
     },
     "src/low_level/textures/InternalDataTexture.js": {
@@ -978,8 +923,8 @@
         75,
         76,
         87,
-        193,
-        197
+        197,
+        201
       ]
     },
     "src/middle_level/Renderer.js": {
@@ -996,11 +941,11 @@
         30,
         31,
         32,
-        355,
-        359,
-        360,
-        465,
-        469
+        352,
+        356,
+        357,
+        462,
+        466
       ]
     },
     "src/middle_level/core/GLBoostMiddleContext.js": {
@@ -1033,52 +978,50 @@
     },
     "src/middle_level/elements/M_Element.js": {
       "expectCount": 97,
-      "actualCount": 70,
+      "actualCount": 72,
       "undocumentLines": [
         10,
-        91,
-        141,
-        142,
-        147,
-        163,
-        176,
-        200,
-        212,
-        220,
-        224,
-        238,
+        93,
+        149,
+        165,
+        178,
+        202,
+        214,
+        222,
+        226,
         242,
-        247,
-        283,
-        291,
-        299,
-        307,
-        315,
-        325,
-        338,
-        346,
+        246,
+        251,
+        287,
+        295,
+        303,
+        311,
+        319,
+        329,
+        342,
         350,
-        399,
-        447,
-        462,
-        515
+        354,
+        403,
+        449,
+        464,
+        517
       ]
     },
     "src/middle_level/elements/M_Group.js": {
-      "expectCount": 31,
-      "actualCount": 28,
+      "expectCount": 35,
+      "actualCount": 32,
       "undocumentLines": [
         14,
-        393,
-        438
+        400,
+        445
       ]
     },
     "src/middle_level/elements/M_Scene.js": {
       "expectCount": 25,
       "actualCount": 23,
       "undocumentLines": [
-        220,
-        271
+        216,
+        263
       ]
     },
     "src/middle_level/elements/cameras/M_AbstractCamera.js": {
@@ -1107,7 +1050,7 @@
       ]
     },
     "src/middle_level/elements/cameras/M_FrustumCamera.js": {
-      "expectCount": 19,
+      "expectCount": 20,
       "actualCount": 8,
       "undocumentLines": [
         5,
@@ -1120,7 +1063,8 @@
         55,
         63,
         71,
-        75
+        75,
+        79
       ]
     },
     "src/middle_level/elements/cameras/M_OrthoCamera.js": {
@@ -1281,18 +1225,18 @@
       "expectCount": 22,
       "actualCount": 10,
       "undocumentLines": [
+        26,
         27,
-        28,
-        31,
-        38,
-        46,
-        54,
-        72,
-        76,
-        87,
-        98,
-        152,
-        158
+        30,
+        37,
+        45,
+        53,
+        71,
+        75,
+        86,
+        97,
+        151,
+        157
       ]
     },
     "src/middle_level/elements/lights/M_PointLight.js": {
@@ -1326,28 +1270,22 @@
       ]
     },
     "src/middle_level/elements/meshes/M_Mesh.js": {
-      "expectCount": 39,
-      "actualCount": 20,
+      "expectCount": 42,
+      "actualCount": 29,
       "undocumentLines": [
         13,
-        23,
-        24,
-        25,
-        59,
-        64,
-        69,
-        72,
-        232,
-        236,
-        243,
+        74,
+        82,
+        242,
         246,
-        250,
-        255,
-        259,
-        314,
-        332,
-        346,
-        370
+        254,
+        257,
+        262,
+        266,
+        321,
+        339,
+        353,
+        377
       ]
     },
     "src/middle_level/elements/meshes/M_ScreenMesh.js": {
@@ -1492,9 +1430,9 @@
         410,
         418,
         426,
-        495,
-        552,
-        589
+        488,
+        545,
+        582
       ]
     },
     "src/middle_level/geometries/M_SkeletalGeometry.js": {
@@ -1514,15 +1452,33 @@
         4
       ]
     },
+    "src/middle_level/loader/GLBoostGLTFLoaderExtension.js": {
+      "expectCount": 9,
+      "actualCount": 6,
+      "undocumentLines": [
+        6,
+        7,
+        30
+      ]
+    },
+    "src/middle_level/loader/GLTF2Exporter.js": {
+      "expectCount": 7,
+      "actualCount": 4,
+      "undocumentLines": [
+        8,
+        9,
+        32
+      ]
+    },
     "src/middle_level/loader/GLTF2Loader.js": {
-      "expectCount": 28,
-      "actualCount": 23,
+      "expectCount": 29,
+      "actualCount": 24,
       "undocumentLines": [
         7,
         8,
         57,
-        148,
-        469
+        163,
+        514
       ]
     },
     "src/middle_level/loader/GLTFLoader.js": {
@@ -1531,8 +1487,8 @@
       "undocumentLines": [
         23,
         24,
-        50,
-        172
+        47,
+        170
       ]
     },
     "src/middle_level/loader/ModelConverter.js": {
@@ -1550,22 +1506,22 @@
       "undocumentLines": [
         8,
         9,
-        35
+        32
       ]
     },
     "src/middle_level/plugins/EffekseerElement.js": {
       "expectCount": 18,
       "actualCount": 9,
       "undocumentLines": [
-        6,
         9,
-        10,
-        11,
         12,
-        67,
-        78,
-        89,
-        100
+        13,
+        14,
+        15,
+        66,
+        77,
+        88,
+        99
       ]
     },
     "src/middle_level/shaders/BlendShapeShader.js": {
@@ -1590,14 +1546,14 @@
       ]
     },
     "src/middle_level/shaders/DecalShader.js": {
-      "expectCount": 14,
-      "actualCount": 9,
+      "expectCount": 15,
+      "actualCount": 10,
       "undocumentLines": [
         8,
         12,
-        119,
-        127,
-        194
+        132,
+        140,
+        210
       ]
     },
     "src/middle_level/shaders/DepthDisplayShader.js": {
@@ -1623,9 +1579,9 @@
       "undocumentLines": [
         5,
         9,
-        66,
-        74,
-        95
+        63,
+        71,
+        92
       ]
     },
     "src/middle_level/shaders/FreeShader.js": {
@@ -1672,7 +1628,7 @@
       "actualCount": 6,
       "undocumentLines": [
         6,
-        333
+        334
       ]
     },
     "src/middle_level/shaders/ParticleShader.js": {

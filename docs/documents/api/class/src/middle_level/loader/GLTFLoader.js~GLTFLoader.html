@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -168,13 +170,13 @@
 </nav>
 
 <div class="content" data-ice="content"><div class="header-notice">
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import GLTFLoader from &apos;<span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber30">glboost/src/middle_level/loader/GLTFLoader.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import GLTFLoader from &apos;<span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber29">glboost/src/middle_level/loader/GLTFLoader.js</a></span>&apos;</code></pre></div>
   <span data-ice="access">public</span>
   <span data-ice="kind">class</span>
   
   
   
-  <span data-ice="source">| <span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber30">source</a></span></span>
+  <span data-ice="source">| <span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber29">source</a></span></span>
 </div>
 
 <div class="self-detail detail">
@@ -194,8 +196,7 @@
 
   
   
-  <div class="description" data-ice="description"><p>[en] This is a loader class of glTF file format. You can see more detail of glTF format at <a href="https://github.com/KhronosGroup/glTF">https://github.com/KhronosGroup/glTF</a> .<br>
-[ja] glTF&#x30D5;&#x30A1;&#x30A4;&#x30EB;&#x3092;&#x8AAD;&#x307F;&#x8FBC;&#x3080;&#x305F;&#x3081;&#x306E;&#x30ED;&#x30FC;&#x30C0;&#x30FC;&#x30AF;&#x30E9;&#x30B9;&#x3067;&#x3059;&#x3002;glTF&#x30D5;&#x30A1;&#x30A4;&#x30EB;&#x30D5;&#x30A9;&#x30FC;&#x30DE;&#x30C3;&#x30C8;&#x306B;&#x3064;&#x3044;&#x3066;&#x306E;&#x8A73;&#x7D30;&#x306F; <a href="https://github.com/KhronosGroup/glTF">https://github.com/KhronosGroup/glTF</a> &#x3092;&#x3054;&#x89A7;&#x304F;&#x3060;&#x3055;&#x3044;&#x3002;</p>
+  <div class="description" data-ice="description"><p>This is a loader class of glTF file format. You can see more detail of glTF format at <a href="https://github.com/KhronosGroup/glTF">https://github.com/KhronosGroup/glTF</a> .</p>
 </div>
   
 
@@ -267,7 +268,7 @@
       <div>
         
         
-        <div data-ice="description"><p>[en] The static method to get singleton instance of this class.</p>
+        <div data-ice="description"><p>The static method to get singleton instance of this class.</p>
 </div>
       </div>
     </td>
@@ -337,7 +338,7 @@
       <div>
         
         
-        <div data-ice="description"><p>[en] The constructor of GLTFLoader class.</p>
+        <div data-ice="description"><p>The constructor of GLTFLoader class.</p>
 </div>
       </div>
     </td>
@@ -1199,7 +1200,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber50">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber47">source</a></span></span>
     </span>
   </h3>
 
@@ -1245,15 +1246,14 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber48">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber45">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  <div data-ice="description"><p>[en] The static method to get singleton instance of this class.<br>
-[ja] &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306E;&#x30B7;&#x30F3;&#x30B0;&#x30EB;&#x30C8;&#x30F3;&#x30A4;&#x30F3;&#x30B9;&#x30BF;&#x30F3;&#x30B9;&#x3092;&#x53D6;&#x5F97;&#x3059;&#x308B;&#x305F;&#x3081;&#x306E;&#x9759;&#x7684;&#x30E1;&#x30BD;&#x30C3;&#x30C9;&#x3002; </p>
+  <div data-ice="description"><p>The static method to get singleton instance of this class.<br>  </p>
 </div>
 
   
@@ -1267,7 +1267,7 @@
       <tbody>
         <tr>
           <td class="return-type code" data-ice="returnType"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></td>
-          <td class="return-desc" data-ice="returnDescription"><p>[en] the singleton instance of GLTFLoader class [ja] GLTFLoader&#x30AF;&#x30E9;&#x30B9;&#x306E;&#x30B7;&#x30F3;&#x30B0;&#x30EB;&#x30C8;&#x30F3;&#x30A4;&#x30F3;&#x30B9;&#x30BF;&#x30F3;&#x30B9;</p>
+          <td class="return-desc" data-ice="returnDescription"><p>The singleton instance of GLTFLoader class</p>
 </td>
         </tr>
       </tbody>
@@ -1305,7 +1305,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1361">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1385">source</a></span></span>
     </span>
   </h3>
 
@@ -1363,15 +1363,14 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber37">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber35">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  <div data-ice="description"><p>[en] The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.<br>
-[ja] GLTFLoader&#x30AF;&#x30E9;&#x30B9;&#x306E;&#x30B3;&#x30F3;&#x30B9;&#x30C8;&#x30E9;&#x30AF;&#x30BF;&#x3067;&#x3059;&#x3002;&#x3057;&#x304B;&#x3057;&#x672C;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x30B7;&#x30F3;&#x30B0;&#x30EB;&#x30C8;&#x30F3;&#x3067;&#x3042;&#x308B;&#x305F;&#x3081;&#x3001;&#x3053;&#x306E;&#x30B3;&#x30F3;&#x30B9;&#x30C8;&#x30E9;&#x30AF;&#x30BF;&#x306F;&#x76F4;&#x63A5;&#x547C;&#x3073;&#x51FA;&#x305B;&#x307E;&#x305B;&#x3093;&#x3002;getInstance()&#x9759;&#x7684;&#x30E1;&#x30BD;&#x30C3;&#x30C9;&#x3092;&#x4F7F;&#x3063;&#x3066;&#x304F;&#x3060;&#x3055;&#x3044;&#x3002; </p>
+  <div data-ice="description"><p>The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method. </p>
 </div>
 
   
@@ -1388,7 +1387,7 @@
       <td data-ice="name" class="code" data-depth="0">enforcer</td>
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol">Symbol</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"><p>[en] a Symbol to forbid calling this constructor directly [ja] &#x3053;&#x306E;&#x30B3;&#x30F3;&#x30B9;&#x30C8;&#x30E9;&#x30AF;&#x30BF;&#x306E;&#x76F4;&#x63A5;&#x547C;&#x3073;&#x51FA;&#x3057;&#x3092;&#x7981;&#x6B62;&#x3059;&#x308B;&#x305F;&#x3081;&#x306E;&#x30B7;&#x30F3;&#x30DC;&#x30EB;</p>
+      <td data-ice="description"><p>a Symbol to forbid calling this constructor directly</p>
 </td>
     </tr>
 </tbody>
@@ -1428,7 +1427,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber172">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber170">source</a></span></span>
     </span>
   </h3>
 
@@ -1474,7 +1473,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber202">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber200">source</a></span></span>
     </span>
   </h3>
 
@@ -1563,7 +1562,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber55">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber52">source</a></span></span>
     </span>
   </h3>
 
@@ -1634,7 +1633,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber69">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber66">source</a></span></span>
     </span>
   </h3>
 
@@ -1717,7 +1716,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1136">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1160">source</a></span></span>
     </span>
   </h3>
 
@@ -1800,7 +1799,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber219">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber217">source</a></span></span>
     </span>
   </h3>
 
@@ -1907,7 +1906,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber241">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber239">source</a></span></span>
     </span>
   </h3>
 
@@ -2008,14 +2007,14 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber120">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber117">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  <div data-ice="description"><p>the method to load glTF file. </p>
+  <div data-ice="description"><p>the method to load glTF file.  </p>
 </div>
 
   
@@ -2205,7 +2204,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1335">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1359">source</a></span></span>
     </span>
   </h3>
 
@@ -2282,7 +2281,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1466">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1490">source</a></span></span>
     </span>
   </h3>
 
@@ -2379,7 +2378,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1330">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1354">source</a></span></span>
     </span>
   </h3>
 
@@ -2468,7 +2467,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1311">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1335">source</a></span></span>
     </span>
   </h3>
 
@@ -2551,7 +2550,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1458">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1482">source</a></span></span>
     </span>
   </h3>
 
@@ -2646,7 +2645,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1390">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1414">source</a></span></span>
     </span>
   </h3>
 
@@ -2723,7 +2722,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1365">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1389">source</a></span></span>
     </span>
   </h3>
 
@@ -2800,7 +2799,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1422">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1446">source</a></span></span>
     </span>
   </h3>
 
@@ -2877,7 +2876,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber262">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber260">source</a></span></span>
     </span>
   </h3>
 
@@ -2948,7 +2947,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1453">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1477">source</a></span></span>
     </span>
   </h3>
 
@@ -3025,7 +3024,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber906">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber919">source</a></span></span>
     </span>
   </h3>
 
@@ -3096,7 +3095,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1254">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1278">source</a></span></span>
     </span>
   </h3>
 
@@ -3179,7 +3178,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber914">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber927">source</a></span></span>
     </span>
   </h3>
 
@@ -3364,7 +3363,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber589">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber598">source</a></span></span>
     </span>
   </h3>
 
@@ -3507,7 +3506,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1244">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1268">source</a></span></span>
     </span>
   </h3>
 
@@ -3608,7 +3607,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber270">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber268">source</a></span></span>
     </span>
   </h3>
 
@@ -3709,7 +3708,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1163">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1187">source</a></span></span>
     </span>
   </h3>
 
@@ -3804,7 +3803,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber481">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber484">source</a></span></span>
     </span>
   </h3>
 
@@ -3923,7 +3922,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber466">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber469">source</a></span></span>
     </span>
   </h3>
 
@@ -3988,7 +3987,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1322">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/loader/GLTFLoader.js.html#lineNumber1346">source</a></span></span>
     </span>
   </h3>
 

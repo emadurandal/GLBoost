@@ -11,10 +11,8 @@ import Vector4 from '../../low_level/math/Vector4';
 
 
 /**
- * [en] This M_Scene class is the top level element of scene graph hierarchy.
- *       To render scene, pass this scene element to Renderer.draw method.<br>
- * [ja] このSceneクラスはシーングラフ階層のトップレベルに位置する要素です。
- *       シーンをレンダリングするには、このscene要素をRenderer.drawメソッドに渡します。
+ * This M_Scene class is the top level element of scene graph hierarchy.
+ *  To render scene, pass this scene element to Renderer.draw method.
  */
 export default class M_Scene extends M_Group {
   _gl: WebGLRenderingContext;
@@ -29,9 +27,8 @@ export default class M_Scene extends M_Group {
   _glContext: GLContext;
   
   /**
-   * [en] constructor
-   * [ja] コンストラクタ
-   * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+   * constructor
+   * @param {HTMLCanvas|string} canvas canvas or canvas' id string.
    */
   constructor(glBoostContext:any) {
     super(glBoostContext);
@@ -59,8 +56,7 @@ export default class M_Scene extends M_Group {
   }
 
   /**
-   * [en] Prepare for Rendering. You have to call this method before Renderer.draw method.
-   * [ja] レンダリングのための前処理を行います。Renderer.drawメソッドの前にこのメソッドを呼ぶ必要があります。
+   * Prepare for Rendering. You have to call this method before Renderer.draw method.
    */
   prepareToRender(expression:any) {
     this._reset();
@@ -233,38 +229,34 @@ export default class M_Scene extends M_Group {
   }    
 
   /**
-   * [en] Get child elements which belong to this scene.<br>
-   * [ja] このシーンに属していた子供の要素の配列を返します。
-   * @return {Array<Element>} [en] child elements of this scene. [ja] このシーンの子供の要素
+   * Get child elements which belong to this scene.
+   * @return child elements of this scene.
    */
-  getChildren() {
+  getChildren(): Array<Element>{
     return this._elements;
   }
 
   /**
-   * [en] Get child elements which belong to this scene.<br>
-   * [ja] このシーンに属していた子供の要素の配列を返します。
-   * @return {Array<Element>} [en] child elements of this scene. [ja] このシーンの子供の要素
+   * Get child elements which belong to this scene.
+   * @return child elements of this scene.
    */
-  get elements():Array<any> {
+  get elements():Array<Element> {
     return this._elements;
   }
 
   /**
-   * [en] Get child meshes which belong to this scene.<br>
-   * [ja] このシーンに属していた子供のMesh要素の配列を返します。
-   * @return {Array<M_Mesh>} [en] child meshes of this scene. [ja] このシーンの子供のMesh要素
+   * Get child meshes which belong to this scene.
+   * @return child meshes of this scene.
    */
-  get meshes() {
+  get meshes(): Array<M_Mesh>{
     return this._meshes;
   }
 
   /**
-   * [en] Get child lights which belong to this scene.<br>
-   * [ja] このシーンに属していた子供のLight要素の配列を返します。
-   * @return {Array<M_AbstractLight>} [en] child lights of this scene. [ja] このシーンの子供のLight要素
+   * Get child lights which belong to this scene.
+   * @return child lights of this scene.
    */
-  get lights() {
+  get lights(): Array<M_AbstractLight>{
     return this._lights;
   }
 
@@ -273,11 +265,10 @@ export default class M_Scene extends M_Group {
   }
 
   /**
-   * [en] Get child cameras which belong to this scene.<br>
-   * [ja] このシーンに属していた子供のCamera要素の配列を返します。
-   * @return {Array<PerspectiveCamera>} [en] child cameras of this scene. [ja] このシーンの子供のCamera要素
+   * Get child cameras which belong to this scene.
+   * @return child cameras of this scene.
    */
-  get cameras() {
+  get cameras(): Array<PerspectiveCamera> {
     return this._cameras;
   }
 

@@ -24,28 +24,25 @@ let singleton = Symbol();
 let singletonEnforcer = Symbol();
 
 /**
- * [en] This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .<br>
- * [ja] glTFファイルを読み込むためのローダークラスです。glTFファイルフォーマットについての詳細は https://github.com/KhronosGroup/glTF をご覧ください。
+ * This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .
  */
 export default class GLTFLoader {
 
   /**
-   * [en] The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.<br>
-   * [ja] GLTFLoaderクラスのコンストラクタです。しかし本クラスはシングルトンであるため、このコンストラクタは直接呼び出せません。getInstance()静的メソッドを使ってください。
-   * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] このコンストラクタの直接呼び出しを禁止するためのシンボル
+   * The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+   * @param enforcer a Symbol to forbid calling this constructor directly
    */
-  constructor(enforcer) {
+  constructor(enforcer: Symbol) {
     if (enforcer !== singletonEnforcer) {
       throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
     }
   }
 
   /**
-   * [en] The static method to get singleton instance of this class.<br>
-   * [ja] このクラスのシングルトンインスタンスを取得するための静的メソッド。
-   * @return {GLTFLoader} [en] the singleton instance of GLTFLoader class [ja] GLTFLoaderクラスのシングルトンインスタンス
+   * The static method to get singleton instance of this class.<br>
+   * @return The singleton instance of GLTFLoader class
    */
-  static getInstance() {
+  static getInstance(): GLTFLoader {
     if (!this[singleton]) {
       this[singleton] = new GLTFLoader(singletonEnforcer);
     }
@@ -112,12 +109,12 @@ export default class GLTFLoader {
 
   /**
    * the method to load glTF file.
-   * @param {glBoostContext} glBoostContext - glBoostContext instance
-   * @param {string} url - url of glTF file
-   * @param {Object} options - option data for loading
-   * @return {Promise} a promise object
+   * @param glBoostContext - glBoostContext instance
+   * @param url - url of glTF file
+   * @param options - option data for loading
+   * @return a promise object
    */
-  loadGLTF(glBoostContext, url, options) {
+  loadGLTF(glBoostContext: glBoostContext, url: string, options: Object): Promise {
     let defaultOptions = {
       files: { 
         //        "foo.gltf": content of file as ArrayBuffer, 

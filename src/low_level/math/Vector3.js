@@ -86,14 +86,14 @@ export default class Vector3 {
   */
 
   /**
-   * 長さの2乗
+   * to square length
    */
   lengthSquared() {
     return this.x*this.x + this.y*this.y + this.z*this.z;
   }
 
   /**
-   * 長さの2乗（static版）
+   * to square length(static verison)
    */
   static lengthSquared(vec3:Vector3) {
     return vec3.x*vec3.x + vec3.y*vec3.y + vec3.z*vec3.z;
@@ -114,21 +114,21 @@ export default class Vector3 {
   }
 
   /**
-   * 内積
+   * dot product
    */
   dotProduct(vec3:Vector3) {
       return this.x * vec3.x + this.y * vec3.y + this.z * vec3.z;
   }
 
   /**
-   * 内積（static版）
+   * dot product(static version)
    */
   static dotProduct(lv:Vector3, rv:Vector3) {
     return lv.x * rv.x + lv.y * rv.y + lv.z * rv.z;
   }
 
   /**
-   * 外積
+   * cross product
    */
   cross(v:Vector3) {
     var x = this.y*v.z - this.z*v.y;
@@ -143,7 +143,7 @@ export default class Vector3 {
   }
 
   /**
-  * 外積(static版)
+  * cross product(static version)
   */
   static cross(lv:Vector3, rv:Vector3) {
     var x = lv.y*rv.z - lv.z*rv.y;
@@ -154,7 +154,7 @@ export default class Vector3 {
   }
 
   /**
-   * 正規化
+   * normalize
    */
   normalize() {
     var length = this.length();
@@ -164,7 +164,7 @@ export default class Vector3 {
   }
 
   /**
-   * 正規化（static版）
+   * normalize(static version)
    */
   static normalize(vec3:Vector3) {
     var length = vec3.length();
@@ -193,7 +193,7 @@ export default class Vector3 {
   }
 
   /**
-   * 減算
+   * subtract
    */
   subtract(v:Vector3) {
     this.x -= v.x;
@@ -204,14 +204,14 @@ export default class Vector3 {
   }
 
   /**
-   * 減算（static版）
+   * subtract(subtract)
    */
   static subtract(lv:Vector3, rv:Vector3) {
     return new Vector3(lv.x - rv.x, lv.y - rv.y, lv.z - rv.z);
   }
 
   /**
-   * 除算
+   * divide
    */
   divide(val:number) {
     if (val !== 0) {
@@ -229,7 +229,7 @@ export default class Vector3 {
   }
 
   /**
-   * 除算（static版）
+   * divide(static version)
    */
   static divide(vec3:Vector3, val:number) {
     if (val !== 0) {
@@ -240,6 +240,9 @@ export default class Vector3 {
     }
   }
 
+  /**
+   * multiply
+   */
   multiply(val:number) {
     this.x *= val;
     this.y *= val;
@@ -248,6 +251,9 @@ export default class Vector3 {
     return this;
   }
 
+  /**
+   * multiply vector
+   */
   multiplyVector(vec:Vector3) {
     this.x *= vec.x;
     this.y *= vec.y;
@@ -256,10 +262,16 @@ export default class Vector3 {
     return this;
   }
 
+  /**
+   * multiply(static version)
+   */
   static multiply(vec3:Vector3, val:number) {
     return new Vector3(vec3.x * val, vec3.y * val, vec3.z * val);
   }
 
+  /**
+   * multiply vector(static version)
+   */
   static multiplyVector(vec3:Vector3, vec:Vector3) {
     return new Vector3(vec3.x * vec.x, vec3.y * vec.y, vec3.z * vec.z);
   }
@@ -276,6 +288,9 @@ export default class Vector3 {
     return sita;
   }
 
+  /**
+   * divide vector
+   */
   divideVector(vec3:Vector3) {
     this.x /= vec3.x;
     this.y /= vec3.y;
@@ -284,10 +299,16 @@ export default class Vector3 {
     return this;
   }
 
+  /**
+   * divide vector(static version)
+   */
   static divideVector(lvec3:Vector3, rvec3:Vector3) {
     return new Vector3(lvec3.x / rvec3.x, lvec3.y / rvec3.y, lvec3.z / rvec3.z);
   }
 
+  /**
+   * change to string
+   */
   toString() {
     return '(' + this.x + ', ' + this.y + ', ' + this.z +')';
   }

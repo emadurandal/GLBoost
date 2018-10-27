@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -168,13 +170,19 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/low_level/core/L_GLBoostMonitor.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import GLBoost from &apos;../../globals&apos;;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/* @flow */
+
+import GLBoost from &apos;../../globals&apos;;
 import MiscUtil from &apos;../misc/MiscUtil&apos;;
 
 let singleton = Symbol();
 
 export default class L_GLBoostMonitor {
-  constructor(enforcer) {
+  _glBoostObjects: Object;
+  _glResources: Array&lt;Array&lt;any&gt;&gt;;
+  static _singletonEnforcer: Symbol;
+
+  constructor(enforcer: Symbol) {
     if (enforcer !== L_GLBoostMonitor._singletonEnforcer || !(this instanceof L_GLBoostMonitor)) {
       throw new Error(&apos;This is a Singleton class. get the instance using \&apos;getInstance\&apos; static method.&apos;);
     }
@@ -185,24 +193,25 @@ export default class L_GLBoostMonitor {
   }
 
   static getInstance() {
-    if (!this[singleton]) {
-      this[singleton] = new L_GLBoostMonitor(L_GLBoostMonitor._singletonEnforcer);
+    const that: any = this;
+    if (!(that:any)[singleton]) {
+      that[singleton] = new L_GLBoostMonitor(L_GLBoostMonitor._singletonEnforcer);
     }
-    return this[singleton];
+    return that[singleton];
   }
 
-  registerGLBoostObject(glBoostObject) {
+  registerGLBoostObject(glBoostObject: Object) {
     this._glBoostObjects[glBoostObject.instanceName] = glBoostObject;
     MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, &apos;GLBoost Resource: &apos; + glBoostObject.toString() + &apos; (&apos; + glBoostObject.belongingCanvasId + &apos;) was created.&apos;);
   }
 
-  deregisterGLBoostObject(glBoostObject) {
+  deregisterGLBoostObject(glBoostObject: Object) {
     delete this._glBoostObjects[glBoostObject.instanceName];
     MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, &apos;GLBoost Resource: &apos; + glBoostObject.toString() + &apos; (&apos; + glBoostObject.belongingCanvasId + &apos;) was ready for discard.&apos;);
   }
 
 
-  getGLBoostObjects(partOfGlBoostObjectInstanceName) {
+  getGLBoostObjects(partOfGlBoostObjectInstanceName: string) {
     let glBoostObjects = [];
     for (let instanceName in this._glBoostObjects) {
       if (instanceName.indexOf(partOfGlBoostObjectInstanceName)&gt;0) {
@@ -213,7 +222,7 @@ export default class L_GLBoostMonitor {
     return glBoostObjects;
   }
 
-  getGLBoostObject(glBoostObjectInstanceName) {
+  getGLBoostObject(glBoostObjectInstanceName: string) {
     for (let instanceName in this._glBoostObjects) {
       if (instanceName === glBoostObjectInstanceName) {
         return this._glBoostObjects[instanceName];
@@ -222,7 +231,7 @@ export default class L_GLBoostMonitor {
     return null;
   }
 
-  getGLBoostObjectByUserFlavorName(glBoostObjectUserFlavorName) {
+  getGLBoostObjectByUserFlavorName(glBoostObjectUserFlavorName: string) {
     for (let instanceName in this._glBoostObjects) {
       if (this._glBoostObjects[instanceName].userFlavorName === glBoostObjectUserFlavorName) {
         return this._glBoostObjects[instanceName];
@@ -232,7 +241,7 @@ export default class L_GLBoostMonitor {
   }
 
 
-  getGLBoostObjectsByUserFlavorName(glBoostObjectUserFlavorName) {
+  getGLBoostObjectsByUserFlavorName(glBoostObjectUserFlavorName: string) {
     const results = [];
     for (let instanceName in this._glBoostObjects) {
       if (this._glBoostObjects[instanceName].userFlavorName === glBoostObjectUserFlavorName) {
@@ -242,7 +251,7 @@ export default class L_GLBoostMonitor {
     return results;
   }
 
-  getGLBoostObjectWhichHasThisObjectId(objectId) {
+  getGLBoostObjectWhichHasThisObjectId(objectId: number) {
     for (let instanceName in this._glBoostObjects) {
       if (this._glBoostObjects[instanceName].objectIndex === objectId) {
         return this._glBoostObjects[instanceName];
@@ -285,13 +294,13 @@ export default class L_GLBoostMonitor {
     MiscUtil.consoleLog(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, &apos;========== GLBoost Object Lists [end] ==========&apos;);
   }
 
-  registerWebGLResource(glBoostObject, glResource) {
+  registerWebGLResource(glBoostObject: Object, glResource: Object) {
     var glResourceName = glResource.constructor.name;
     this._glResources.push([glBoostObject, glResource]);
     MiscUtil.consoleLog(GLBoost.LOG_GL_RESOURCE_LIFECYCLE, &apos;WebGL Resource: &apos; + glResourceName + &apos; was created by &apos; + glBoostObject.toString() + &apos; (&apos; + glBoostObject.belongingCanvasId + &apos;).&apos;);
   }
 
-  deregisterWebGLResource(glBoostObject, glResource) {
+  deregisterWebGLResource(glBoostObject: Object, glResource: Object) {
     var glResourceName = glResource.constructor.name;
     this._glResources.forEach((glResource, i)=&gt;{
       if (glResource[0] === glBoostObject &amp;&amp; glResource[1].constructor.name === glResourceName) {
@@ -301,8 +310,8 @@ export default class L_GLBoostMonitor {
     MiscUtil.consoleLog(GLBoost.LOG_GL_RESOURCE_LIFECYCLE, &apos;WebGL Resource: &apos; + glResourceName + &apos; was deleted by &apos; + glBoostObject.toString() + &apos; (&apos; + glBoostObject.belongingCanvasId + &apos;).&apos;);
   }
 
-  getWebGLResources(webglResourceName) {
-    let webglResources = this._glResources.filter((glResourceArray)=&gt;{
+  getWebGLResources(webglResourceName: string) {
+    let webglResources = this._glResources.filter((glResourceArray:Array&lt;any&gt;)=&gt;{
       if (glResourceArray[1].constructor.name === webglResourceName) {
         return true;
       } else {

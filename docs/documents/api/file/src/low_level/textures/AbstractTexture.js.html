@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -174,16 +176,14 @@ import GLBoostObject from &apos;../core/GLBoostObject&apos;;
 import Vector4 from &apos;../math/Vector4&apos;;
 
 /**
- * [en] This is the abstract class for all texture classes. Don&apos;t use this class directly.&lt;br&gt;
- * [ja] &#x5168;&#x3066;&#x306E;&#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x30AF;&#x30E9;&#x30B9;&#x306E;&#x305F;&#x3081;&#x306E;&#x62BD;&#x8C61;&#x30AF;&#x30E9;&#x30B9;&#x3067;&#x3059;&#x3002;&#x76F4;&#x63A5;&#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x4F7F;&#x308F;&#x306A;&#x3044;&#x3067;&#x304F;&#x3060;&#x3055;&#x3044;&#x3002;
+ * This is the abstract class for all texture classes. Don&apos;t use this class directly.
  */
 export default class AbstractTexture extends GLBoostObject {
 
   /**
-   * [en] The constructor of PointLight class. Do not construct this class directly.&lt;br&gt;
-   * [ja] PointLight&#x30AF;&#x30E9;&#x30B9;&#x306E;&#x30B3;&#x30F3;&#x30B9;&#x30C8;&#x30E9;&#x30AF;&#x30BF;&#x3002;&#x76F4;&#x63A5;&#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x3092;&#x751F;&#x6210;&#x3057;&#x3088;&#x3046;&#x3068;&#x3057;&#x306A;&#x3044;&#x3067;&#x304F;&#x3060;&#x3055;&#x3044;&#x3002;
+   * The constructor of PointLight class. Do not construct this class directly.
    *
-   * * @param {HTMLCanvas|string} canvas [en] canvas or canvas&apos; id string. [ja] canvas&#x307E;&#x305F;&#x306F;canvas&#x306E;id&#x6587;&#x5B57;&#x5217;
+   * * @param {HTMLCanvas|string} canvas canvas or canvas&apos; id string.
    */
   constructor(glBoostContext) {
     super(glBoostContext);
@@ -201,18 +201,16 @@ export default class AbstractTexture extends GLBoostObject {
   }
 
   /**
-   * [en] get the WebGL texture resource within this class. &lt;br /&gt;
-   * [ja] &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x5185;&#x90E8;&#x3067;&#x7BA1;&#x7406;&#x3057;&#x3066;&#x3044;&#x308B;WebGL&#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x30EA;&#x30BD;&#x30FC;&#x30B9;&#x3092;&#x53D6;&#x5F97;&#x3057;&#x307E;&#x3059;&#x3002;
+   * get the WebGL texture resource within this class.
    *
-   * @returns {null|*} [en] WebGL texture resouce. [ja] WebGL&#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x30EA;&#x30BD;&#x30FC;&#x30B9;
+   * @returns WebGL texture resouce.
    */
-  get glTextureResource() {
+  get glTextureResource() : null | *{
     return this._texture;
   }
 
   /**
-   * [en] bind the texture. It calls bindTexture on WebGL only if it has WebGL texture. Otherwise it returns false without doing anything.&lt;br /&gt;
-   * [ja] &#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x3092;&#x30D0;&#x30A4;&#x30F3;&#x30C9;&#x3057;&#x307E;&#x3059;&#x3002;&#x81EA;&#x8EAB;&#x304C;WebGL&#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x3092;&#x6301;&#x3063;&#x3066;&#x3044;&#x308B;&#x5834;&#x5408;&#x306E;&#x307F;&#x3001;WebGL&#x306E;bindTexture&#x3092;&#x547C;&#x3073;&#x307E;&#x3059;&#x3002;&#x305D;&#x308C;&#x4EE5;&#x5916;&#x306F;&#x4F55;&#x3082;&#x305B;&#x305A;&#x306B;false&#x3092;&#x8FD4;&#x3057;&#x307E;&#x3059;&#x3002;
+   * bind the texture. It calls bindTexture on WebGL only if it has WebGL texture. Otherwise it returns false without doing anything.
    */
   setUp(textureUnitIndex) {
     var gl = this._glContext.gl;
@@ -232,8 +230,7 @@ export default class AbstractTexture extends GLBoostObject {
   }
 
   /**
-   * [en] unbind the texture. &lt;br /&gt;
-   * [ja] &#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x3092;&#x30D0;&#x30A4;&#x30F3;&#x30C9;&#x89E3;&#x9664;&#x3057;&#x307E;&#x3059;&#x3002;
+   * unbind the texture.
    */
   tearDown(textureUnitIndex) {
     var gl = this._glContext.gl;
@@ -284,12 +281,12 @@ export default class AbstractTexture extends GLBoostObject {
   /**
    * Origin is left bottom
    *
-   * @param {number} x horizontal pixel position (0 is left)
-   * @param {number} y virtical pixel position (0 is bottom)
-   * @param {Uint8Array} argByteArray Pixel Data as Uint8Array
-   * @returns {Vector4} Pixel Value in Vector4
+   * @param x horizontal pixel position (0 is left)
+   * @param y virtical pixel position (0 is bottom)
+   * @param argByteArray Pixel Data as Uint8Array
+   * @returns Pixel Value in Vector4
    */
-  getPixelValueAt(x, y, argByteArray) {
+  getPixelValueAt(x: number, y: number, argByteArray: Uint8Array):Vector4 {
     let byteArray = argByteArray;
     if (!byteArray) {
       byteArray = this.getTexturePixelData();
@@ -315,24 +312,26 @@ export default class AbstractTexture extends GLBoostObject {
     return canvas;
   }
   /**
-   * [en] check whether or not this texture size is power of two. &lt;br /&gt;
-   * [ja] &#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x30B5;&#x30A4;&#x30BA;&#x304C;&#xFF12;&#x306E;&#x7D2F;&#x4E57;&#x304B;&#x3069;&#x3046;&#x304B;&#x3092;&#x8FD4;&#x3057;&#x307E;&#x3059;
+   * check whether or not this texture size is power of two.
    *
-   * @param {number} x [en] texture size. [ja] &#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x30B5;&#x30A4;&#x30BA;
-   * @returns {boolean} [en] check whether or not the size x is power of two. [ja] x&#x304C;&#xFF12;&#x306E;&#x7D2F;&#x4E57;&#x304B;&#x3069;&#x3046;&#x304B;
+   * @param x texture size.
+   * @returns check whether or not the size x is power of two.
    */
-  _isPowerOfTwo(x) {
+  _isPowerOfTwo(x: number): boolean {
     return (x &amp; (x - 1)) == 0;
   }
 
+  _isPowerOfTwoTexture() {
+    return this._isPowerOfTwo(this.width) &amp;&amp; this._isPowerOfTwo(this.height);
+  }
+
   /**
-   * [en] get a value nearest power of two. &lt;br /&gt;
-   * [ja] &#x4E0E;&#x3048;&#x3089;&#x308C;&#x305F;&#x6570;&#x304B;&#x3089;&#x898B;&#x3066;&#xFF12;&#x306E;&#x7D2F;&#x4E57;&#x306B;&#x6700;&#x3082;&#x8FD1;&#x3044;&#x5024;&#x3092;&#x8FD4;&#x3057;&#x307E;&#x3059;&#x3002;
+   * get a value nearest power of two.
    *
-   * @param {number} x [en] texture size. [ja] &#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x30B5;&#x30A4;&#x30BA;
-   * @returns {number} [en] a value nearest power of two. [ja] x&#x306B;&#x8FD1;&#x3044;&#xFF12;&#x306E;&#x7D2F;&#x4E57;&#x306E;&#x5024;
+   * @param x texture size.
+   * @returns a value nearest power of two.
    */
-  _getNearestPowerOfTwo(x) {
+  _getNearestPowerOfTwo(x: number): number {
     return Math.pow( 2, Math.round( Math.log( x ) / Math.LN2 ) );
   }
 

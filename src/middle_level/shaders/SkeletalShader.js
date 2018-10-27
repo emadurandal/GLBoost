@@ -273,9 +273,9 @@ return mat4(
   }
 
   /**
-   * @return {string}
+   * 
    */
-  VSPreProcess_SkeletalShaderSource(existCamera_f, f, lights, material, extraData) {
+  VSPreProcess_SkeletalShaderSource(existCamera_f, f, lights, material, extraData): string {
     let shaderText = '';
 
     shaderText += 'vec4 weightVec = aVertex_weight;\n'; // DO NOT normalize as vec4!

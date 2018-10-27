@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -256,14 +258,14 @@ export default class Vector3 {
   */
 
   /**
-   * &#x9577;&#x3055;&#x306E;2&#x4E57;
+   * to square length
    */
   lengthSquared() {
     return this.x*this.x + this.y*this.y + this.z*this.z;
   }
 
   /**
-   * &#x9577;&#x3055;&#x306E;2&#x4E57;&#xFF08;static&#x7248;&#xFF09;
+   * to square length(static verison)
    */
   static lengthSquared(vec3:Vector3) {
     return vec3.x*vec3.x + vec3.y*vec3.y + vec3.z*vec3.z;
@@ -284,21 +286,21 @@ export default class Vector3 {
   }
 
   /**
-   * &#x5185;&#x7A4D;
+   * dot product
    */
   dotProduct(vec3:Vector3) {
       return this.x * vec3.x + this.y * vec3.y + this.z * vec3.z;
   }
 
   /**
-   * &#x5185;&#x7A4D;&#xFF08;static&#x7248;&#xFF09;
+   * dot product(static version)
    */
   static dotProduct(lv:Vector3, rv:Vector3) {
     return lv.x * rv.x + lv.y * rv.y + lv.z * rv.z;
   }
 
   /**
-   * &#x5916;&#x7A4D;
+   * cross product
    */
   cross(v:Vector3) {
     var x = this.y*v.z - this.z*v.y;
@@ -313,7 +315,7 @@ export default class Vector3 {
   }
 
   /**
-  * &#x5916;&#x7A4D;(static&#x7248;)
+  * cross product(static version)
   */
   static cross(lv:Vector3, rv:Vector3) {
     var x = lv.y*rv.z - lv.z*rv.y;
@@ -324,7 +326,7 @@ export default class Vector3 {
   }
 
   /**
-   * &#x6B63;&#x898F;&#x5316;
+   * normalize
    */
   normalize() {
     var length = this.length();
@@ -334,7 +336,7 @@ export default class Vector3 {
   }
 
   /**
-   * &#x6B63;&#x898F;&#x5316;&#xFF08;static&#x7248;&#xFF09;
+   * normalize(static version)
    */
   static normalize(vec3:Vector3) {
     var length = vec3.length();
@@ -363,7 +365,7 @@ export default class Vector3 {
   }
 
   /**
-   * &#x6E1B;&#x7B97;
+   * subtract
    */
   subtract(v:Vector3) {
     this.x -= v.x;
@@ -374,14 +376,14 @@ export default class Vector3 {
   }
 
   /**
-   * &#x6E1B;&#x7B97;&#xFF08;static&#x7248;&#xFF09;
+   * subtract(subtract)
    */
   static subtract(lv:Vector3, rv:Vector3) {
     return new Vector3(lv.x - rv.x, lv.y - rv.y, lv.z - rv.z);
   }
 
   /**
-   * &#x9664;&#x7B97;
+   * divide
    */
   divide(val:number) {
     if (val !== 0) {
@@ -399,7 +401,7 @@ export default class Vector3 {
   }
 
   /**
-   * &#x9664;&#x7B97;&#xFF08;static&#x7248;&#xFF09;
+   * divide(static version)
    */
   static divide(vec3:Vector3, val:number) {
     if (val !== 0) {
@@ -410,6 +412,9 @@ export default class Vector3 {
     }
   }
 
+  /**
+   * multiply
+   */
   multiply(val:number) {
     this.x *= val;
     this.y *= val;
@@ -418,6 +423,9 @@ export default class Vector3 {
     return this;
   }
 
+  /**
+   * multiply vector
+   */
   multiplyVector(vec:Vector3) {
     this.x *= vec.x;
     this.y *= vec.y;
@@ -426,10 +434,16 @@ export default class Vector3 {
     return this;
   }
 
+  /**
+   * multiply(static version)
+   */
   static multiply(vec3:Vector3, val:number) {
     return new Vector3(vec3.x * val, vec3.y * val, vec3.z * val);
   }
 
+  /**
+   * multiply vector(static version)
+   */
   static multiplyVector(vec3:Vector3, vec:Vector3) {
     return new Vector3(vec3.x * vec.x, vec3.y * vec.y, vec3.z * vec.z);
   }
@@ -446,6 +460,9 @@ export default class Vector3 {
     return sita;
   }
 
+  /**
+   * divide vector
+   */
   divideVector(vec3:Vector3) {
     this.x /= vec3.x;
     this.y /= vec3.y;
@@ -454,10 +471,16 @@ export default class Vector3 {
     return this;
   }
 
+  /**
+   * divide vector(static version)
+   */
   static divideVector(lvec3:Vector3, rvec3:Vector3) {
     return new Vector3(lvec3.x / rvec3.x, lvec3.y / rvec3.y, lvec3.z / rvec3.z);
   }
 
+  /**
+   * change to string
+   */
   toString() {
     return &apos;(&apos; + this.x + &apos;, &apos; + this.y + &apos;, &apos; + this.z +&apos;)&apos;;
   }
