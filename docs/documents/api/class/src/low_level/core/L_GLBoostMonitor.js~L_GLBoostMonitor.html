@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -168,13 +170,13 @@
 </nav>
 
 <div class="content" data-ice="content"><div class="header-notice">
-  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import L_GLBoostMonitor from &apos;<span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber6">glboost/src/low_level/core/L_GLBoostMonitor.js</a></span>&apos;</code></pre></div>
+  <div data-ice="importPath" class="import-path"><pre class="prettyprint"><code data-ice="importPathCode">import L_GLBoostMonitor from &apos;<span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber8">glboost/src/low_level/core/L_GLBoostMonitor.js</a></span>&apos;</code></pre></div>
   <span data-ice="access">public</span>
   <span data-ice="kind">class</span>
   
   
   
-  <span data-ice="source">| <span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber6">source</a></span></span>
+  <span data-ice="source">| <span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber8">source</a></span></span>
 </div>
 
 <div class="self-detail detail">
@@ -207,12 +209,12 @@
 </div>
 
 <div data-ice="staticMemberSummary"><h2>Static Member Summary</h2><table class="summary" data-ice="summary">
-  <thead><tr><td data-ice="title" colspan="3">Static Public Members</td></tr></thead>
+  <thead><tr><td data-ice="title" colspan="3">Static Private Members</td></tr></thead>
   <tbody>
   
   <tr data-ice="target">
     <td>
-      <span class="access" data-ice="access">public</span>
+      <span class="access" data-ice="access">private</span>
       <span data-ice="static">static</span>
       
       
@@ -224,7 +226,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#static-member-[singleton]">[singleton]</a></span></span><span class="code" data-ice="signature">: <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#static-member-_singletonEnforcer">_singletonEnforcer</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol">Symbol</a></span></span>
         </p>
       </div>
       <div>
@@ -294,7 +296,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-constructor-constructor">constructor</a></span></span><span class="code" data-ice="signature">(enforcer: <span>*</span>)</span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-constructor-constructor">constructor</a></span></span><span class="code" data-ice="signature">(enforcer: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol">Symbol</a></span>)</span>
         </p>
       </div>
       <div>
@@ -329,7 +331,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-member-_glBoostObjects">_glBoostObjects</a></span></span><span class="code" data-ice="signature">: {}</span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-member-_glBoostObjects">_glBoostObjects</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
         </p>
       </div>
       <div>
@@ -357,7 +359,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-member-_glResources">_glResources</a></span></span><span class="code" data-ice="signature">: <span><span>*</span><span>[]</span></span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-member-_glResources">_glResources</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span>any</span>&gt;&gt;</span>
         </p>
       </div>
       <div>
@@ -392,7 +394,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-deregisterGLBoostObject">deregisterGLBoostObject</a></span></span><span class="code" data-ice="signature">(glBoostObject: <span>*</span>)</span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-deregisterGLBoostObject">deregisterGLBoostObject</a></span></span><span class="code" data-ice="signature">(glBoostObject: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>)</span>
         </p>
       </div>
       <div>
@@ -420,7 +422,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-deregisterWebGLResource">deregisterWebGLResource</a></span></span><span class="code" data-ice="signature">(glBoostObject: <span>*</span>, glResource: <span>*</span>)</span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-deregisterWebGLResource">deregisterWebGLResource</a></span></span><span class="code" data-ice="signature">(glBoostObject: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, glResource: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>)</span>
         </p>
       </div>
       <div>
@@ -448,7 +450,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-getGLBoostObject">getGLBoostObject</a></span></span><span class="code" data-ice="signature">(glBoostObjectInstanceName: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-getGLBoostObject">getGLBoostObject</a></span></span><span class="code" data-ice="signature">(glBoostObjectInstanceName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -476,7 +478,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-getGLBoostObjectByUserFlavorName">getGLBoostObjectByUserFlavorName</a></span></span><span class="code" data-ice="signature">(glBoostObjectUserFlavorName: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-getGLBoostObjectByUserFlavorName">getGLBoostObjectByUserFlavorName</a></span></span><span class="code" data-ice="signature">(glBoostObjectUserFlavorName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -504,7 +506,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-getGLBoostObjectWhichHasThisObjectId">getGLBoostObjectWhichHasThisObjectId</a></span></span><span class="code" data-ice="signature">(objectId: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-getGLBoostObjectWhichHasThisObjectId">getGLBoostObjectWhichHasThisObjectId</a></span></span><span class="code" data-ice="signature">(objectId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -532,7 +534,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-getGLBoostObjects">getGLBoostObjects</a></span></span><span class="code" data-ice="signature">(partOfGlBoostObjectInstanceName: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-getGLBoostObjects">getGLBoostObjects</a></span></span><span class="code" data-ice="signature">(partOfGlBoostObjectInstanceName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -560,7 +562,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-getGLBoostObjectsByUserFlavorName">getGLBoostObjectsByUserFlavorName</a></span></span><span class="code" data-ice="signature">(glBoostObjectUserFlavorName: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-getGLBoostObjectsByUserFlavorName">getGLBoostObjectsByUserFlavorName</a></span></span><span class="code" data-ice="signature">(glBoostObjectUserFlavorName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -588,7 +590,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-getWebGLResources">getWebGLResources</a></span></span><span class="code" data-ice="signature">(webglResourceName: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-getWebGLResources">getWebGLResources</a></span></span><span class="code" data-ice="signature">(webglResourceName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -728,7 +730,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-registerGLBoostObject">registerGLBoostObject</a></span></span><span class="code" data-ice="signature">(glBoostObject: <span>*</span>)</span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-registerGLBoostObject">registerGLBoostObject</a></span></span><span class="code" data-ice="signature">(glBoostObject: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>)</span>
         </p>
       </div>
       <div>
@@ -756,7 +758,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-registerWebGLResource">registerWebGLResource</a></span></span><span class="code" data-ice="signature">(glBoostObject: <span>*</span>, glResource: <span>*</span>)</span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/L_GLBoostMonitor.js~L_GLBoostMonitor.html#instance-method-registerWebGLResource">registerWebGLResource</a></span></span><span class="code" data-ice="signature">(glBoostObject: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, glResource: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>)</span>
         </p>
       </div>
       <div>
@@ -776,21 +778,21 @@
 
 
 
-<div data-ice="staticMemberDetails"><h2 data-ice="title">Static Public Members</h2>
+<div data-ice="staticMemberDetails"><h2 data-ice="title">Static Private Members</h2>
 
 <div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="static-member-[singleton]">
-    <span class="access" data-ice="access">public</span>
+  <h3 data-ice="anchor" id="static-member-_singletonEnforcer">
+    <span class="access" data-ice="access">private</span>
     <span data-ice="static">static</span>
     
     
     
     
-    <span class="code" data-ice="name">[singleton]</span><span class="code" data-ice="signature">: <span>*</span></span>
+    <span class="code" data-ice="name">_singletonEnforcer</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol">Symbol</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber19">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber11">source</a></span></span>
     </span>
   </h3>
 
@@ -836,7 +838,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber17">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber23">source</a></span></span>
     </span>
   </h3>
 
@@ -890,11 +892,11 @@
     
     
     
-    <span class="code" data-ice="name">constructor</span><span class="code" data-ice="signature">(enforcer: <span>*</span>)</span>
+    <span class="code" data-ice="name">constructor</span><span class="code" data-ice="signature">(enforcer: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol">Symbol</a></span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber7">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber13">source</a></span></span>
     </span>
   </h3>
 
@@ -915,7 +917,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">enforcer</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol">Symbol</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -952,11 +954,11 @@
     
     
     
-    <span class="code" data-ice="name">_glBoostObjects</span><span class="code" data-ice="signature">: {}</span>
+    <span class="code" data-ice="name">_glBoostObjects</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber12">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber9">source</a></span></span>
     </span>
   </h3>
 
@@ -995,11 +997,11 @@
     
     
     
-    <span class="code" data-ice="name">_glResources</span><span class="code" data-ice="signature">: <span><span>*</span><span>[]</span></span></span>
+    <span class="code" data-ice="name">_glResources</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span>any</span>&gt;&gt;</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber13">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber10">source</a></span></span>
     </span>
   </h3>
 
@@ -1041,11 +1043,11 @@
     
     
     
-    <span class="code" data-ice="name">deregisterGLBoostObject</span><span class="code" data-ice="signature">(glBoostObject: <span>*</span>)</span>
+    <span class="code" data-ice="name">deregisterGLBoostObject</span><span class="code" data-ice="signature">(glBoostObject: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber29">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber36">source</a></span></span>
     </span>
   </h3>
 
@@ -1066,7 +1068,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">glBoostObject</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -1100,11 +1102,11 @@
     
     
     
-    <span class="code" data-ice="name">deregisterWebGLResource</span><span class="code" data-ice="signature">(glBoostObject: <span>*</span>, glResource: <span>*</span>)</span>
+    <span class="code" data-ice="name">deregisterWebGLResource</span><span class="code" data-ice="signature">(glBoostObject: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, glResource: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber124">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber131">source</a></span></span>
     </span>
   </h3>
 
@@ -1125,13 +1127,13 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">glBoostObject</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">glResource</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -1165,11 +1167,11 @@
     
     
     
-    <span class="code" data-ice="name">getGLBoostObject</span><span class="code" data-ice="signature">(glBoostObjectInstanceName: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">getGLBoostObject</span><span class="code" data-ice="signature">(glBoostObjectInstanceName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber46">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber53">source</a></span></span>
     </span>
   </h3>
 
@@ -1190,7 +1192,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">glBoostObjectInstanceName</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -1236,11 +1238,11 @@
     
     
     
-    <span class="code" data-ice="name">getGLBoostObjectByUserFlavorName</span><span class="code" data-ice="signature">(glBoostObjectUserFlavorName: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">getGLBoostObjectByUserFlavorName</span><span class="code" data-ice="signature">(glBoostObjectUserFlavorName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber55">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber62">source</a></span></span>
     </span>
   </h3>
 
@@ -1261,7 +1263,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">glBoostObjectUserFlavorName</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -1307,11 +1309,11 @@
     
     
     
-    <span class="code" data-ice="name">getGLBoostObjectWhichHasThisObjectId</span><span class="code" data-ice="signature">(objectId: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">getGLBoostObjectWhichHasThisObjectId</span><span class="code" data-ice="signature">(objectId: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber75">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber82">source</a></span></span>
     </span>
   </h3>
 
@@ -1332,7 +1334,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">objectId</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -1378,11 +1380,11 @@
     
     
     
-    <span class="code" data-ice="name">getGLBoostObjects</span><span class="code" data-ice="signature">(partOfGlBoostObjectInstanceName: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">getGLBoostObjects</span><span class="code" data-ice="signature">(partOfGlBoostObjectInstanceName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber35">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber42">source</a></span></span>
     </span>
   </h3>
 
@@ -1403,7 +1405,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">partOfGlBoostObjectInstanceName</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -1449,11 +1451,11 @@
     
     
     
-    <span class="code" data-ice="name">getGLBoostObjectsByUserFlavorName</span><span class="code" data-ice="signature">(glBoostObjectUserFlavorName: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">getGLBoostObjectsByUserFlavorName</span><span class="code" data-ice="signature">(glBoostObjectUserFlavorName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber65">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber72">source</a></span></span>
     </span>
   </h3>
 
@@ -1474,7 +1476,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">glBoostObjectUserFlavorName</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -1520,11 +1522,11 @@
     
     
     
-    <span class="code" data-ice="name">getWebGLResources</span><span class="code" data-ice="signature">(webglResourceName: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">getWebGLResources</span><span class="code" data-ice="signature">(webglResourceName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber134">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber141">source</a></span></span>
     </span>
   </h3>
 
@@ -1545,7 +1547,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">webglResourceName</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -1595,7 +1597,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber85">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber92">source</a></span></span>
     </span>
   </h3>
 
@@ -1638,7 +1640,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber96">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber103">source</a></span></span>
     </span>
   </h3>
 
@@ -1681,7 +1683,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber162">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber169">source</a></span></span>
     </span>
   </h3>
 
@@ -1724,7 +1726,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber146">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber153">source</a></span></span>
     </span>
   </h3>
 
@@ -1763,11 +1765,11 @@
     
     
     
-    <span class="code" data-ice="name">registerGLBoostObject</span><span class="code" data-ice="signature">(glBoostObject: <span>*</span>)</span>
+    <span class="code" data-ice="name">registerGLBoostObject</span><span class="code" data-ice="signature">(glBoostObject: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber24">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber31">source</a></span></span>
     </span>
   </h3>
 
@@ -1788,7 +1790,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">glBoostObject</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -1822,11 +1824,11 @@
     
     
     
-    <span class="code" data-ice="name">registerWebGLResource</span><span class="code" data-ice="signature">(glBoostObject: <span>*</span>, glResource: <span>*</span>)</span>
+    <span class="code" data-ice="name">registerWebGLResource</span><span class="code" data-ice="signature">(glBoostObject: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>, glResource: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber118">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/low_level/core/L_GLBoostMonitor.js.html#lineNumber125">source</a></span></span>
     </span>
   </h3>
 
@@ -1847,13 +1849,13 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">glBoostObject</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">glResource</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>

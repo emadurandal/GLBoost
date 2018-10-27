@@ -20,9 +20,9 @@ export default class ModelConverter {
 
   /**
    * The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
-   * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
+   * @param enforcer a Symbol to forbid calling this constructor directly
    */
-  constructor(enforcer) {
+  constructor(enforcer: Symbol) {
     if (enforcer !== singletonEnforcer) {
       throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
     }
@@ -30,9 +30,9 @@ export default class ModelConverter {
 
   /**
    * The static method to get singleton instance of this class.
-   * @return {GLTFLoader} the singleton instance of GLTFLoader class
+   * @return The singleton instance of GLTFLoader class
    */
-  static getInstance() {
+  static getInstance(): GLTFLoader {
     if (!this[singleton]) {
       this[singleton] = new ModelConverter(singletonEnforcer);
     }

@@ -104,9 +104,8 @@ export default class GLBoostObject {
   }
 
   /**
-   * [en] Return instance name.
-   * [ja] インスタンス名を返します。
-   * @returns {string} [en] the instance name. [ja] インスタンス名
+   * Return instance name.
+   * @returns the instance name.
    */
   toString():string {
     return this._instanceName;

@@ -32,10 +32,10 @@ export default class M_Group extends M_Element {
 
   /**
    * Add the element to this group as a child.
-   * @param {Element} element - a instance of Element class
-   * @param {boolean} isDuplicateOk - allow duplicating if need
+   * @param element - a instance of Element class
+   * @param isDuplicateOk - allow duplicating if need
    */
-  addChild(element: any, isDuplicateOk: boolean = false) {
+  addChild(element: Element, isDuplicateOk: boolean = false) {
 
     if (isDuplicateOk){
       // if forgive duplicated register by copy
@@ -56,9 +56,8 @@ export default class M_Group extends M_Element {
   }
 
   /**
-   * [en] remove the element from this group.
-   * [ja] このグループから指定した要素を削除します。
-   * @param {Element} element [en] the element to remove [ja] 削除したい要素
+   * remove the element from this group.
+   * @param element the element to remove
    */
   removeChild(element: M_Element) {
     this._elements = this._elements.filter(function(elem) {
@@ -70,8 +69,7 @@ export default class M_Group extends M_Element {
   }
 
   /**
-   * [en] remove all elements from this group.
-   * [ja] このグループから全ての要素を削除します。
+   * remove all elements from this group.
    */
   removeAll() {
     this._elements = this._elements.filter(function(elem) {

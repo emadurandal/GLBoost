@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -181,7 +183,17 @@ import MathClassUtil from &apos;../../../low_level/math/MathClassUtil&apos;;
 import is from &apos;../../../low_level/misc/IsUtil&apos;;
 
 export default class M_Mesh extends M_Element {
-  constructor(glBoostContext, geometry, material) {
+  _isPickable: boolean;
+  _transformedDepth: number;
+  _opacity: number;
+  _gizmos: Array&lt;M_Mesh&gt;;
+  _geometry: any;
+  _outlineGizmo: any;
+  _material: M_Mesh;
+  _glBoostSystem: GLBoostSystem;
+  bindShapeMatrix: Matrix44;
+
+  constructor(glBoostContext: glBoostContext, geometry: any, material: any) {
     super(glBoostContext);
 
     if (geometry) {
@@ -195,7 +207,7 @@ export default class M_Mesh extends M_Element {
     this._isPickable = true;
   }
 
-  prepareToRender(expression, existCamera_f, lights) {
+  prepareToRender(expression: any, existCamera_f: any, lights: any) {
     this._geometry.prepareToRender(expression, existCamera_f, lights, this._material, this);
     /*
     if (this._geometry._materials.length === 0 &amp;&amp; this._material) {
@@ -208,7 +220,7 @@ export default class M_Mesh extends M_Element {
     */
   }
 
-  draw(data) {
+  draw(data: any) {
     this._geometry.draw(
       {
         expression: data.expression,
@@ -225,7 +237,7 @@ export default class M_Mesh extends M_Element {
     );
   }
 
-  set geometry(geometry) {
+  set geometry(geometry: any) {
     this._geometry = geometry;
     geometry._parent = this;
     M_Mesh._geometries[geometry.toString()] = geometry;
@@ -235,7 +247,7 @@ export default class M_Mesh extends M_Element {
     return this._geometry;
   }
 
-  set material(material) {
+  set material(material: any) {
     this._material = material;
   }
 
@@ -318,7 +330,7 @@ export default class M_Mesh extends M_Element {
     }
   }
 
-  merge(meshOrMeshes) {
+  merge(meshOrMeshes: M_Mesh | Array&lt;M_Mesh&gt;) {
     if (Array.isArray(meshOrMeshes)) {
       this.bakeTransformToGeometry();
 
@@ -351,7 +363,7 @@ export default class M_Mesh extends M_Element {
     }
   }
 
-  mergeHarder(meshOrMeshes) {
+  mergeHarder(meshOrMeshes: M_Mesh | Array&lt;M_Mesh&gt;) {
 
     if (Array.isArray(meshOrMeshes)) {
 
@@ -382,7 +394,7 @@ export default class M_Mesh extends M_Element {
     }
   }
 
-  calcTransformedDepth(camera) {
+  calcTransformedDepth(camera: any) {
     var viewMatrix = camera.lookAtRHMatrix();
     var m_m = null;
     if (this.bindShapeMatrix) {
@@ -405,16 +417,13 @@ export default class M_Mesh extends M_Element {
 
   get isTransparent() {
     let isTransparent = (this._opacity &lt; 1.0) ? true : false;
-    isTransparent |= this.geometry.isTransparent(this);
+    isTransparent = isTransparent || this._isTransparentForce;
+    isTransparent = isTransparent || this._isTransparentForce;
     return isTransparent;
   }
 
-  set isTransparentForce(flg) {
+  set isTransparent(flg: boolean) {
     this._isTransparentForce = flg;
-  }
-
-  get isTransparentForce() {
-    return this._isTransparentForce;
   }
 
   get AABBInWorld() {
@@ -435,7 +444,7 @@ export default class M_Mesh extends M_Element {
   }
 
 
-  rayCast(arg1: Vector3, arg2: Vector3, camera, viewport) {
+  rayCast(arg1: Vector3, arg2: number, camera: any, viewport: any) {
     let origVecInLocal = null;
     let dirVecInLocal = null;
     if (arg1 instanceof Vector3 &amp;&amp; arg2 instanceof Vector3) {
@@ -489,7 +498,7 @@ export default class M_Mesh extends M_Element {
     }
   }
 
-  set isOutlineVisible(flg) {
+  set isOutlineVisible(flg: boolean) {
     if (flg &amp;&amp; this._outlineGizmo === null &amp;&amp; this.className === &apos;M_Mesh&apos;) {
       this._outlineGizmo = this._glBoostSystem._glBoostContext.createOutlineGizmo(this);
     }
@@ -506,7 +515,7 @@ export default class M_Mesh extends M_Element {
     return this._outlineGizmo.isVisible;
   }
 
-  set isVisible(flg) {
+  set isVisible(flg: boolean) {
     super.isVisible = flg;
     if (this._outlineGizmo) {
       this._outlineGizmo.isVisible = flg;
@@ -533,7 +542,7 @@ export default class M_Mesh extends M_Element {
     super._needUpdate();
   }
 
-  set isPickable(flag) {
+  set isPickable(flag: boolean) {
     this._isPickable = flag;
   }
 

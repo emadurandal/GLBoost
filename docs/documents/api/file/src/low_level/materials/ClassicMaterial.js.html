@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -168,11 +170,19 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/low_level/materials/ClassicMaterial.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import GLBoost from &apos;../../globals&apos;;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/* @flow */
+
+import GLBoost from &apos;../../globals&apos;;
 import L_AbstractMaterial from &apos;./L_AbstractMaterial&apos;;
 import Vector4 from &apos;../math/Vector4&apos;;
 
 export default class ClassicMaterial extends L_AbstractMaterial {
+  _wireframeWidthRelativeScale: number;
+  _baseColor: Vector4;
+  _diffuseColor: Vector4;
+  _specularColor: Vector4;
+  _ambientColor: Vector4;
+
   constructor(glBoostContext) {
     super(glBoostContext);
 
@@ -197,7 +207,7 @@ export default class ClassicMaterial extends L_AbstractMaterial {
   }
 
 
-  set baseColor(vec) {
+  set baseColor(vec: Vector4) {
     if (!vec) {
       return;
     }
@@ -210,7 +220,7 @@ export default class ClassicMaterial extends L_AbstractMaterial {
     return this._baseColor;
   }
 
-  set diffuseColor(vec) {
+  set diffuseColor(vec: Vector4) {
     if (!vec) {
       return;
     }
@@ -223,7 +233,7 @@ export default class ClassicMaterial extends L_AbstractMaterial {
     return this._diffuseColor;
   }
 
-  set specularColor(vec) {
+  set specularColor(vec: Vector4) {
     if (!vec) {
       return;
     }
@@ -236,7 +246,7 @@ export default class ClassicMaterial extends L_AbstractMaterial {
     return this._specularColor;
   }
 
-  set ambientColor(vec) {
+  set ambientColor(vec: Vector4) {
     if (!vec) {
       return;
     }

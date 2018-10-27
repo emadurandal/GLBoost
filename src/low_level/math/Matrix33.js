@@ -249,13 +249,16 @@ export default class Matrix33 {
   }
 
   /**
-   * ゼロ行列
+   * zero matrix
    */
   zero() {
     this.setComponents(0, 0, 0, 0, 0, 0, 0, 0, 0);
     return this;
   }
 
+  /**
+   * zero matrix(static version)
+   */
   static zero() {
     return new Matrix33(0, 0, 0, 0, 0, 0, 0, 0, 0);
   }
@@ -275,7 +278,7 @@ export default class Matrix33 {
   }
 
   /**
-   * 転置
+   * transpose
    */
   transpose() {
     this._swap(1, 3);
@@ -286,7 +289,7 @@ export default class Matrix33 {
   }
 
   /**
-   * 転置（static版）
+   * transpose(static version)
    */
   static transpose(mat) {
 
@@ -308,7 +311,7 @@ export default class Matrix33 {
   }
 
   /**
-   * 行列同士の乗算
+   * multiply zero matrix and zero matrix
    */
   multiply(mat) {
     var m00 = this.m00*mat.m00 + this.m01*mat.m10 + this.m02*mat.m20;
@@ -332,7 +335,7 @@ export default class Matrix33 {
   }
 
   /**
-   * 行列同士の乗算（static版）
+   * multiply zero matrix and zero matrix(static version)
    */
   static multiply(l_m, r_m) {
     var m00 = l_m.m00*r_m.m00 + l_m.m01*r_m.m10 + l_m.m02*r_m.m20;

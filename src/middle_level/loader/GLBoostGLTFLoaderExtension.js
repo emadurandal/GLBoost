@@ -13,9 +13,9 @@ export default class GLBoostGLTFLoaderExtension {
 
   /**
    * The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
-   * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
+   * @param enforcer a Symbol to forbid calling this constructor directly
    */
-  constructor(enforcer) {
+  constructor(enforcer: Symbol) {
     if (enforcer !== singletonEnforcer) {
       throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
     }
@@ -23,9 +23,9 @@ export default class GLBoostGLTFLoaderExtension {
 
   /**
    * The static method to get singleton instance of this class.
-   * @return {ObjLoader} the singleton instance of ObjLoader class
+   * @return the singleton instance of ObjLoader class
    */
-  static getInstance() {
+  static getInstance(): ObjLoader{
     if (!this[singleton]) {
       this[singleton] = new GLBoostGLTFLoaderExtension(singletonEnforcer);
     }

@@ -1494,9 +1494,8 @@
     }
 
     /**
-     * [en] Return instance name.
-     * [ja] インスタンス名を返します。
-     * @returns {string} [en] the instance name. [ja] インスタンス名
+     * Return instance name.
+     * @returns {string} the instance name.
      */
     toString()        {
       return this._instanceName;
@@ -1803,14 +1802,14 @@
     */
 
     /**
-     * 長さの2乗
+     * length squared
      */
     lengthSquared() {
       return this.x*this.x + this.y*this.y + this.z*this.z;
     }
 
     /**
-     * 長さの2乗（static版）
+     * length squared(static version)
      */
     static lengthSquared(vec3        ) {
       return vec3.x*vec3.x + vec3.y*vec3.y + vec3.z*vec3.z;
@@ -1831,21 +1830,21 @@
     }
 
     /**
-     * 内積
+     * dot product
      */
     dotProduct(vec3        ) {
         return this.x * vec3.x + this.y * vec3.y + this.z * vec3.z;
     }
 
     /**
-     * 内積（static版）
+     * dot product(static version)
      */
     static dotProduct(lv        , rv        ) {
       return lv.x * rv.x + lv.y * rv.y + lv.z * rv.z;
     }
 
     /**
-     * 外積
+     * cross product
      */
     cross(v        ) {
       var x = this.y*v.z - this.z*v.y;
@@ -1860,7 +1859,7 @@
     }
 
     /**
-    * 外積(static版)
+    * cross product(static版)
     */
     static cross(lv        , rv        ) {
       var x = lv.y*rv.z - lv.z*rv.y;
@@ -1871,7 +1870,7 @@
     }
 
     /**
-     * 正規化
+     * normalize
      */
     normalize() {
       var length = this.length();
@@ -1881,7 +1880,7 @@
     }
 
     /**
-     * 正規化（static版）
+     * normalize(static version)
      */
     static normalize(vec3        ) {
       var length = vec3.length();
@@ -1910,7 +1909,7 @@
     }
 
     /**
-     * 減算
+     * subtract
      */
     subtract(v        ) {
       this.x -= v.x;

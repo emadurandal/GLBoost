@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -220,7 +222,8 @@ export class DecalShaderSource {
     }
     shaderText += &apos;uniform vec4 materialBaseColor;\n&apos;;
     shaderText += &apos;uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n&apos;;
-
+    shaderText += &apos;uniform vec2 uAlphaTestParameters;\n&apos;;
+    
     return shaderText;
   }
 
@@ -253,6 +256,17 @@ export class DecalShaderSource {
     return shaderText;
   }
 
+  FSFinalize_DecalShaderSource(f, gl, lights, material, extraData) {
+    let shaderText = &apos;&apos;;
+    shaderText += `
+                     if (uAlphaTestParameters.x &gt; 0.5 &amp;&amp; rt0.a &lt; uAlphaTestParameters.y) {
+                       discard;
+                     }
+    `;
+
+    return shaderText;
+  }
+
   prepare_DecalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
     var vertexAttribsAsResult = [];
@@ -277,11 +291,12 @@ export class DecalShaderSource {
       let uIsTextureToMultiplyAlphaToColorPreviously = this._glContext.getUniformLocation(shaderProgram, &apos;uIsTextureToMultiplyAlphaToColorPreviously&apos;);
       material.setUniform(shaderProgram, &apos;uIsTextureToMultiplyAlphaToColorPreviously&apos;, uIsTextureToMultiplyAlphaToColorPreviously);
     }
+    material.setUniform(shaderProgram, &apos;uniform_alphaTestParameters&apos;, this._glContext.getUniformLocation(shaderProgram, &apos;uAlphaTestParameters&apos;));
 
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_DIFFUSE, shaderProgram, &apos;uTexture&apos;); 
     
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_NORMAL, shaderProgram, &apos;uNormalTexture&apos;); 
-
+    
     return vertexAttribsAsResult;
   }
 }
@@ -314,7 +329,10 @@ export default class DecalShader extends WireframeShader {
       material.updateTextureInfo(GLBoost.TEXTURE_PURPOSE_DIFFUSE, &apos;uTexture&apos;); 
       this._glContext.uniform1i(material.getUniform(glslProgram, &apos;uIsTextureToMultiplyAlphaToColorPreviously&apos;), diffuseTexture.toMultiplyAlphaToColorPreviously, true);
     }
-
+    
+    const alphaCutoff = material.alphaCutoff;
+    const isAlphaTestEnable = material.isAlphaTest;
+    this._glContext.uniform2f(material.getUniform(glslProgram, &apos;uniform_alphaTestParameters&apos;), isAlphaTestEnable ? 1.0 : 0.0, alphaCutoff, true);
 
     // For Shadow
     for (let i=0; i&lt;lights.length; i++) {

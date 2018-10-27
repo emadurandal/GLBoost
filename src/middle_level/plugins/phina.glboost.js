@@ -23,7 +23,7 @@ phina.namespace(function() {
     renderer: null,
     canvas: null,
 
-    /** 子供を 自分のCanvasRenderer で描画するか */
+    /** rendering child by self CanvasRenderer or not */
     renderChildBySelf: true,
 
     init: function(params) {
@@ -40,7 +40,7 @@ phina.namespace(function() {
       this.canvas.style.display = "none";
 
       this.glBoostContext = new GLBoostMiddleContext(this.canvas);
-      // レンダラーを生成
+      // create renderer
       this.renderer = this.glBoostContext.createRenderer({clearColor: {red:1, green:1, blue:1, alpha:1}});
       this.scene = this.glBoostContext.createScene();
       this.expression = this.glBoostContext.createExpressionAndRenderPasses(1);
@@ -61,13 +61,13 @@ phina.namespace(function() {
     superClass: 'phina.display.Layer',
 
     /**
-     * 子孫要素の描画の面倒を自分で見る
+     * rendering child by self CanvasRenderer or not
      */
     renderChildBySelf: true,
 
-    /** 子孫要素を普通に描画するためのキャンバス */
+    /** For drawing child attribute canvas */
     canvas2d: null,
-    /** canvas2dに描画するレンダラー */
+    /** To drawing canvas2d renderer */
     renderer2d: null,
 
     width: 0,

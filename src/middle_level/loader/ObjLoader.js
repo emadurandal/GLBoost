@@ -9,28 +9,25 @@ let singleton = Symbol();
 let singletonEnforcer = Symbol();
 
 /**
- * [en] This is a loader class of Obj file format.<br>
- * [ja] Objファイルを読み込むためのローダークラスです。
+ * This is a loader class of Obj file format.
  */
 export default class ObjLoader {
 
   /**
-   * [en] The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.<br>
-   * [ja] ObjLoaderクラスのコンストラクタです。しかし本クラスはシングルトンであるため、このコンストラクタは直接呼び出せません。getInstance()静的メソッドを使ってください。
-   * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] このコンストラクタの直接呼び出しを禁止するためのシンボル
+   * The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+   * @param enforcer a Symbol to forbid calling this constructor directly
    */
-  constructor(enforcer) {
+  constructor(enforcer: Symbol) {
     if (enforcer !== singletonEnforcer) {
       throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
     }
   }
 
   /**
-   * [en] The static method to get singleton instance of this class.<br>
-   * [ja] このクラスのシングルトンインスタンスを取得するための静的メソッド。
-   * @return {ObjLoader} [en] the singleton instance of ObjLoader class [ja] ObjLoaderクラスのシングルトンインスタンス
+   * The static method to get singleton instance of this class.
+   * @return The singleton instance of ObjLoader class
    */
-  static getInstance() {
+  static getInstance(): ObjLoader {
     if (!this[singleton]) {
       this[singleton] = new ObjLoader(singletonEnforcer);
     }
@@ -39,13 +36,13 @@ export default class ObjLoader {
 
   /**
    * the method to load Obj file.
-   * @param {glBoostContext} glBoostContext - glBoostContext instance
-   * @param {string} url - url of glTF file
-   * @param {Shader} defaultShader - a shader to assign to loaded geometries
-   * @param {string} mtlString - string of mtl file (optional)
-   * @return {Promise} a promise object
+   * @param glBoostContext - glBoostContext instance
+   * @param url - url of glTF file
+   * @param defaultShader - a shader to assign to loaded geometries
+   * @param mtlString - string of mtl file (optional)
+   * @return a promise object
    */
-  loadObj(glBoostContext, url, defaultShader = null, mtlString = null) {
+  loadObj(glBoostContext: glBoostContext, url: string, defaultShader: Shader = null, mtlString: string = null): Promise {
     return DataUtil.loadResourceAsync(url, false, (resolve, responseText)=>{
       let gotText = responseText;
       let partsOfPath = url.split('/');

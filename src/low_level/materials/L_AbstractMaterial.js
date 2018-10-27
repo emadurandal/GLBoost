@@ -254,8 +254,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
   }
 
   /**
-   * [en] bind the texture. For any value, it returns true if we call WebGL's bindTexture function, false otherwise.<br />
-   * [ja] テクスチャをバインドします。どんな値にせよ、WebGLのbindTexture関数を呼んだ場合はtrueを、そうでなければfalseを返します。
+   * bind the texture. For any value, it returns true if we call WebGL's bindTexture function, false otherwise.
    */
   setUpTexture(textureName, textureUnitIndex) {
     var gl = this._gl;

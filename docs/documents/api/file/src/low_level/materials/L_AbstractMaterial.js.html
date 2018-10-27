@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -219,6 +221,8 @@ export default class L_AbstractMaterial extends GLBoostObject {
       &quot;lineWidth&quot;: [1.0],
       &quot;polygonOffset&quot;: [0.0, 0.0]
     };
+    this._isAlphaTestEnable = true;
+    this._alphaCutoff = 0.1;
 
     this._countOfUpdate = 0;
   }
@@ -422,8 +426,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
   }
 
   /**
-   * [en] bind the texture. For any value, it returns true if we call WebGL&apos;s bindTexture function, false otherwise.&lt;br /&gt;
-   * [ja] &#x30C6;&#x30AF;&#x30B9;&#x30C1;&#x30E3;&#x3092;&#x30D0;&#x30A4;&#x30F3;&#x30C9;&#x3057;&#x307E;&#x3059;&#x3002;&#x3069;&#x3093;&#x306A;&#x5024;&#x306B;&#x305B;&#x3088;&#x3001;WebGL&#x306E;bindTexture&#x95A2;&#x6570;&#x3092;&#x547C;&#x3093;&#x3060;&#x5834;&#x5408;&#x306F;true&#x3092;&#x3001;&#x305D;&#x3046;&#x3067;&#x306A;&#x3051;&#x308C;&#x3070;false&#x3092;&#x8FD4;&#x3057;&#x307E;&#x3059;&#x3002;
+   * bind the texture. For any value, it returns true if we call WebGL&apos;s bindTexture function, false otherwise.
    */
   setUpTexture(textureName, textureUnitIndex) {
     var gl = this._gl;
@@ -466,7 +469,7 @@ export default class L_AbstractMaterial extends GLBoostObject {
     }
   }
 
-  setUpStates() {
+  setUpStates(mesh) {
     let globalStatesUsage = this._glBoostSystem._glBoostContext.globalStatesUsage;
     if (this._globalStatesUsage) {
       globalStatesUsage = this._globalStatesUsage;
@@ -486,6 +489,12 @@ export default class L_AbstractMaterial extends GLBoostObject {
         break;
       default:
         break;
+    }
+
+    if (mesh.isTransparent || this.isTransparent) {
+      //this._gl.disable(2929);
+      this._gl.enable(3042);
+      //this._gl.colorMask(true, true, true, false);
     }
   }
 
@@ -603,6 +612,21 @@ export default class L_AbstractMaterial extends GLBoostObject {
     return Object.keys(this._textureSemanticsDic).length;
   }
 
+  set isAlphaTest(flg){
+    this._isAlphaTestEnable = flg;
+  }
+
+  get isAlphaTest() {
+    return this._isAlphaTestEnable;
+  }
+
+  set alphaCutoff(value) {
+    this._alphaCutoff = value;
+  }
+
+  get alphaCutoff() {
+    return this._alphaCutoff;
+  }
 }
 
 GLBoost[&apos;L_AbstractMaterial&apos;] = L_AbstractMaterial;

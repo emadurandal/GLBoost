@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -168,11 +170,27 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/low_level/geometries/BlendShapeGeometry.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import GLBoost from &apos;../../globals&apos;;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/* @flow */
+
+import GLBoost from &apos;../../globals&apos;;
 import BlendShapeShaderSource from &apos;../../middle_level/shaders/BlendShapeShader&apos;;
 import Geometry from &apos;./Geometry&apos;;
 
 export default class BlendShapeGeometry extends Geometry {
+  _blendWeight_1: number;
+  _blendWeight_2: number;
+  _blendWeight_3: number;
+  _blendWeight_4: number;
+  _blendWeight_5: number;
+  _blendWeight_6: number;
+  _blendWeight_7: number;
+  _blendWeight_8: number;
+  _blendWeight_9: number;
+  _blendWeight_10: number;
+  _currentRenderPassIndex: number;
+  _materialForBlend: Object | null;
+  _glContext: Object;
+
   constructor(glBoostContext) {
     super(glBoostContext);
 
@@ -192,7 +210,7 @@ export default class BlendShapeGeometry extends Geometry {
   }
 
 
-  draw(data) {
+  draw(data: Object) {
     this._currentRenderPassIndex = data.renderPass_index;
     super.draw({
       expression: data.expression,
@@ -228,7 +246,7 @@ export default class BlendShapeGeometry extends Geometry {
     super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, mesh);
   }
 
-  _setBlendWeightToGlslProgram(blendTargetNumber, weight) {
+  _setBlendWeightToGlslProgram(blendTargetNumber: number, weight: number) {
     let blendTarget = GLBoost.getValueOfGLBoostConstant(blendTargetNumber);
     let materials = [this._materialForBlend];
     for (let i=0; i&lt;materials.length;i++) {
@@ -237,7 +255,7 @@ export default class BlendShapeGeometry extends Geometry {
     }
   }
 
-  set blendWeight_1(weight) {
+  set blendWeight_1(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -249,7 +267,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_1;
   }
 
-  set blendWeight_2(weight) {
+  set blendWeight_2(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -261,7 +279,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_2;
   }
 
-  set blendWeight_3(weight) {
+  set blendWeight_3(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -273,7 +291,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_3;
   }
 
-  set blendWeight_4(weight) {
+  set blendWeight_4(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -285,7 +303,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_4;
   }
 
-  set blendWeight_5(weight) {
+  set blendWeight_5(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -297,7 +315,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_5;
   }
 
-  set blendWeight_6(weight) {
+  set blendWeight_6(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -309,7 +327,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_6;
   }
 
-  set blendWeight_7(weight) {
+  set blendWeight_7(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -321,7 +339,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_7;
   }
 
-  set blendWeight_8(weight) {
+  set blendWeight_8(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -333,7 +351,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_8;
   }
 
-  set blendWeight_9(weight) {
+  set blendWeight_9(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -345,7 +363,7 @@ export default class BlendShapeGeometry extends Geometry {
     return this._blendWeight_9;
   }
 
-  set blendWeight_10(weight) {
+  set blendWeight_10(weight: number) {
     var gl = this._glContext.gl;
     var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
