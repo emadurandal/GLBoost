@@ -1,3 +1,5 @@
+// @flow
+
 import GLExtensionsManager from '../low_level/core/GLExtensionsManager';
 import GLBoostObject from '../low_level/core/GLBoostObject';
 import Matrix44 from '../low_level/math/Matrix44';

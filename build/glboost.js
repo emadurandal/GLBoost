@@ -1495,7 +1495,7 @@
 
     /**
      * Return instance name.
-     * @returns {string} the instance name.
+     * @returns the instance name.
      */
     toString()        {
       return this._instanceName;
@@ -1802,14 +1802,14 @@
     */
 
     /**
-     * length squared
+     * to square length
      */
     lengthSquared() {
       return this.x*this.x + this.y*this.y + this.z*this.z;
     }
 
     /**
-     * length squared(static version)
+     * to square length(static verison)
      */
     static lengthSquared(vec3        ) {
       return vec3.x*vec3.x + vec3.y*vec3.y + vec3.z*vec3.z;
@@ -1859,7 +1859,7 @@
     }
 
     /**
-    * cross product(static版)
+    * cross product(static version)
     */
     static cross(lv        , rv        ) {
       var x = lv.y*rv.z - lv.z*rv.y;
@@ -1920,14 +1920,14 @@
     }
 
     /**
-     * 減算（static版）
+     * subtract(subtract)
      */
     static subtract(lv        , rv        ) {
       return new Vector3(lv.x - rv.x, lv.y - rv.y, lv.z - rv.z);
     }
 
     /**
-     * 除算
+     * divide
      */
     divide(val       ) {
       if (val !== 0) {
@@ -1945,7 +1945,7 @@
     }
 
     /**
-     * 除算（static版）
+     * divide(static version)
      */
     static divide(vec3        , val       ) {
       if (val !== 0) {
@@ -1956,6 +1956,9 @@
       }
     }
 
+    /**
+     * multiply
+     */
     multiply(val       ) {
       this.x *= val;
       this.y *= val;
@@ -1964,6 +1967,9 @@
       return this;
     }
 
+    /**
+     * multiply vector
+     */
     multiplyVector(vec        ) {
       this.x *= vec.x;
       this.y *= vec.y;
@@ -1972,10 +1978,16 @@
       return this;
     }
 
+    /**
+     * multiply(static version)
+     */
     static multiply(vec3        , val       ) {
       return new Vector3(vec3.x * val, vec3.y * val, vec3.z * val);
     }
 
+    /**
+     * multiply vector(static version)
+     */
     static multiplyVector(vec3        , vec        ) {
       return new Vector3(vec3.x * vec.x, vec3.y * vec.y, vec3.z * vec.z);
     }
@@ -1992,6 +2004,9 @@
       return sita;
     }
 
+    /**
+     * divide vector
+     */
     divideVector(vec3        ) {
       this.x /= vec3.x;
       this.y /= vec3.y;
@@ -2000,10 +2015,16 @@
       return this;
     }
 
+    /**
+     * divide vector(static version)
+     */
     static divideVector(lvec3        , rvec3        ) {
       return new Vector3(lvec3.x / rvec3.x, lvec3.y / rvec3.y, lvec3.z / rvec3.z);
     }
 
+    /**
+     * change to string
+     */
     toString() {
       return '(' + this.x + ', ' + this.y + ', ' + this.z +')';
     }
@@ -2789,13 +2810,16 @@
     }
 
     /**
-     * ゼロ行列
+     * zero matrix
      */
     zero() {
       this.setComponents(0, 0, 0, 0, 0, 0, 0, 0, 0);
       return this;
     }
 
+    /**
+     * zero matrix(static version)
+     */
     static zero() {
       return new Matrix33(0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
@@ -2815,7 +2839,7 @@
     }
 
     /**
-     * 転置
+     * transpose
      */
     transpose() {
       this._swap(1, 3);
@@ -2826,7 +2850,7 @@
     }
 
     /**
-     * 転置（static版）
+     * transpose(static version)
      */
     static transpose(mat) {
 
@@ -2848,7 +2872,7 @@
     }
 
     /**
-     * 行列同士の乗算
+     * multiply zero matrix and zero matrix
      */
     multiply(mat) {
       var m00 = this.m00*mat.m00 + this.m01*mat.m10 + this.m02*mat.m20;
@@ -2872,7 +2896,7 @@
     }
 
     /**
-     * 行列同士の乗算（static版）
+     * multiply zero matrix and zero matrix(static version)
      */
     static multiply(l_m, r_m) {
       var m00 = l_m.m00*r_m.m00 + l_m.m01*r_m.m10 + l_m.m02*r_m.m20;
@@ -3167,7 +3191,7 @@
     }
 
     /**
-     * 単位行列にする
+     * to the identity matrix
      */
     identity() {
       this.setComponents(
@@ -3180,7 +3204,7 @@
     }
 
     /**
-     * 単位行列にする（static版）
+     * to the identity matrix（static版）
      */
     static identity() {
       return new Matrix44$1(
@@ -3425,7 +3449,7 @@
     }
 
     /**
-     * 転置
+     * transpose
      */
     transpose() {
       this._swap(1, 4);
@@ -3439,7 +3463,7 @@
     }
 
     /**
-     * 転置（static版）
+     * transpose(static version)
      */
     static transpose(mat) {
 
@@ -3463,7 +3487,7 @@
     }
 
     /**
-     * 行列同士の乗算
+     * multiply zero matrix and zero matrix
      */
     multiply(mat) {
       var m00 = this.m00*mat.m00 + this.m01*mat.m10 + this.m02*mat.m20 + this.m03*mat.m30;
@@ -3524,7 +3548,7 @@
     }
 
     /**
-     * 行列同士の乗算（static版）
+     * multiply zero matrix and zero matrix(static version)
      */
     static multiply(l_m, r_m) {
       var m00 = l_m.m00*r_m.m00 + l_m.m01*r_m.m10 + l_m.m02*r_m.m20 + l_m.m03*r_m.m30;
@@ -3803,6 +3827,8 @@
 
   GLBoost$1["Matrix44"] = Matrix44$1;
 
+  //      
+
   class MathClassUtil {
     constructor() {
 
@@ -3892,7 +3918,12 @@
       }
     }
 
-    static compomentNumberOfVector(element) {
+    /**
+     * discriminate which Vector instance 
+     * @param element any Vector instance  
+     * @return number of Vector instance
+     */
+    static compomentNumberOfVector(element                                                   )         {
       if(element instanceof Vector2) {
         return 2;
       } else if (element instanceof Vector3) {
@@ -4150,10 +4181,9 @@
     }
 
     /**
-     * [en] Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).<br>
-     * [ja] アニメーションのための入力値（例えばフレーム値）をセットします。この値はシーングラフに属する全ての子孫に影響します。
-     * @param inputName [en] inputName name of input value. [ja] 入力値の名前
-     * @param inputValue [en] input value of animation. [ja] アニメーションの入力値
+     * Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).
+     * @param inputName inputName name of input value.
+     * @param inputValue input value of animation.
      */
     setCurrentAnimationValue(inputName        , inputValue                                           ) {
       if ((this     )._setDirtyToAnimatedElement != null) {
@@ -6439,6 +6469,8 @@
   //DrawKickerWorld._lastGeometry = null;
   //DrawKickerWorld._lastRenderPassIndex = -1;
 
+  //      
+
   class SkeletalShaderSource {
 
     VSDefine_SkeletalShaderSource(in_, out_, f, lights, material, extraData) {
@@ -6711,9 +6743,9 @@ return mat4(
     }
 
     /**
-     * @return {string}
+     * 
      */
-    VSPreProcess_SkeletalShaderSource(existCamera_f, f, lights, material, extraData) {
+    VSPreProcess_SkeletalShaderSource(existCamera_f, f, lights, material, extraData)         {
       let shaderText = '';
 
       shaderText += 'vec4 weightVec = aVertex_weight;\n'; // DO NOT normalize as vec4!
@@ -7337,7 +7369,7 @@ return mat4(
     }
 
     /**
-     * 全ての頂点属性のリストを返す
+     * return all vertex attribute name list
      */
     _allVertexAttribs(vertices) {
       var attribNameArray = [];
@@ -8685,17 +8717,17 @@ return mat4(
 
   GLBoost$1['BlendShapeGeometry'] = BlendShapeGeometry;
 
+  //      
+
   /**
-   * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
-   * [ja] 全てのテクスチャクラスのための抽象クラスです。直接このクラスは使わないでください。
+   * This is the abstract class for all texture classes. Don't use this class directly.
    */
   class AbstractTexture extends GLBoostObject {
 
     /**
-     * [en] The constructor of PointLight class. Do not construct this class directly.<br>
-     * [ja] PointLightクラスのコンストラクタ。直接このクラスを生成しようとしないでください。
+     * The constructor of PointLight class. Do not construct this class directly.
      *
-     * * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     * * @param {HTMLCanvas|string} canvas canvas or canvas' id string.
      */
     constructor(glBoostContext) {
       super(glBoostContext);
@@ -8713,18 +8745,16 @@ return mat4(
     }
 
     /**
-     * [en] get the WebGL texture resource within this class. <br />
-     * [ja] このクラス内部で管理しているWebGLテクスチャリソースを取得します。
+     * get the WebGL texture resource within this class.
      *
-     * @returns {null|*} [en] WebGL texture resouce. [ja] WebGLテクスチャリソース
+     * @returns WebGL texture resouce.
      */
-    get glTextureResource() {
+    get glTextureResource()           {
       return this._texture;
     }
 
     /**
-     * [en] bind the texture. It calls bindTexture on WebGL only if it has WebGL texture. Otherwise it returns false without doing anything.<br />
-     * [ja] テクスチャをバインドします。自身がWebGLテクスチャを持っている場合のみ、WebGLのbindTextureを呼びます。それ以外は何もせずにfalseを返します。
+     * bind the texture. It calls bindTexture on WebGL only if it has WebGL texture. Otherwise it returns false without doing anything.
      */
     setUp(textureUnitIndex) {
       var gl = this._glContext.gl;
@@ -8744,8 +8774,7 @@ return mat4(
     }
 
     /**
-     * [en] unbind the texture. <br />
-     * [ja] テクスチャをバインド解除します。
+     * unbind the texture.
      */
     tearDown(textureUnitIndex) {
       var gl = this._glContext.gl;
@@ -8796,12 +8825,12 @@ return mat4(
     /**
      * Origin is left bottom
      *
-     * @param {number} x horizontal pixel position (0 is left)
-     * @param {number} y virtical pixel position (0 is bottom)
-     * @param {Uint8Array} argByteArray Pixel Data as Uint8Array
-     * @returns {Vector4} Pixel Value in Vector4
+     * @param x horizontal pixel position (0 is left)
+     * @param y virtical pixel position (0 is bottom)
+     * @param argByteArray Pixel Data as Uint8Array
+     * @returns Pixel Value in Vector4
      */
-    getPixelValueAt(x, y, argByteArray) {
+    getPixelValueAt(x        , y        , argByteArray            )         {
       let byteArray = argByteArray;
       if (!byteArray) {
         byteArray = this.getTexturePixelData();
@@ -8827,13 +8856,12 @@ return mat4(
       return canvas;
     }
     /**
-     * [en] check whether or not this texture size is power of two. <br />
-     * [ja] テクスチャサイズが２の累乗かどうかを返します
+     * check whether or not this texture size is power of two.
      *
-     * @param {number} x [en] texture size. [ja] テクスチャサイズ
-     * @returns {boolean} [en] check whether or not the size x is power of two. [ja] xが２の累乗かどうか
+     * @param x texture size.
+     * @returns check whether or not the size x is power of two.
      */
-    _isPowerOfTwo(x) {
+    _isPowerOfTwo(x        )          {
       return (x & (x - 1)) == 0;
     }
 
@@ -8842,13 +8870,12 @@ return mat4(
     }
 
     /**
-     * [en] get a value nearest power of two. <br />
-     * [ja] 与えられた数から見て２の累乗に最も近い値を返します。
+     * get a value nearest power of two.
      *
-     * @param {number} x [en] texture size. [ja] テクスチャサイズ
-     * @returns {number} [en] a value nearest power of two. [ja] xに近い２の累乗の値
+     * @param x texture size.
+     * @returns a value nearest power of two.
      */
-    _getNearestPowerOfTwo(x) {
+    _getNearestPowerOfTwo(x        )         {
       return Math.pow( 2, Math.round( Math.log( x ) / Math.LN2 ) );
     }
 
@@ -9773,8 +9800,7 @@ return mat4(
     }
 
     /**
-     * [en] bind the texture. For any value, it returns true if we call WebGL's bindTexture function, false otherwise.<br />
-     * [ja] テクスチャをバインドします。どんな値にせよ、WebGLのbindTexture関数を呼んだ場合はtrueを、そうでなければfalseを返します。
+     * bind the texture. For any value, it returns true if we call WebGL's bindTexture function, false otherwise.
      */
     setUpTexture(textureName, textureUnitIndex) {
       var gl = this._gl;
@@ -13927,12 +13953,12 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * create textures as render target. (and attach it to framebuffer object internally.)<br>
-     * @param {number} width - width of texture
-     * @param {number} height - height of texture
-     * @param {number} textureNum - the number of creation.
-     * @returns {Array} an array of created textures.
+     * @param  width - width of texture
+     * @param  height - height of texture
+     * @param  textureNum - the number of creation.
+     * @returns  an array of created textures.
      */
-    createTexturesForRenderTarget(width        , height       , textureNum       ) {
+    createTexturesForRenderTarget(width        , height       , textureNum       )        {
       var glContext = this.__system._glContext;
       var gl = glContext.gl;
 
@@ -14709,10 +14735,10 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * Add the element to this group as a child.
-     * @param {Element} element - a instance of Element class
-     * @param {boolean} isDuplicateOk - allow duplicating if need
+     * @param element - a instance of Element class
+     * @param isDuplicateOk - allow duplicating if need
      */
-    addChild(element     , isDuplicateOk          = false) {
+    addChild(element         , isDuplicateOk          = false) {
 
       if (isDuplicateOk){
         // if forgive duplicated register by copy
@@ -14733,9 +14759,8 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     /**
-     * [en] remove the element from this group.
-     * [ja] このグループから指定した要素を削除します。
-     * @param {Element} element [en] the element to remove [ja] 削除したい要素
+     * remove the element from this group.
+     * @param element the element to remove
      */
     removeChild(element           ) {
       this._elements = this._elements.filter(function(elem) {
@@ -14747,8 +14772,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     /**
-     * [en] remove all elements from this group.
-     * [ja] このグループから全ての要素を削除します。
+     * remove all elements from this group.
      */
     removeAll() {
       this._elements = this._elements.filter(function(elem) {
@@ -15188,7 +15212,7 @@ albedo.rgb *= (1.0 - metallic);
       this.removeAll();
     }
 
-    rayCast(arg1        , arg2        , camera     , viewport     ) {
+    rayCast(arg1        , arg2        , camera     , viewport     , ignoreInstanceNameList           ) {
       const meshes = this.searchElementsByType(M_Mesh);
       let currentShortestT = Number.MAX_VALUE;
       let currentShortestIntersectedPosVec3 = null;
@@ -15198,6 +15222,9 @@ albedo.rgb *= (1.0 - metallic);
           continue;
         }
         if (!mesh.isPickable) {
+          continue;
+        }
+        if (ignoreInstanceNameList && ignoreInstanceNameList.indexOf(mesh.instanceName)) {
           continue;
         }
         let result = null;
@@ -16203,9 +16230,10 @@ albedo.rgb *= (1.0 - metallic);
 
   }
 
+  //      
+
   /**
-   * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>
-   * ja: このクラスはレンダリングプロセスの制御を司ります。Canvasにイメージをレンダリングするために、このRendererクラスは他の要素のデータを集め、描画プロセスの計画を決定し、実行します。
+   * This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.
    */
   class Renderer extends GLBoostObject {
     constructor(glBoostContext, parameters) {
@@ -16234,10 +16262,10 @@ albedo.rgb *= (1.0 - metallic);
 
 
     /**
-     * en: update things of elements of the expression.<br>
-     * @param {Expression} expression a instance of Expression class
+     * update things of elements of the expression.
+     * @param expression a instance of Expression class
      */
-    update(expression) {
+    update(expression            ) {
       
       let skeletalMeshes = [];
       let effekseerElements = [];
@@ -16274,11 +16302,10 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     /**
-     * en: draw elements of the expression.<br>
-     * ja: sceneが持つオブジェクトを描画します
-     * @param {Expression} expression a instance of Expression class
+     * draw elements of the expression.
+     * @param expression a instance of Expression class
      */
-    draw(expression) {
+    draw(expression            ) {
       let renderPassTag = '';
       expression.renderPasses.forEach((renderPass, index)=>{
         if (!renderPass.isEnableToDraw || !renderPass.scene) {
@@ -16464,13 +16491,12 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     /**
-     * en: clear color/depth/stencil of canvas.<br>
-     * ja: canvasのカラー、デプス、ステンシルのいずれか又は全てをクリアします。
-     * @param {boolean} color_flg true: clear color, false: don't clear color
-     * @param {boolean} depth_flg true: clear depth, false: don't clear depth
-     * @param {boolean} stencil_flg  true: clear stencil, false: don't clear stencil
+     * clear color/depth/stencil of canvas.
+     * @param color_flg true: clear color, false: don't clear color
+     * @param depth_flg true: clear depth, false: don't clear depth
+     * @param stencil_flg  true: clear stencil, false: don't clear stencil
      */
-    clearCanvas( color_flg, depth_flg, stencil_flg ) {
+    clearCanvas( color_flg         , depth_flg         , stencil_flg          ) {
       const gl = this._glContext.gl;
 
       var bufferBits = 0;
@@ -16484,22 +16510,20 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     /**
-     * en: Get WebGL context.<br>
-     * ja: WebGLコンテキストを取得します。
-     * @returns {webglcontext} a context of WebGL
+     * Get WebGL context.
+     * @returns a context of WebGL
      */
-    get glContext() {
+    get glContext()               {
       return this._glContext.gl;
     }
 
 
     /**
-     * en: resize canvas and viewport.<br>
-     * ja: canvasとビューポートをリサイズします。
-     * @param {number} width en: width to resize, ja: リサイズする幅
-     * @param {number} height en: height to resize, ja:リサイズする高さ
+     * resize canvas and viewport.
+     * @param width width to resize.
+     * @param height height to resize.
      */
-    resize(width, height) {
+    resize(width        , height        ) {
       this._glContext.canvasWidth = width;
       this._glContext.canvasHeight = height;
     }
@@ -16682,10 +16706,8 @@ albedo.rgb *= (1.0 - metallic);
 
 
   /**
-   * [en] This M_Scene class is the top level element of scene graph hierarchy.
-   *       To render scene, pass this scene element to Renderer.draw method.<br>
-   * [ja] このSceneクラスはシーングラフ階層のトップレベルに位置する要素です。
-   *       シーンをレンダリングするには、このscene要素をRenderer.drawメソッドに渡します。
+   * This M_Scene class is the top level element of scene graph hierarchy.
+   *  To render scene, pass this scene element to Renderer.draw method.
    */
   class M_Scene extends M_Group {
                                
@@ -16700,9 +16722,8 @@ albedo.rgb *= (1.0 - metallic);
                           
     
     /**
-     * [en] constructor
-     * [ja] コンストラクタ
-     * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     * constructor
+     * @param {HTMLCanvas|string} canvas canvas or canvas' id string.
      */
     constructor(glBoostContext    ) {
       super(glBoostContext);
@@ -16729,8 +16750,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     /**
-     * [en] Prepare for Rendering. You have to call this method before Renderer.draw method.
-     * [ja] レンダリングのための前処理を行います。Renderer.drawメソッドの前にこのメソッドを呼ぶ必要があります。
+     * Prepare for Rendering. You have to call this method before Renderer.draw method.
      */
     prepareToRender(expression    ) {
       this._reset();
@@ -16902,38 +16922,34 @@ albedo.rgb *= (1.0 - metallic);
     }    
 
     /**
-     * [en] Get child elements which belong to this scene.<br>
-     * [ja] このシーンに属していた子供の要素の配列を返します。
-     * @return {Array<Element>} [en] child elements of this scene. [ja] このシーンの子供の要素
+     * Get child elements which belong to this scene.
+     * @return child elements of this scene.
      */
-    getChildren() {
+    getChildren()                {
       return this._elements;
     }
 
     /**
-     * [en] Get child elements which belong to this scene.<br>
-     * [ja] このシーンに属していた子供の要素の配列を返します。
-     * @return {Array<Element>} [en] child elements of this scene. [ja] このシーンの子供の要素
+     * Get child elements which belong to this scene.
+     * @return child elements of this scene.
      */
-    get elements()            {
+    get elements()                {
       return this._elements;
     }
 
     /**
-     * [en] Get child meshes which belong to this scene.<br>
-     * [ja] このシーンに属していた子供のMesh要素の配列を返します。
-     * @return {Array<M_Mesh>} [en] child meshes of this scene. [ja] このシーンの子供のMesh要素
+     * Get child meshes which belong to this scene.
+     * @return child meshes of this scene.
      */
-    get meshes() {
+    get meshes()               {
       return this._meshes;
     }
 
     /**
-     * [en] Get child lights which belong to this scene.<br>
-     * [ja] このシーンに属していた子供のLight要素の配列を返します。
-     * @return {Array<M_AbstractLight>} [en] child lights of this scene. [ja] このシーンの子供のLight要素
+     * Get child lights which belong to this scene.
+     * @return child lights of this scene.
      */
-    get lights() {
+    get lights()                        {
       return this._lights;
     }
 
@@ -16942,11 +16958,10 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     /**
-     * [en] Get child cameras which belong to this scene.<br>
-     * [ja] このシーンに属していた子供のCamera要素の配列を返します。
-     * @return {Array<PerspectiveCamera>} [en] child cameras of this scene. [ja] このシーンの子供のCamera要素
+     * Get child cameras which belong to this scene.
+     * @return child cameras of this scene.
      */
-    get cameras() {
+    get cameras()                           {
       return this._cameras;
     }
 
@@ -18056,21 +18071,23 @@ albedo.rgb *= (1.0 - metallic);
     }
   }
 
+  //      
+
+
   /**
-   * [en] This is a Directional Light class.<br>
-   * [ja] 平行光源クラスです。
+   * This is a Directional Light class.
    */
   class M_DirectionalLight extends M_AbstractLight {
 
     /**
      * The constructor of DirectionalLight class. 
      * 
-     * @param {glBoostSystem} glBoostSystem - glBoostSystem Instance
-     * @param {Vector4} intensity intensity as Vector4 Color
-     * @param {Vector3} rotate - initial rotation vector
-     * @param {number} length - length for DirectionalLightGizmo
+     * @param glBoostSystem - glBoostSystem Instance
+     * @param intensity intensity as Vector4 Color
+     * @param rotate - initial rotation vector
+     * @param length - length for DirectionalLightGizmo
      */
-    constructor(glBoostSystem, intensity, rotate = new Vector3(0, 0, 0), length = 1.0) {
+    constructor(glBoostSystem               , intensity         , rotate          = new Vector3(0, 0, 0), length         = 1.0) {
       super(glBoostSystem);
 
       this._intensity = intensity;
@@ -18961,32 +18978,31 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost['PhongShader'] = PhongShader;
 
+  //      
+
   let singleton$4 = Symbol();
   let singletonEnforcer$1 = Symbol();
 
   /**
-   * [en] This is a loader class of Obj file format.<br>
-   * [ja] Objファイルを読み込むためのローダークラスです。
+   * This is a loader class of Obj file format.
    */
   class ObjLoader {
 
     /**
-     * [en] The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.<br>
-     * [ja] ObjLoaderクラスのコンストラクタです。しかし本クラスはシングルトンであるため、このコンストラクタは直接呼び出せません。getInstance()静的メソッドを使ってください。
-     * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] このコンストラクタの直接呼び出しを禁止するためのシンボル
+     * The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+     * @param enforcer a Symbol to forbid calling this constructor directly
      */
-    constructor(enforcer) {
+    constructor(enforcer        ) {
       if (enforcer !== singletonEnforcer$1) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
     }
 
     /**
-     * [en] The static method to get singleton instance of this class.<br>
-     * [ja] このクラスのシングルトンインスタンスを取得するための静的メソッド。
-     * @return {ObjLoader} [en] the singleton instance of ObjLoader class [ja] ObjLoaderクラスのシングルトンインスタンス
+     * The static method to get singleton instance of this class.
+     * @return The singleton instance of ObjLoader class
      */
-    static getInstance() {
+    static getInstance()            {
       if (!this[singleton$4]) {
         this[singleton$4] = new ObjLoader(singletonEnforcer$1);
       }
@@ -18995,13 +19011,13 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * the method to load Obj file.
-     * @param {glBoostContext} glBoostContext - glBoostContext instance
-     * @param {string} url - url of glTF file
-     * @param {Shader} defaultShader - a shader to assign to loaded geometries
-     * @param {string} mtlString - string of mtl file (optional)
-     * @return {Promise} a promise object
+     * @param glBoostContext - glBoostContext instance
+     * @param url - url of glTF file
+     * @param defaultShader - a shader to assign to loaded geometries
+     * @param mtlString - string of mtl file (optional)
+     * @return a promise object
      */
-    loadObj(glBoostContext, url, defaultShader = null, mtlString = null) {
+    loadObj(glBoostContext                , url        , defaultShader         = null, mtlString         = null)          {
       return DataUtil.loadResourceAsync(url, false, (resolve, responseText)=>{
         let gotText = responseText;
         let partsOfPath = url.split('/');
@@ -19708,32 +19724,32 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost['LambertShader'] = LambertShader;
 
+  //      
+
+
   let singleton$5 = Symbol();
   let singletonEnforcer$2 = Symbol();
 
   /**
-   * [en] This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .<br>
-   * [ja] glTFファイルを読み込むためのローダークラスです。glTFファイルフォーマットについての詳細は https://github.com/KhronosGroup/glTF をご覧ください。
+   * This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .
    */
   class GLTFLoader {
 
     /**
-     * [en] The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.<br>
-     * [ja] GLTFLoaderクラスのコンストラクタです。しかし本クラスはシングルトンであるため、このコンストラクタは直接呼び出せません。getInstance()静的メソッドを使ってください。
-     * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] このコンストラクタの直接呼び出しを禁止するためのシンボル
+     * The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+     * @param enforcer a Symbol to forbid calling this constructor directly
      */
-    constructor(enforcer) {
+    constructor(enforcer        ) {
       if (enforcer !== singletonEnforcer$2) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
     }
 
     /**
-     * [en] The static method to get singleton instance of this class.<br>
-     * [ja] このクラスのシングルトンインスタンスを取得するための静的メソッド。
-     * @return {GLTFLoader} [en] the singleton instance of GLTFLoader class [ja] GLTFLoaderクラスのシングルトンインスタンス
+     * The static method to get singleton instance of this class.<br>
+     * @return The singleton instance of GLTFLoader class
      */
-    static getInstance() {
+    static getInstance()             {
       if (!this[singleton$5]) {
         this[singleton$5] = new GLTFLoader(singletonEnforcer$2);
       }
@@ -19800,12 +19816,12 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * the method to load glTF file.
-     * @param {glBoostContext} glBoostContext - glBoostContext instance
-     * @param {string} url - url of glTF file
-     * @param {Object} options - option data for loading
-     * @return {Promise} a promise object
+     * @param glBoostContext - glBoostContext instance
+     * @param url - url of glTF file
+     * @param options - option data for loading
+     * @return a promise object
      */
-    loadGLTF(glBoostContext, url, options) {
+    loadGLTF(glBoostContext                , url        , options        )          {
       let defaultOptions = {
         files: { 
           //        "foo.gltf": content of file as ArrayBuffer, 
@@ -21303,6 +21319,8 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1["GLTFLoader"] = GLTFLoader;
 
+  //      
+
   let singleton$6 = Symbol();
   let singletonEnforcer$3 = Symbol();
 
@@ -21313,9 +21331,9 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
-     * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
+     * @param enforcer a Symbol to forbid calling this constructor directly
      */
-    constructor(enforcer) {
+    constructor(enforcer        ) {
       if (enforcer !== singletonEnforcer$3) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
@@ -21349,9 +21367,9 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * The static method to get singleton instance of this class.
-     * @return {GLTFLoader} the singleton instance of GLTFLoader class
+     * @return The singleton instance of GLTFLoader class
      */
-    static getInstance() {
+    static getInstance()             {
       if (!this[singleton$6]) {
         this[singleton$6] = new GLTF2Loader(singletonEnforcer$3);
       }
@@ -21360,11 +21378,11 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * the method to load glTF2 file.
-     * @param {string} uri uri of glTF file
-     * @param {Object} options - opition data for loading
-     * @return {Promise}
+     * @param uri uri of glTF file
+     * @param options - opition data for loading
+     * @return
      */
-    loadGLTF(uri, options = {}) {
+    loadGLTF(uri        , options         = {})          {
       let defaultOptions = {
         files: { 
           //        "foo.gltf": content of file as ArrayBuffer, 
@@ -22093,6 +22111,8 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1["GLTF2Loader"] = GLTF2Loader;
 
+  //      
+
   let singleton$7 = Symbol();
   let singletonEnforcer$4 = Symbol();
 
@@ -22103,9 +22123,9 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
-     * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
+     * @param enforcer a Symbol to forbid calling this constructor directly
      */
-    constructor(enforcer) {
+    constructor(enforcer        ) {
       if (enforcer !== singletonEnforcer$4) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
@@ -22113,9 +22133,9 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * The static method to get singleton instance of this class.
-     * @return {GLTFLoader} the singleton instance of GLTFLoader class
+     * @return The singleton instance of GLTFLoader class
      */
-    static getInstance() {
+    static getInstance()             {
       if (!this[singleton$7]) {
         this[singleton$7] = new ModelConverter(singletonEnforcer$4);
       }
@@ -22188,7 +22208,7 @@ albedo.rgb *= (1.0 - metallic);
         options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, gltfModel.asset);
       }
       if (options && options.loaderExtension && options.loaderExtension.loadExtensionInfoAndSetToRootGroup) {
-        options.loaderExtension.loadExtensionInfoAndSetToRootGroup(rootGroup, json, glBoostContext);
+        options.loaderExtension.loadExtensionInfoAndSetToRootGroup(rootGroup, gltfModel, glBoostContext);
       }
 
       rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
@@ -23002,7 +23022,7 @@ albedo.rgb *= (1.0 - metallic);
       renderer: null,
       canvas: null,
 
-      /** 子供を 自分のCanvasRenderer で描画するか */
+      /** rendering child by self CanvasRenderer or not */
       renderChildBySelf: true,
 
       init: function(params) {
@@ -23019,7 +23039,7 @@ albedo.rgb *= (1.0 - metallic);
         this.canvas.style.display = "none";
 
         this.glBoostContext = new GLBoostMiddleContext(this.canvas);
-        // レンダラーを生成
+        // create renderer
         this.renderer = this.glBoostContext.createRenderer({clearColor: {red:1, green:1, blue:1, alpha:1}});
         this.scene = this.glBoostContext.createScene();
         this.expression = this.glBoostContext.createExpressionAndRenderPasses(1);
@@ -23040,13 +23060,13 @@ albedo.rgb *= (1.0 - metallic);
       superClass: 'phina.display.Layer',
 
       /**
-       * 子孫要素の描画の面倒を自分で見る
+       * rendering child by self CanvasRenderer or not
        */
       renderChildBySelf: true,
 
-      /** 子孫要素を普通に描画するためのキャンバス */
+      /** For drawing child attribute canvas */
       canvas2d: null,
-      /** canvas2dに描画するレンダラー */
+      /** To drawing canvas2d renderer */
       renderer2d: null,
 
       width: 0,
@@ -23607,6 +23627,8 @@ albedo.rgb *= (1.0 - metallic);
     GLBoost['JointGizmoUpdater'] = JointGizmoUpdater;
   }
 
+  //      
+
   let singleton$8 = Symbol();
   let singletonEnforcer$5 = Symbol();
 
@@ -23617,9 +23639,9 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
-     * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
+     * @param enforcer a Symbol to forbid calling this constructor directly
      */
-    constructor(enforcer) {
+    constructor(enforcer        ) {
       if (enforcer !== singletonEnforcer$5) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
@@ -23627,9 +23649,9 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * The static method to get singleton instance of this class.
-     * @return {ObjLoader} the singleton instance of ObjLoader class
+     * @return the singleton instance of ObjLoader class
      */
-    static getInstance() {
+    static getInstance()           {
       if (!this[singleton$8]) {
         this[singleton$8] = new GLBoostGLTFLoaderExtension(singletonEnforcer$5);
       }
@@ -23940,4 +23962,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-322-gfd0bb-mod branch: feature/change-alphatest-imprement';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-328-gf433f-mod branch: develop';

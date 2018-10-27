@@ -1,3 +1,5 @@
+// @flow
+
 import GLBoost from '../../globals';
 import DataUtil from '../../low_level/misc/DataUtil';
 import DecalShader from '../shaders/DecalShader';

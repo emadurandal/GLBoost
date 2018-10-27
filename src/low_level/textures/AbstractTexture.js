@@ -1,3 +1,5 @@
+// @flow
+
 import GLBoost from '../../globals';
 import GLContext from '../core/GLContext';
 import GLBoostObject from '../core/GLBoostObject';

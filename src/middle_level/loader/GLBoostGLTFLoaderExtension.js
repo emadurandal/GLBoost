@@ -1,3 +1,5 @@
+// @flow
+
 import GLBoost from '../../globals';
 import Vector4 from '../../low_level/math/Vector4';
 import M_Mesh from '../elements/meshes/M_Mesh';

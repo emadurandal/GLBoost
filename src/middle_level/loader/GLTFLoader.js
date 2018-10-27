@@ -1,3 +1,5 @@
+// @flow
+
 import GLBoost from '../../globals';
 import M_OrthoCamera from '../elements/cameras/M_OrthoCamera';
 import M_PerspectiveCamera from '../elements/cameras/M_PerspectiveCamera';

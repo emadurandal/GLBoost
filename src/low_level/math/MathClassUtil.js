@@ -1,3 +1,5 @@
+// @flow
+
 import GLBoost from '../../globals';
 import Vector2 from './Vector2';
 import Vector3 from './Vector3';

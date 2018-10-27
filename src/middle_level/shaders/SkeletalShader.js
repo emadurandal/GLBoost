@@ -1,3 +1,5 @@
+// @flow
+
 import GLBoost from '../../globals';
 import Shader from '../../low_level/shaders/Shader';
 

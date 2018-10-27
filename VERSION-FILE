@@ -1,6 +1,6 @@
-version: 0.0.4-322-gfd0bb-mod
-branch: feature/change-alphatest-imprement
-d6ac854de323a7e4315e0d849338dfb4b1f0f97b0b636f6df94f8364c64ca463 ./build/glboost.js
-d6ac854de323a7e4315e0d849338dfb4b1f0f97b0b636f6df94f8364c64ca463 ./build/glboost.js
-eb911a89c5137beffdb0863bfb053980f819b14c6f2e29db61f65cf90ee7a608 ./build/glboost.min.js
+version: 0.0.4-328-gf433f-mod
+branch: develop
+df2e6e75a4e278b0ef3596ba32b624913caa6fc9d3861d3cc7e4f8ebee881f24 ./build/glboost.js
+df2e6e75a4e278b0ef3596ba32b624913caa6fc9d3861d3cc7e4f8ebee881f24 ./build/glboost.js
+dbf76d8cf0c2f33823bfc2d5ea273820211ff79f02a929a03185d166c150b078 ./build/glboost.min.js
 7bf12109d8a418d29a30c9b5060412dbef549f1f937b6fc469fc4181018e234d ./build/glboost.min.js.map

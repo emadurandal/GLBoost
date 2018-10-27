@@ -1,3 +1,5 @@
+// @flow
+
 import M_AbstractLight from './M_AbstractLight';
 import M_DirectionalLightGizmo from '../gizmos/M_DirectionalLightGizmo';
 import Vector3 from '../../../low_level/math/Vector3';
