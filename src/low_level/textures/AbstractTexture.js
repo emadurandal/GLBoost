@@ -203,3 +203,4 @@ export default class AbstractTexture extends GLBoostObject {
     this._toMultiplyAlphaToColorPreviously = flag;
   }
 }
+GLBoost['AbstractTexture'] = AbstractTexture;

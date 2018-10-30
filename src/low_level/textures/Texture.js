@@ -204,3 +204,4 @@ export default class Texture extends AbstractTexture {
 
 
 }
+GLBoost['Texture'] = Texture;
