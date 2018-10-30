@@ -9722,6 +9722,10 @@ return mat4(
       return count;
     }
 
+    getTextures() {
+      return Object.values(this._textureDic);
+    }
+
     getTextureUserFlavorNames() {
       return Object.keys(this._textureDic);
     }
@@ -14935,7 +14939,6 @@ albedo.rgb *= (1.0 - metallic);
       if (element instanceof type) {
         return element;
       }
-
       
       return null;
     }
@@ -14959,18 +14962,39 @@ albedo.rgb *= (1.0 - metallic);
           }
         }
       }
-
-      if (type === L_AbstractMaterial && element instanceof M_Mesh) {
+      
+      if (type.name.indexOf('Material') !== -1 && element instanceof M_Mesh) {
         let materials = element.getAppropriateMaterials();
         for (let material of materials) {
-          if (this._validateByQuery(material, query, queryMeta)) {
-            return material;
+          if (material instanceof type) {
+            if (this._validateByQuery(material, query, queryMeta)) {
+              return material;
+            }
           }
         }
         return null;
-      } else if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+      }
+      
+      if (type.name.indexOf('Texture') !== -1 && element instanceof M_Mesh) {
+        let materials = element.getAppropriateMaterials();
+        for (let material of materials) {
+          const textures = material.getTextures();
+          for (let texture of textures) {
+            if (texture instanceof type) {
+              if (this._validateByQuery(texture, query, queryMeta)) {
+                return texture;
+              }
+            }
+          }
+        }
+        return null;
+      }
+      
+      if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
         return element;
       }
+
+      return null;
     }
 
     searchGLBoostObjectsByNameAndType(query     , type               , queryMeta           = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
@@ -14995,16 +15019,35 @@ albedo.rgb *= (1.0 - metallic);
         }
         return objects;
       }
-
-      if (type === L_AbstractMaterial && element instanceof M_Mesh) {
+      
+      if (type.name.indexOf('Material') !== -1 && element instanceof M_Mesh) {
         let materials = element.getAppropriateMaterials();
         for (let material of materials) {
-          if (this._validateByQuery(material, query, queryMeta)) {
-            objects.push(material);
+          if (material instanceof type) {
+            if (this._validateByQuery(material, query, queryMeta)) {
+              objects.push(material);
+            }
           }
         }
         return objects;
-      } else if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+      }
+      
+      if (type.name.indexOf('Texture') !== -1 && element instanceof M_Mesh) {
+        let materials = element.getAppropriateMaterials();
+        for (let material of materials) {
+          const textures = material.getTextures();
+          for (let texture of textures) {
+            if (texture instanceof type) {
+              if (this._validateByQuery(texture, query, queryMeta)) {
+                objects.push(texture);
+              }
+            }
+          }
+        }
+        return objects;
+      }
+      
+      if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
         return [element];
       }
       return objects;
@@ -15015,7 +15058,7 @@ albedo.rgb *= (1.0 - metallic);
       if (element instanceof M_Group) {
         let children = element.getChildren();
         for (let i = 0; i < children.length; i++) {
-          let hitChildren = this.searchGLBoostObjectsByType(query, type, queryMeta, children[i]);
+          let hitChildren = this.searchGLBoostObjectsByType(type, children[i]);
           if (hitChildren.length > 0) {
             objects = objects.concat(hitChildren);
           }
@@ -15031,13 +15074,30 @@ albedo.rgb *= (1.0 - metallic);
         return objects;
       }
 
-      if (type === L_AbstractMaterial && element instanceof M_Mesh) {
+      if (type.name.indexOf('Material') !== -1 && element instanceof M_Mesh) {
         let materials = element.getAppropriateMaterials();
         for (let material of materials) {
-          objects.push(material);
+          if (material instanceof type) {
+            objects.push(material);
+          }
         }
         return objects;
-      } else if (element instanceof type) {
+      }
+      
+      if (type.name.indexOf('Texture') !== -1 && element instanceof M_Mesh) {
+        let materials = element.getAppropriateMaterials();
+        for (let material of materials) {
+          const textures = material.getTextures();
+          for (let texture of textures) {
+            if (texture instanceof type) {
+              objects.push(texture);
+            }
+          }
+        }
+        return objects;
+      }
+
+      if (element instanceof type) {
         return [element];
       }
       return objects;
@@ -24000,4 +24060,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-332-g1e82-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-333-gaa84-mod branch: develop';

@@ -174,6 +174,10 @@ export default class L_AbstractMaterial extends GLBoostObject {
     return count;
   }
 
+  getTextures() {
+    return Object.values(this._textureDic);
+  }
+
   getTextureUserFlavorNames() {
     return Object.keys(this._textureDic);
   }
