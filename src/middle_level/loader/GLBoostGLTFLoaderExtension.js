@@ -79,7 +79,7 @@ export default class GLBoostGLTFLoaderExtension {
       const transparentMeshesAsManualOrder = (asset.extras.transparent_meshes_draw_order != null) ? asset.extras.transparent_meshes_draw_order : [];
       let meshParents = rootGroup.searchElementsByType(M_Group);
       const transparentMeshes = [];
-      for (let name of transparentMeshesDrawOrder) {
+      for (let name of transparentMeshesAsManualOrder) {
         for (let parent of meshParents) {
           if (parent.userFlavorName === name) {
             const mesh = parent.getChildren()[0];

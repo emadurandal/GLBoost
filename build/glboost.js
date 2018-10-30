@@ -23700,20 +23700,21 @@ albedo.rgb *= (1.0 - metallic);
 
       // Transparent Meshes Draw Order
       if (asset && asset.extras) {
-        rootGroup.transparentMeshesDrawOrder = (asset.extras.transparent_meshes_draw_order != null) ? asset.extras.transparent_meshes_draw_order : [];
+        const transparentMeshesAsManualOrder = (asset.extras.transparent_meshes_draw_order != null) ? asset.extras.transparent_meshes_draw_order : [];
         let meshParents = rootGroup.searchElementsByType(M_Group);
-        rootGroup.transparentMeshes = [];
-        for (let name of rootGroup.transparentMeshesDrawOrder) {
+        const transparentMeshes = [];
+        for (let name of transparentMeshesAsManualOrder) {
           for (let parent of meshParents) {
             if (parent.userFlavorName === name) {
               const mesh = parent.getChildren()[0];
               if (mesh.isTransparent) {
-                rootGroup.transparentMeshes.push(mesh);
+                transparentMeshes.push(mesh);
               }
               break;
             }
           }
         }
+        rootGroup.transparentMeshesAsManualOrder = transparentMeshes;
       }
 
     }
@@ -23733,21 +23734,22 @@ albedo.rgb *= (1.0 - metallic);
           }
         }
 
-        // Transparent Meshes Draw Order
-        rootGroup.transparentMeshesDrawOrder = (ext.transparentMeshesDrawOrder != null) ? ext.transparentMeshesDrawOrder : [];
+        const transparentMeshesDrawOrder = (ext.transparentMeshesDrawOrder != null) ? ext.transparentMeshesDrawOrder : [];
         let meshParents = rootGroup.searchElementsByType(M_Group);
-        rootGroup.transparentMeshes = [];
-        for (let name of rootGroup.transparentMeshesDrawOrder) {
+        const transparentMeshes = [];
+        for (let name of transparentMeshesDrawOrder) {
           for (let parent of meshParents) {
             if (parent.userFlavorName === name) {
               const mesh = parent.getChildren()[0];
               if (mesh.isTransparent) {
-                rootGroup.transparentMeshes.push(mesh);
+                transparentMeshes.push(mesh);
               }
               break;
             }
           }
         }
+        rootGroup.transparentMeshesAsManualOrder = transparentMeshes;
+        
       }
 
       if (json.extensions && json.extensions.Effekseer) {
@@ -23962,4 +23964,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-328-gf433f-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-331-g3d93-mod branch: develop';
