@@ -69,10 +69,10 @@ export default class L_GLBoostMonitor {
   }
 
 
-  getGLBoostObjectsByUserFlavorName(glBoostObjectUserFlavorName: string) {
+  getGLBoostObjectsByUserFlavorName(partOfGlBoostObjectUserFlavorName: string) {
     const results = [];
     for (let instanceName in this._glBoostObjects) {
-      if (this._glBoostObjects[instanceName].userFlavorName === glBoostObjectUserFlavorName) {
+      if (this._glBoostObjects[instanceName].userFlavorName.indexOf(partOfGlBoostObjectUserFlavorName) !== -1) {
         results.push(this._glBoostObjects[instanceName]);
       }
     }

@@ -396,7 +396,8 @@
       c.define('QUERY_TYPE_INSTANCE_NAME');
       c.define('QUERY_TYPE_USER_FLAVOR_NAME');
       c.define('QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR');
-      c.define('QUERY_FORMAT_STRING');
+      c.define('QUERY_FORMAT_STRING_PARTIAL_MATCHING');
+      c.define('QUERY_FORMAT_STRING_PERFECT_MATCHING');
       c.define('QUERY_FORMAT_REGEXP');
 
       c.define('WORLD_MATRIX');
@@ -776,10 +777,10 @@
     }
 
 
-    getGLBoostObjectsByUserFlavorName(glBoostObjectUserFlavorName        ) {
+    getGLBoostObjectsByUserFlavorName(partOfGlBoostObjectUserFlavorName        ) {
       const results = [];
       for (let instanceName in this._glBoostObjects) {
-        if (this._glBoostObjects[instanceName].userFlavorName === glBoostObjectUserFlavorName) {
+        if (this._glBoostObjects[instanceName].userFlavorName.indexOf(partOfGlBoostObjectUserFlavorName) !== -1) {
           results.push(this._glBoostObjects[instanceName]);
         }
       }
@@ -8917,6 +8918,7 @@ return mat4(
       this._toMultiplyAlphaToColorPreviously = flag;
     }
   }
+  GLBoost$1['AbstractTexture'] = AbstractTexture;
 
   class FragmentSimpleShaderSource {
     // In the context within these member methods,
@@ -12817,6 +12819,7 @@ albedo.rgb *= (1.0 - metallic);
 
 
   }
+  GLBoost$1['Texture'] = Texture;
 
   class PhinaTexture extends Texture {
     constructor(glBoostContext, width, height, fillStyle, parameters = null) {
@@ -15002,6 +15005,39 @@ albedo.rgb *= (1.0 - metallic);
         }
         return objects;
       } else if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+        return [element];
+      }
+      return objects;
+    }
+
+    searchGLBoostObjectsByType(type               , element          = this) {
+      let objects = [];
+      if (element instanceof M_Group) {
+        let children = element.getChildren();
+        for (let i = 0; i < children.length; i++) {
+          let hitChildren = this.searchGLBoostObjectsByType(query, type, queryMeta, children[i]);
+          if (hitChildren.length > 0) {
+            objects = objects.concat(hitChildren);
+          }
+        }
+        return objects;
+      }
+
+      if (type.name.indexOf('Gizmo') !== -1 && element instanceof M_Element) {
+        let gizmos = element._gizmos;
+        for (let gizmo of gizmos) {
+          objects.push(gizmo);
+        }
+        return objects;
+      }
+
+      if (type === L_AbstractMaterial && element instanceof M_Mesh) {
+        let materials = element.getAppropriateMaterials();
+        for (let material of materials) {
+          objects.push(material);
+        }
+        return objects;
+      } else if (element instanceof type) {
         return [element];
       }
       return objects;
@@ -23964,4 +24000,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-331-g3d93-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-331-g28e9-mod branch: develop';
