@@ -229,7 +229,6 @@ export default class M_Group extends M_Element {
     if (element instanceof type) {
       return element;
     }
-
     
     return null;
   }
@@ -253,18 +252,39 @@ export default class M_Group extends M_Element {
         }
       }
     }
-
-    if (type === L_AbstractMaterial && element instanceof M_Mesh) {
+    
+    if (type.name.indexOf('Material') !== -1 && element instanceof M_Mesh) {
       let materials = element.getAppropriateMaterials();
       for (let material of materials) {
-        if (this._validateByQuery(material, query, queryMeta)) {
-          return material;
+        if (material instanceof type) {
+          if (this._validateByQuery(material, query, queryMeta)) {
+            return material;
+          }
         }
       }
       return null;
-    } else if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+    }
+    
+    if (type.name.indexOf('Texture') !== -1 && element instanceof M_Mesh) {
+      let materials = element.getAppropriateMaterials();
+      for (let material of materials) {
+        const textures = material.getTextures();
+        for (let texture of textures) {
+          if (texture instanceof type) {
+            if (this._validateByQuery(texture, query, queryMeta)) {
+              return texture;
+            }
+          }
+        }
+      }
+      return null;
+    }
+    
+    if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
       return element;
     }
+
+    return null;
   }
 
   searchGLBoostObjectsByNameAndType(query: any, type: GLBoostObject, queryMeta:QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element: M_Group = this) {
@@ -289,16 +309,85 @@ export default class M_Group extends M_Element {
       }
       return objects;
     }
-
-    if (type === L_AbstractMaterial && element instanceof M_Mesh) {
+    
+    if (type.name.indexOf('Material') !== -1 && element instanceof M_Mesh) {
       let materials = element.getAppropriateMaterials();
       for (let material of materials) {
-        if (this._validateByQuery(material, query, queryMeta)) {
+        if (material instanceof type) {
+          if (this._validateByQuery(material, query, queryMeta)) {
+            objects.push(material);
+          }
+        }
+      }
+      return objects;
+    }
+    
+    if (type.name.indexOf('Texture') !== -1 && element instanceof M_Mesh) {
+      let materials = element.getAppropriateMaterials();
+      for (let material of materials) {
+        const textures = material.getTextures();
+        for (let texture of textures) {
+          if (texture instanceof type) {
+            if (this._validateByQuery(texture, query, queryMeta)) {
+              objects.push(texture);
+            }
+          }
+        }
+      }
+      return objects;
+    }
+    
+    if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+      return [element];
+    }
+    return objects;
+  }
+
+  searchGLBoostObjectsByType(type: GLBoostObject, element: M_Group = this) {
+    let objects = [];
+    if (element instanceof M_Group) {
+      let children = element.getChildren();
+      for (let i = 0; i < children.length; i++) {
+        let hitChildren = this.searchGLBoostObjectsByType(type, children[i]);
+        if (hitChildren.length > 0) {
+          objects = objects.concat(hitChildren);
+        }
+      }
+      return objects;
+    }
+
+    if (type.name.indexOf('Gizmo') !== -1 && element instanceof M_Element) {
+      let gizmos = element._gizmos;
+      for (let gizmo of gizmos) {
+        objects.push(gizmo);
+      }
+      return objects;
+    }
+
+    if (type.name.indexOf('Material') !== -1 && element instanceof M_Mesh) {
+      let materials = element.getAppropriateMaterials();
+      for (let material of materials) {
+        if (material instanceof type) {
           objects.push(material);
         }
       }
       return objects;
-    } else if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+    }
+    
+    if (type.name.indexOf('Texture') !== -1 && element instanceof M_Mesh) {
+      let materials = element.getAppropriateMaterials();
+      for (let material of materials) {
+        const textures = material.getTextures();
+        for (let texture of textures) {
+          if (texture instanceof type) {
+            objects.push(texture);
+          }
+        }
+      }
+      return objects;
+    }
+
+    if (element instanceof type) {
       return [element];
     }
     return objects;
