@@ -24060,4 +24060,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-333-gaa84-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-334-gb6d01-mod branch: develop';

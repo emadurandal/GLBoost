@@ -1,6 +1,6 @@
-version: 0.0.4-333-gaa84-mod
+version: 0.0.4-334-gb6d01-mod
 branch: develop
-d2b0c27e80ff42f84093d5dc2b6e1f071b4edb67ae2ced05aa1ef3ba0cd20f44 ./build/glboost.js
-d2b0c27e80ff42f84093d5dc2b6e1f071b4edb67ae2ced05aa1ef3ba0cd20f44 ./build/glboost.js
-09fc76277dee85518dd6ef7c924fd39563944307692dc0e264939fa16c503a3f ./build/glboost.min.js
+537b3e7acbeef89ff1539185a90b7341cb2862b2365ccf1fdab914c3759c74a2 ./build/glboost.js
+537b3e7acbeef89ff1539185a90b7341cb2862b2365ccf1fdab914c3759c74a2 ./build/glboost.js
+f590b979259225bda8bdf1e4ad30b3df36fb92ba3b41ccb8c6e312fde6526437 ./build/glboost.min.js
 7bf12109d8a418d29a30c9b5060412dbef549f1f937b6fc469fc4181018e234d ./build/glboost.min.js.map
