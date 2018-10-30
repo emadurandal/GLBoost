@@ -109,23 +109,24 @@ export default class GLBoostGLTFLoaderExtension {
           rootGroup.animationTracks = ext.animation.tracks;
         }
       }
-
-      const transparentMeshesDrawOrder = (ext.transparentMeshesDrawOrder != null) ? ext.transparentMeshesDrawOrder : [];
-      let meshParents = rootGroup.searchElementsByType(M_Group);
-      const transparentMeshes = [];
-      for (let name of transparentMeshesDrawOrder) {
-        for (let parent of meshParents) {
-          if (parent.userFlavorName === name) {
-            const mesh = parent.getChildren()[0];
-            if (mesh.isTransparent) {
-              transparentMeshes.push(mesh);
+      
+      const transparentMeshesDrawOrder = ext.transparentMeshesDrawOrder;
+      if (transparentMeshesDrawOrder) {
+        let meshParents = rootGroup.searchElementsByType(M_Group);
+        const transparentMeshes = [];
+        for (let name of transparentMeshesDrawOrder) {
+          for (let parent of meshParents) {
+            if (parent.userFlavorName === name) {
+              const mesh = parent.getChildren()[0];
+              if (mesh.isTransparent) {
+                transparentMeshes.push(mesh);
+              }
+              break;
             }
-            break;
           }
         }
+        rootGroup.transparentMeshesAsManualOrder = transparentMeshes;
       }
-      rootGroup.transparentMeshesAsManualOrder = transparentMeshes;
-      
     }
 
     if (json.extensions && json.extensions.Effekseer) {

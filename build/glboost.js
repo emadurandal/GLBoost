@@ -23829,23 +23829,24 @@ albedo.rgb *= (1.0 - metallic);
             rootGroup.animationTracks = ext.animation.tracks;
           }
         }
-
-        const transparentMeshesDrawOrder = (ext.transparentMeshesDrawOrder != null) ? ext.transparentMeshesDrawOrder : [];
-        let meshParents = rootGroup.searchElementsByType(M_Group);
-        const transparentMeshes = [];
-        for (let name of transparentMeshesDrawOrder) {
-          for (let parent of meshParents) {
-            if (parent.userFlavorName === name) {
-              const mesh = parent.getChildren()[0];
-              if (mesh.isTransparent) {
-                transparentMeshes.push(mesh);
+        
+        const transparentMeshesDrawOrder = ext.transparentMeshesDrawOrder;
+        if (transparentMeshesDrawOrder) {
+          let meshParents = rootGroup.searchElementsByType(M_Group);
+          const transparentMeshes = [];
+          for (let name of transparentMeshesDrawOrder) {
+            for (let parent of meshParents) {
+              if (parent.userFlavorName === name) {
+                const mesh = parent.getChildren()[0];
+                if (mesh.isTransparent) {
+                  transparentMeshes.push(mesh);
+                }
+                break;
               }
-              break;
             }
           }
+          rootGroup.transparentMeshesAsManualOrder = transparentMeshes;
         }
-        rootGroup.transparentMeshesAsManualOrder = transparentMeshes;
-        
       }
 
       if (json.extensions && json.extensions.Effekseer) {
@@ -24060,4 +24061,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-335-gdda40-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-336-g135d3-mod branch: develop';
