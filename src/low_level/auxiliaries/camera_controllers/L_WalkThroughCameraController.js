@@ -58,12 +58,12 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
 
       if ('ontouchend' in document) {
         eventTargetDom.addEventListener('touchstart', this._mouseDown.bind(this));
-        eventTargetDom.addEventListener('touchend', this._mouseUp.bind(this));
+        document.addEventListener('touchend', this._mouseUp.bind(this));
         eventTargetDom.addEventListener('touchmove', this._mouseMove.bind(this));          
       }
       if ('onmouseup' in document) {
         eventTargetDom.addEventListener('mousedown', this._mouseDown.bind(this));
-        eventTargetDom.addEventListener('mouseup', this._mouseUp.bind(this));
+        document.addEventListener('mouseup', this._mouseUp.bind(this));
         eventTargetDom.addEventListener('mousemove', this._mouseMove.bind(this));          
       }
       if ('onmousewheel' in document) {
@@ -79,12 +79,12 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
       
       if ('ontouchend' in document) {
         eventTargetDom.removeEventListener('touchstart', this._mouseDown.bind(this));
-        eventTargetDom.removeEventListener('touchend', this._mouseUp.bind(this));
+        document.removeEventListener('touchend', this._mouseUp.bind(this));
         eventTargetDom.removeEventListener('touchmove', this._mouseMove).bind(this);          
       }
       if ('onmouseup' in document) {
         eventTargetDom.removeEventListener('mousedown', this._mouseDown.bind(this));
-        eventTargetDom.removeEventListener('mouseup', this._mouseUp.bind(this));
+        document.removeEventListener('mouseup', this._mouseUp.bind(this));
         eventTargetDom.removeEventListener('mousemove', this._mouseMove.bind(this));          
       }
       if ('onmousewheel' in document) {
