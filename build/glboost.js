@@ -12104,8 +12104,8 @@ albedo.rgb *= (1.0 - metallic);
           document.addEventListener('mouseup', this._mouseUp.bind(this));
           eventTargetDom.addEventListener('mousemove', this._mouseMove.bind(this));          
         }
-        if ('onmousewheel' in document) {
-          document.addEventListener('mousewheel', this._mouseWheel.bind(this));
+        if (window.WheelEvent) {
+          eventTargetDom.addEventListener('wheel', this._mouseWheel.bind(this));
         }
       }
     }
@@ -12125,8 +12125,8 @@ albedo.rgb *= (1.0 - metallic);
           document.removeEventListener('mouseup', this._mouseUp.bind(this));
           eventTargetDom.removeEventListener('mousemove', this._mouseMove.bind(this));          
         }
-        if ('onmousewheel' in document) {
-          document.removeEventListener('mousewheel', this._mouseWheel.bind(this));
+        if (window.WheelEvent) {
+          eventTargetDom.removeEventListener('wheel', this._mouseWheel.bind(this));
         }
       }
     }
@@ -24061,4 +24061,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-337-g237fc-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-338-ga3a9-mod branch: develop';

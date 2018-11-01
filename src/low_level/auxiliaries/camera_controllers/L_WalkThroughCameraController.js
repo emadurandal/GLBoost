@@ -66,8 +66,8 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
         document.addEventListener('mouseup', this._mouseUp.bind(this));
         eventTargetDom.addEventListener('mousemove', this._mouseMove.bind(this));          
       }
-      if ('onmousewheel' in document) {
-        document.addEventListener('mousewheel', this._mouseWheel.bind(this));
+      if (window.WheelEvent) {
+        eventTargetDom.addEventListener('wheel', this._mouseWheel.bind(this));
       }
     }
   }
@@ -87,8 +87,8 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
         document.removeEventListener('mouseup', this._mouseUp.bind(this));
         eventTargetDom.removeEventListener('mousemove', this._mouseMove.bind(this));          
       }
-      if ('onmousewheel' in document) {
-        document.removeEventListener('mousewheel', this._mouseWheel.bind(this));
+      if (window.WheelEvent) {
+        eventTargetDom.removeEventListener('wheel', this._mouseWheel.bind(this));
       }
     }
   }
