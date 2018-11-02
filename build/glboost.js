@@ -22407,11 +22407,15 @@ albedo.rgb *= (1.0 - metallic);
       for (let mesh of gltfModel.meshes) {
         let geometry = null;
         let glboostMesh = null;
-        if (mesh.extras && mesh.extras._skin && mesh.extras._skin.inverseBindMatrices) {
+        if (mesh.extras && mesh.extras._skin) {
           geometry = glBoostContext.createSkeletalGeometry();
           glboostMesh = glBoostContext.createSkeletalMesh(geometry, null);
           glboostMesh.gltfJointIndices = mesh.extras._skin.jointsIndices;
-          glboostMesh.inverseBindMatrices = mesh.extras._skin.inverseBindMatrices.extras.vertexAttributeArray;
+          if (mesh.extras._skin.inverseBindMatrices) {
+            glboostMesh.inverseBindMatrices = mesh.extras._skin.inverseBindMatrices.extras.vertexAttributeArray;
+          } else {
+            glboostMesh.inverseBindMatrices = []; 
+          }
         } else {
           geometry = glBoostContext.createGeometry();
           glboostMesh = glBoostContext.createMesh(geometry);
@@ -24061,4 +24065,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-338-ga3a9-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-339-g9c57-mod branch: develop';
