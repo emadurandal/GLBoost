@@ -610,7 +610,7 @@ export default class M_Group extends M_Element {
       if (!mesh.isPickable) {
         continue;
       }
-      if (ignoreInstanceNameList && ignoreInstanceNameList.indexOf(mesh.instanceName)) {
+      if (ignoreInstanceNameList && ignoreInstanceNameList.indexOf(mesh.instanceName) !== -1) {
         continue;
       }
       let result = null;
