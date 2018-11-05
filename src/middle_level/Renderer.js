@@ -32,6 +32,7 @@ export default class Renderer extends GLBoostObject {
     this.__requestedToEnterWebVR = false;
     this.__isReadyForWebVR = false;
     this.__animationFrameObject = window;
+    this.__effekseerElements = [];
   }
 
 
@@ -54,6 +55,7 @@ export default class Renderer extends GLBoostObject {
         effekseerElement.update(camera);
       }
     }
+    this.__effekseerElements = effekseerElements;
 
     let unique = function(array) {
       return array.reduce(function(a, b) {
@@ -69,7 +71,7 @@ export default class Renderer extends GLBoostObject {
       mesh.geometry.update(mesh);
     }
 
-    if (typeof effekseer !== "undefined") {
+    if (typeof effekseer !== "undefined" && this.__effekseerElements.length > 0) {
       effekseer.update();
     }
 
@@ -194,7 +196,7 @@ export default class Renderer extends GLBoostObject {
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 //      glem.drawBuffers(gl, [gl.BACK]);
 
-      if (typeof effekseer !== "undefined" && camera != null) {
+      if (typeof effekseer !== "undefined" && this.__effekseerElements.length > 0 && camera != null) {
         const projection = camera.projectionRHMatrix().m;
         const viewing = camera.lookAtRHMatrix().multiply(camera.inverseWorldMatrixWithoutMySelf).m; 
         effekseer.setProjectionMatrix(projection);
