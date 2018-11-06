@@ -1,9 +1,12 @@
 {
   "test": [
     "basic",
+    "index_buffer",
     "custom_shader",
     "custom_shader_2",
     "free_shader",
+    "obj_mesh",
+    "obj_mesh_two_objects",
     "loading_gltf",
     "loading_gltf_head",
     "loading_gltf_anim",
@@ -25,5 +28,9 @@
     "update_particles",
     "effekseer",
     "raycast"
+  ],
+  "test2": [
+    "multiple_render_passes",
+    "multiple_render_targets"
   ]
 }
