@@ -8,7 +8,6 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="stylesheet" href="app.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>
-  <script src="../../../libs/phina.js"></script>
   <script src="../../../build/glboost.js"></script>
 
 </head>
@@ -32,8 +31,6 @@
     GLBoost.VALUE_TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
     var SCREEN_WIDTH = 640;
     var SCREEN_HEIGHT = 640;
-
-    phina.globalize();
 
     var canvas = document.getElementById("world");
     var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
@@ -78,7 +75,7 @@
 
     var camera = glBoostContext.createPerspectiveCamera(
       {
-        eye: new GLBoost.Vector3(0.0, 5, 15.0),
+        eye: new GLBoost.Vector4(0.0, 5, 15.0, 1),
         center: new GLBoost.Vector3(0.0, 0.0, 0.0),
         up: new GLBoost.Vector3(0.0, 1.0, 0.0)
       },
@@ -113,14 +110,6 @@
       */
     };
 
-
-    var label = Label('phina.jsとGLBoostの\n夢の共演！');
-    label.fill = 'white';
-    label.stroke = 'black';
-    label.fontSize = 32;
-    label.strokeWidth = 4;
-    // label.x = this.gridX.center();
-    // label.y = this.gridY.center();
 
     var render = function () {
       renderer.clearCanvas();
