@@ -377,6 +377,13 @@ export default class M_Mesh extends M_Element {
   get isPickable() {
     return this._isPickable;
   }
+
+  readyForDiscard() {
+    const materials = this.getAppropriateMaterials();
+    for (let material of materials) {
+      material.readyForDiscard();
+    }
+  }
 }
 M_Mesh._geometries = {};
 

@@ -5014,12 +5014,6 @@
     }
 
     readyForDiscard() {
-      if (this instanceof this.className.indexOf('Mesh') !== -1) {
-        const materials = element.getAppropriateMaterials();
-        for (let material of materials) {
-          material.readyForDiscard();
-        }
-      }
     }
   }
 
@@ -14371,6 +14365,13 @@ albedo.rgb *= (1.0 - metallic);
 
     get isPickable() {
       return this._isPickable;
+    }
+
+    readyForDiscard() {
+      const materials = this.getAppropriateMaterials();
+      for (let material of materials) {
+        material.readyForDiscard();
+      }
     }
   }
   M_Mesh._geometries = {};
@@ -23905,4 +23906,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-351-ge2c4-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-352-g2ce55-mod branch: develop';

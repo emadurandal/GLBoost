@@ -355,11 +355,5 @@ export default class M_Element extends L_Element {
   }
 
   readyForDiscard() {
-    if (this instanceof this.className.indexOf('Mesh') !== -1) {
-      const materials = element.getAppropriateMaterials();
-      for (let material of materials) {
-        material.readyForDiscard();
-      }
-    }
   }
 }
