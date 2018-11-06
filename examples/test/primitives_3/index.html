@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>GLBoost Primitives 3 example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="app.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>
+  <script src="../../../build/glboost.js"></script>
+
+</head>
+
+<body>
+  <header>
+    <p class="header-title">GLBoost Primitives 3 example (2000 Cubes which have own material)</p>
+  </header>
+  <main>
+    <canvas id="world" width="600" height="600"></canvas>
+  </main>
+  <script>
+
+    var arg = new Object;
+    var pair = location.search.substring(1).split('&');
+    for (var i = 0; pair[i]; i++) {
+      var kv = pair[i].split('=');
+      arg[kv[0]] = kv[1];
+    }
+
+    GLBoost.VALUE_TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
+    var SCREEN_WIDTH = 640;
+    var SCREEN_HEIGHT = 640;
+
+
+    var canvas = document.getElementById("world");
+    var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
+    var scene = glBoostContext.createScene();
+
+    var renderer = glBoostContext.createRenderer({
+      canvas: canvas,
+      clearColor: {
+        red: 0.6,
+        green: 0.6,
+        blue: 0.6,
+        alpha: 1
+      }
+    });
+
+    var shader = GLBoost.PhongShader;
+    var geometry = glBoostContext.createCube(
+      [20, 20, 20], [1, 1, 1, 1] // GLBoost can accept arrays as vector values other than instances of vector class.
+      //new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(1, 1, 1, 1) // of course you can use vector class.
+    );
+
+    for (var i = 0; i < 2000; i++) {
+      var material = glBoostContext.createClassicMaterial();
+      var object = glBoostContext.createMesh(geometry, material);
+      material.shaderClass = shader;
+      material.baseColor = new GLBoost.Vector4(Math.random(), Math.random(), Math.random(), Math.random() * 0.5 + 0.5);
+
+      object.translate = new GLBoost.Vector3(Math.random() * 800 - 400, Math.random() * 800 - 400, Math.random() * 800 - 400);
+
+      object.rotate = new GLBoost.Vector3(Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI, Math.random() * 2 * Math.PI);
+
+      object.scale = new GLBoost.Vector3(Math.random() + 0.5, Math.random() + 0.5, Math.random() + 0.5);
+
+      scene.addChild(object);
+    }
+
+    var camera = glBoostContext.createPerspectiveCamera(
+      {
+        eye: new GLBoost.Vector4(0.0, 5, 15.0, 1),
+        center: new GLBoost.Vector3(0.0, 0.0, 0.0),
+        up: new GLBoost.Vector3(0.0, 1.0, 0.0)
+      },
+      {
+        fovy: 45.0,
+        aspect: 1.0,
+        zNear: 0.1,
+        zFar: 1000.0
+      }
+    );
+    scene.addChild(camera);
+
+    var expression = glBoostContext.createExpressionAndRenderPasses(1);
+    expression.renderPasses[0].scene = scene;
+    expression.renderPasses[0].setClearColor(new GLBoost.Vector4(0.8, 0.8, 0.8, 1));
+    expression.prepareToRender();
+
+    var theta = 0;
+    var radius = 100;
+    update = function () {
+      //var rotateMatrix = GLBoost.Matrix44.rotateY(-0.02);
+      //var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
+      theta += 0.5;
+      camera.eye = new GLBoost.Vector3(
+        radius * Math.sin(GLBoost.MathUtil.degreeToRadian(theta)),
+        radius * Math.sin(GLBoost.MathUtil.degreeToRadian(theta)),
+        radius * Math.cos(GLBoost.MathUtil.degreeToRadian(theta)));
+    };
+
+
+    var render = function () {
+      renderer.clearCanvas();
+      update();
+      renderer.update(expression);
+      renderer.draw(expression);
+      requestAnimationFrame(render);
+    };
+    render();
+  </script>
+</body>
+
+</html>

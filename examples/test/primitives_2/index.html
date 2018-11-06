@@ -2,20 +2,19 @@
 <html>
 
 <head>
-  <title>GLBoost Primitives 3 example</title>
+  <title>GLBoost Primitives 2 example</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, user-scalable=no" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <link rel="stylesheet" href="app.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>
-  <script src="../../../libs/phina.js"></script>
   <script src="../../../build/glboost.js"></script>
 
 </head>
 
 <body>
   <header>
-    <p class="header-title">GLBoost Primitives 3 example (2000 Cubes which have own material)</p>
+    <p class="header-title">GLBoost Primitives 2 example (2000 Cubes, one shared Material)</p>
   </header>
   <main>
     <canvas id="world" width="600" height="600"></canvas>
@@ -33,7 +32,6 @@
     var SCREEN_WIDTH = 640;
     var SCREEN_HEIGHT = 640;
 
-    phina.globalize();
 
     var canvas = document.getElementById("world");
     var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
@@ -49,17 +47,13 @@
       }
     });
 
-    var shader = GLBoost.PhongShader;
-    var geometry = glBoostContext.createCube(
-      [20, 20, 20], [1, 1, 1, 1] // GLBoost can accept arrays as vector values other than instances of vector class.
-      //new GLBoost.Vector3(20,20,20), new GLBoost.Vector4(1, 1, 1, 1) // of course you can use vector class.
-    );
+    var material = glBoostContext.createClassicMaterial();
+    material.shaderClass = GLBoost.PhongShader;
+
+    var geometry = glBoostContext.createCube(new GLBoost.Vector3(20, 20, 20), new GLBoost.Vector4(Math.random() * 1, Math.random() * 1, Math.random() * 1, 1));
 
     for (var i = 0; i < 2000; i++) {
-      var material = glBoostContext.createClassicMaterial();
       var object = glBoostContext.createMesh(geometry, material);
-      material.shaderClass = shader;
-      material.baseColor = new GLBoost.Vector4(Math.random(), Math.random(), Math.random(), Math.random() * 0.5 + 0.5);
 
       object.translate = new GLBoost.Vector3(Math.random() * 800 - 400, Math.random() * 800 - 400, Math.random() * 800 - 400);
 
@@ -72,7 +66,7 @@
 
     var camera = glBoostContext.createPerspectiveCamera(
       {
-        eye: new GLBoost.Vector4(0.0, 5, 15.0, 1),
+        eye: new GLBoost.Vector3(0.0, 5, 15.0),
         center: new GLBoost.Vector3(0.0, 0.0, 0.0),
         up: new GLBoost.Vector3(0.0, 1.0, 0.0)
       },
@@ -93,8 +87,6 @@
     var theta = 0;
     var radius = 100;
     update = function () {
-      //var rotateMatrix = GLBoost.Matrix44.rotateY(-0.02);
-      //var rotatedVector = rotateMatrix.multiplyVector(camera.eye);
       theta += 0.5;
       camera.eye = new GLBoost.Vector3(
         radius * Math.sin(GLBoost.MathUtil.degreeToRadian(theta)),
@@ -102,14 +94,6 @@
         radius * Math.cos(GLBoost.MathUtil.degreeToRadian(theta)));
     };
 
-
-    var label = Label('phina.jsとGLBoostの\n夢の共演！');
-    label.fill = 'white';
-    label.stroke = 'black';
-    label.fontSize = 32;
-    label.strokeWidth = 4;
-    // label.x = this.gridX.center();
-    // label.y = this.gridY.center();
 
     var render = function () {
       renderer.clearCanvas();
