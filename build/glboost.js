@@ -3082,7 +3082,7 @@
 
   GLBoost$1['Matrix33'] = Matrix33;
 
-  class Matrix44$2 {
+  class Matrix44$1 {
 
     constructor(m, isColumnMajor = false, notCopyFloat32Array = false
     ) {
@@ -3183,7 +3183,7 @@
     }
 
     clone() {
-      return new Matrix44$2(
+      return new Matrix44$1(
         this.m[0], this.m[4], this.m[8], this.m[12],
         this.m[1], this.m[5], this.m[9], this.m[13],
         this.m[2], this.m[6], this.m[10], this.m[14],
@@ -3208,7 +3208,7 @@
      * to the identity matrix（static版）
      */
     static identity() {
-      return new Matrix44$2(
+      return new Matrix44$1(
           1, 0, 0, 0,
           0, 1, 0, 0,
           0, 0, 1, 0,
@@ -3236,7 +3236,7 @@
     }
 
     static translate(vec) {
-      return new Matrix44$2(
+      return new Matrix44$1(
         1, 0, 0, vec.x,
         0, 1, 0, vec.y,
         0, 0, 1, vec.z,
@@ -3254,7 +3254,7 @@
     }
 
     static scale(vec) {
-      return new Matrix44$2(
+      return new Matrix44$1(
         vec.x, 0, 0, 0,
         0, vec.y, 0, 0,
         0, 0, vec.z, 0,
@@ -3303,7 +3303,7 @@
 
       var cos = Math.cos(radian);
       var sin = Math.sin(radian);
-      return new Matrix44$2(
+      return new Matrix44$1(
         1, 0, 0, 0,
         0, cos, -sin, 0,
         0, sin, cos, 0,
@@ -3344,7 +3344,7 @@
 
       var cos = Math.cos(radian);
       var sin = Math.sin(radian);
-      return new Matrix44$2(
+      return new Matrix44$1(
         cos, 0, sin, 0,
         0, 1, 0, 0,
         -sin, 0, cos, 0,
@@ -3385,7 +3385,7 @@
 
       var cos = Math.cos(radian);
       var sin = Math.sin(radian);
-      return new Matrix44$2(
+      return new Matrix44$1(
         cos, -sin, 0, 0,
         sin, cos, 0, 0,
         0, 0, 1, 0,
@@ -3394,7 +3394,7 @@
     }
 
     static rotateXYZ(x, y, z) {
-      return new Matrix44$2(Matrix33.rotateZ(z).multiply(Matrix33.rotateY(y).multiply(Matrix33.rotateX(x))));
+      return new Matrix44$1(Matrix33.rotateZ(z).multiply(Matrix33.rotateY(y).multiply(Matrix33.rotateX(x))));
     }
 
     /**
@@ -3431,7 +3431,7 @@
     }
 
     static zero() {
-      return new Matrix44$2(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+      return new Matrix44$1(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
 
     flatten() {
@@ -3468,7 +3468,7 @@
      */
     static transpose(mat) {
 
-      var mat_t = new Matrix44$2(
+      var mat_t = new Matrix44$1(
         mat.m00, mat.m10, mat.m20, mat.m30,
         mat.m01, mat.m11, mat.m21, mat.m31,
         mat.m02, mat.m12, mat.m22, mat.m32,
@@ -3572,7 +3572,7 @@
       var m23 = l_m.m20*r_m.m03 + l_m.m21*r_m.m13 + l_m.m22*r_m.m23 + l_m.m23*r_m.m33;
       var m33 = l_m.m30*r_m.m03 + l_m.m31*r_m.m13 + l_m.m32*r_m.m23 + l_m.m33*r_m.m33;
 
-      return new Matrix44$2(
+      return new Matrix44$1(
           m00, m01, m02, m03,
           m10, m11, m12, m13,
           m20, m21, m22, m23,
@@ -3650,7 +3650,7 @@
       var m32 = (mat.m00*mat.m12*mat.m31 + mat.m01*mat.m10*mat.m32 + mat.m02*mat.m11*mat.m30 - mat.m00*mat.m11*mat.m32 - mat.m01*mat.m12*mat.m30 - mat.m02*mat.m10*mat.m31) / det;
       var m33 = (mat.m00*mat.m11*mat.m22 + mat.m01*mat.m12*mat.m20 + mat.m02*mat.m10*mat.m21 - mat.m00*mat.m12*mat.m21 - mat.m01*mat.m10*mat.m22 - mat.m02*mat.m11*mat.m20) / det;
 
-      return new Matrix44$2(
+      return new Matrix44$1(
         m00, m01, m02, m03,
         m10, m11, m12, m13,
         m20, m21, m22, m23,
@@ -3821,12 +3821,12 @@
 
     getRotate() {
       const quat = Quaternion.fromMatrix(this);
-      const rotateMat = new Matrix44$2(quat);
+      const rotateMat = new Matrix44$1(quat);
       return rotateMat;
     }
   }
 
-  GLBoost$1["Matrix44"] = Matrix44$2;
+  GLBoost$1["Matrix44"] = Matrix44$1;
 
   //      
 
@@ -3853,7 +3853,7 @@
     static arrayToVectorOrMatrix(element) {
       if (Array.isArray(element)) {
         if(typeof(element[15]) !== 'undefined') {
-          return new Matrix44$2(element);
+          return new Matrix44$1(element);
         } else if(typeof(element[8]) !== 'undefined') {
           return new Matrix33(element);
         } else if(typeof(element[3]) !== 'undefined') {
@@ -3869,7 +3869,7 @@
     }
 
     static cloneOfMathObjects(element) {
-      if(element instanceof Matrix44$2) {
+      if(element instanceof Matrix44$1) {
         return element.clone();
       } else if (element instanceof Matrix33) {
         return element.clone();
@@ -4071,8 +4071,8 @@
       this._scale = new Vector3(1, 1, 1);
       this._rotate = Vector3.zero();
       this._quaternion = new Quaternion(0, 0, 0, 1);
-      this._matrix = Matrix44$2.identity();
-      this._invMatrix = Matrix44$2.identity();
+      this._matrix = Matrix44$1.identity();
+      this._invMatrix = Matrix44$1.identity();
 
   //    this._finalMatrix = Matrix44.identity();
 
@@ -4285,7 +4285,7 @@
       } else if (this._is_trs_matrix_updated) {
         this._rotate = this._matrix.toEulerAngles();
       } else if (this._is_quaternion_updated) {
-        this._rotate = (new Matrix44$2(this._quaternion)).toEulerAngles();
+        this._rotate = (new Matrix44$1(this._quaternion)).toEulerAngles();
       }
 
       this._is_euler_angles_updated = true;
@@ -4377,11 +4377,11 @@
         return this._matrix.clone();
       }
 
-      const rotationMatrix = new Matrix44$2(this.getQuaternionNotAnimated());
+      const rotationMatrix = new Matrix44$1(this.getQuaternionNotAnimated());
 
       let scale = this.getScaleNotAnimated();
 
-      this._matrix = Matrix44$2.multiply(rotationMatrix, Matrix44$2.scale(scale));
+      this._matrix = Matrix44$1.multiply(rotationMatrix, Matrix44$1.scale(scale));
       let translateVec = this.getTranslateNotAnimated();
       this._matrix.m03 = translateVec.x;
       this._matrix.m13 = translateVec.y;
@@ -4424,11 +4424,11 @@
       } else {
 
         let quaternion = this.getQuaternionAtOrStatic(lineName, input);
-        const rotationMatrix = new Matrix44$2(quaternion);
+        const rotationMatrix = new Matrix44$1(quaternion);
 
         let scale = this.getScaleAtOrStatic(lineName, input);
         
-        this._matrix = Matrix44$2.multiply(rotationMatrix, Matrix44$2.scale(scale));
+        this._matrix = Matrix44$1.multiply(rotationMatrix, Matrix44$1.scale(scale));
         let translateVec = this.getTranslateAtOrStatic(lineName, input);
         this._matrix.m03 = translateVec.x;
         this._matrix.m13 = translateVec.y;
@@ -4481,7 +4481,7 @@
         if (this._is_trs_matrix_updated) {
           value = Quaternion.fromMatrix(this._matrix);
         } else if (this._is_euler_angles_updated) {
-          value = Quaternion.fromMatrix(Matrix44$2.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
+          value = Quaternion.fromMatrix(Matrix44$1.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
         } else {
           console.log('Not Quaternion Updated in error!');
         }
@@ -4501,7 +4501,7 @@
     }
 
     get normalMatrix() {
-      return new Matrix33(Matrix44$2.invert(this.transformMatrix).transpose());
+      return new Matrix33(Matrix44$1.invert(this.transformMatrix).transpose());
     }
 
     __updateTransform() {
@@ -4514,10 +4514,10 @@
 
     __updateRotation() {
       if (this._is_euler_angles_updated && !this._is_quaternion_updated) {
-        this._quaternion = Quaternion.fromMatrix(Matrix44$2.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
+        this._quaternion = Quaternion.fromMatrix(Matrix44$1.rotateXYZ(this._rotate.x, this._rotate.y, this._rotate.z));
         this._is_quaternion_updated = true;
       } else if (!this._is_euler_angles_updated && this._is_quaternion_updated) {
-        this._rotate = (new Matrix44$2(this._quaternion)).toEulerAngles();
+        this._rotate = (new Matrix44$1(this._quaternion)).toEulerAngles();
         this._is_euler_angles_updated = true;
       } else if (!this._is_euler_angles_updated && !this._is_quaternion_updated && this._is_trs_matrix_updated) {
         const m = this._matrix;
@@ -4550,11 +4550,11 @@
 
     __updateMatrix() {
       if (!this._is_trs_matrix_updated && this._is_translate_updated && this._is_quaternion_updated && this._is_scale_updated) {
-        const rotationMatrix = new Matrix44$2(this.getQuaternionNotAnimated());
+        const rotationMatrix = new Matrix44$1(this.getQuaternionNotAnimated());
     
         let scale = this.getScaleNotAnimated();
     
-        this._matrix = Matrix44$2.multiply(rotationMatrix, Matrix44$2.scale(scale));
+        this._matrix = Matrix44$1.multiply(rotationMatrix, Matrix44$1.scale(scale));
         let translateVec = this.getTranslateNotAnimated();
         this._matrix.m03 = translateVec.x;
         this._matrix.m13 = translateVec.y;
@@ -4627,7 +4627,7 @@
       let xDir = Vector3.cross(yDir, FrontVec);
       let zDir = Vector3.cross(xDir, yDir);
       
-      let rotateMatrix = Matrix44$2.identity();
+      let rotateMatrix = Matrix44$1.identity();
 
       rotateMatrix.m00 = xDir.x;
       rotateMatrix.m10 = xDir.y;
@@ -4670,7 +4670,7 @@
       super(glBoostContext);
 
       this._parent = null;
-      this._invMatrix = Matrix44$2.identity();
+      this._invMatrix = Matrix44$1.identity();
       this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
       this._accumulatedAncestryObjectUpdateNumber = -Math.MAX_VALUE;
       this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = -Math.MAX_VALUE;    
@@ -4693,7 +4693,7 @@
       this._gizmos = [];
       this._masterElement = null;
 
-      this._worldMatrix = new Matrix44$2();
+      this._worldMatrix = new Matrix44$1();
     }
 
     _accumulateMyAndParentNameWithUpdateInfo(currentElem) {
@@ -4733,37 +4733,6 @@
       }
     }
 
-
-    _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf, input) {
-      if (input === void 0 && this._activeAnimationLineName !== null) {
-        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-      }
-
-      let tempNumber = 0;
-      if (this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder !== input ||
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder === void 0)
-      {
-
-        let currentMatrix = null;
-        if (withMySelf) {
-          currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
-        } else {
-          currentMatrix = Matrix44$2.identity();
-        }
-    
-        if (this._parent === null) {
-          this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = currentMatrix;
-          return currentMatrix;
-        }
-
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44$2.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder = tempNumber;
-        this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
-      }
-      return this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder;
-    }
-
     get worldMatrixWithoutMySelf() {
       return this.getWorldMatrixWithoutMySelfAt(void 0);
     }
@@ -4785,7 +4754,7 @@
       //console.log(tempNumber);
       if (this._accumulatedAncestryObjectUpdateNumberNormal !== tempNumber || typeof this._normalMatrix === 'undefined') {
         let world_m = this._multiplyMyAndParentTransformMatrices(true, null);
-        this._normalMatrix = new Matrix33(Matrix44$2.invert(world_m).transpose());
+        this._normalMatrix = new Matrix33(Matrix44$1.invert(world_m).transpose());
         this._accumulatedAncestryObjectUpdateNumberNormal = tempNumber;
       }
 
@@ -4799,14 +4768,14 @@
         if (withMySelf) {
           return currentElem.transformMatrixOnlyRotate;
         } else {
-          return Matrix44$2.identity();
+          return Matrix44$1.identity();
         }
       } else {
-        let currentMatrix = Matrix44$2.identity();
+        let currentMatrix = Matrix44$1.identity();
         if (withMySelf) {
           currentMatrix = currentElem.transformMatrixOnlyRotate;
         }
-        return Matrix44$2.multiply(this._multiplyMyAndParentRotateMatrices(currentElem._parent, true), currentMatrix);
+        return Matrix44$1.multiply(this._multiplyMyAndParentRotateMatrices(currentElem._parent, true), currentMatrix);
       }
     }
 
@@ -4819,7 +4788,7 @@
     }
 
     getInverseWorldMatrix(withMyself, input) {
-      return Matrix44$2.invert(this._multiplyMyAndParentTransformMatrices(withMyself, input));
+      return Matrix44$1.invert(this._multiplyMyAndParentTransformMatrices(withMyself, input));
     }
 
     _accumulateMyAndParentOpacity(currentElem) {
@@ -4963,6 +4932,8 @@
       }
     }
 
+
+
     get gizmoScale() {
       if (this._gizmos.length === 0) {
         return 1.0;
@@ -5020,7 +4991,7 @@
           if (withMySelf) {
             currentMatrix = this.getRotateTranslateAt(input);
           } else {
-            currentMatrix = Matrix44$2.identity();
+            currentMatrix = Matrix44$1.identity();
           }
       
           if (this._parent === null) {
@@ -5028,7 +4999,7 @@
             return currentMatrix;
           }
 
-          this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44$2.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, input), currentMatrix);
+          this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44$1.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, input), currentMatrix);
           this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints = tempNumber;
           this.__cache_input_multiplyMyAndParentTransformMatricesForJoints = input;
       }
@@ -5069,13 +5040,13 @@
         if (withMySelf) {
           currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
         } else {
-          currentMatrix = Matrix44$2.identity();
+          currentMatrix = Matrix44$1.identity();
         }
         if (this._parent === null) {
           this.__cache_returnValue_multiplyMyAndParentTransformMatrices = currentMatrix;
           return currentMatrix;
         }
-        this.__cache_returnValue_multiplyMyAndParentTransformMatrices = Matrix44$2.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
+        this.__cache_returnValue_multiplyMyAndParentTransformMatrices = Matrix44$1.multiply(this._parent._multiplyMyAndParentTransformMatrices(true, input), currentMatrix);
         this.__updateInfoString_multiplyMyAndParentTransformMatrices = tempNumber;
         this.__cache_input_multiplyMyAndParentTransformMatrices = input;
       }
@@ -5083,46 +5054,12 @@
     
     }
 
-    get inverseTransformMatrixAccumulatedAncestryWithoutMySelf() {
-      if (this._parent === null) {
-        return Matrix44$1.identity();
-      }
-
-      return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).clone().invert();
-    }
-
-    _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf, input) {
-      if (input === null && this._activeAnimationLineName !== null) {
-        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-      }
-
-      let tempNumber = 0;
-      if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder !== input ||
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder === void 0)
-      {
-
-        let currentMatrix = null;
-        if (withMySelf) {
-          currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
-        } else {
-          currentMatrix = Matrix44$2.identity();
-        }
-    
-        if (this._parent === null) {
-          this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = currentMatrix;
-          return currentMatrix;
-        }
-
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44$2.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder = tempNumber;
-        this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
-      }
-      return this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder;
-    }
-
     get gizmos() {
       return this._gizmos;
+    }
+
+    addGizmo(gizmo) {
+      this._gizmos.push(gizmo);
     }
 
     readyForDiscard() {
@@ -6136,21 +6073,21 @@
             viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf);
   //        viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrix);
         } else {
-          viewMatrix = Matrix44$2.identity();
+          viewMatrix = Matrix44$1.identity();
         }
 
         let projectionMatrix;
         if (mesh.isAffectedByProjectionMatrix) {
           projectionMatrix = camera.projectionRHMatrix();
         } else {
-          projectionMatrix = Matrix44$2.identity();
+          projectionMatrix = Matrix44$1.identity();
         }
 
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$2.multiply(viewMatrix, world_m).flatten());
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$1.multiply(viewMatrix, world_m).flatten());
 
-        camera._lastPVMatrixFromLight = Matrix44$2.multiply(projectionMatrix, viewMatrix);
+        camera._lastPVMatrixFromLight = Matrix44$1.multiply(projectionMatrix, viewMatrix);
       }
     }
 
@@ -6161,23 +6098,23 @@
       if (webvrFrameData) {
         let viewMatrix;
         if (mesh.isAffectedByViewMatrix) {
-          const invertSittingToStandingTransform = (new Matrix44$2(webvrFrameData.sittingToStandingTransform, true)).invert();
-          const leftOrRightViewMatrix = new Matrix44$2(webvrFrameData[leftOrRight + 'ViewMatrix'], true);
-          viewMatrix = Matrix44$2.multiply(leftOrRightViewMatrix, invertSittingToStandingTransform);
+          const invertSittingToStandingTransform = (new Matrix44$1(webvrFrameData.sittingToStandingTransform, true)).invert();
+          const leftOrRightViewMatrix = new Matrix44$1(webvrFrameData[leftOrRight + 'ViewMatrix'], true);
+          viewMatrix = Matrix44$1.multiply(leftOrRightViewMatrix, invertSittingToStandingTransform);
         } else {
-          viewMatrix = Matrix44$2.identity();
+          viewMatrix = Matrix44$1.identity();
         }
 
         let projectionMatrix;
         if (mesh.isAffectedByProjectionMatrix) {
-          projectionMatrix = new Matrix44$2(webvrFrameData[leftOrRight + 'ProjectionMatrix'], true);
+          projectionMatrix = new Matrix44$1(webvrFrameData[leftOrRight + 'ProjectionMatrix'], true);
         } else {
-          projectionMatrix = Matrix44$2.identity();
+          projectionMatrix = Matrix44$1.identity();
         }
 
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
         Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$2.multiply(viewMatrix, world_m).flatten());
+        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$1.multiply(viewMatrix, world_m).flatten());
 
   //      camera._lastPVMatrixFromLight = Matrix44.multiply(projectionMatrix, viewMatrix);
       }
@@ -6265,7 +6202,7 @@
             normal_m = mesh.normalMatrix;
           }
         } else {
-          world_m = Matrix44$2.identity();
+          world_m = Matrix44$1.identity();
           normal_m = Matrix33.identity();
         }
 
@@ -9465,7 +9402,7 @@ return mat4(
           let cameraMatrix = lights[i].camera.lookAtRHMatrix();
           let viewMatrix = cameraMatrix.clone();
           let projectionMatrix = lights[i].camera.projectionRHMatrix();
-          this._glContext.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, Matrix44$2.multiply(projectionMatrix, viewMatrix).flatten(), true);
+          this._glContext.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, Matrix44$1.multiply(projectionMatrix, viewMatrix).flatten(), true);
         }
 
         if (lights[i].camera && lights[i].camera.texture) {
@@ -10613,7 +10550,7 @@ albedo.rgb *= (1.0 - metallic);
       var s = Vector3.normalize(Vector3.cross(f, up));
       var u = Vector3.cross(s, f);
 
-      return new Matrix44$2(s.x, s.y, s.z, -Vector3.dotProduct(s,eye),
+      return new Matrix44$1(s.x, s.y, s.z, -Vector3.dotProduct(s,eye),
         u.x, u.y, u.z, -Vector3.dotProduct(u,eye),
         -f.x, -f.y, -f.z, Vector3.dotProduct(f,eye),
         0, 0, 0, 1);
@@ -10799,14 +10736,14 @@ albedo.rgb *= (1.0 - metallic);
       var xscale = yscale / aspect;
 
       if (zFar) {
-        return new Matrix44$2(
+        return new Matrix44$1(
           xscale, 0.0, 0.0, 0.0,
           0.0, yscale, 0.0, 0.0,
           0.0, 0.0, - (zFar + zNear) / (zFar - zNear), - (2.0 * zFar * zNear) / (zFar - zNear),
           0.0, 0.0, -1.0, 0.0
         );
       } else {
-        return new Matrix44$2(
+        return new Matrix44$1(
           xscale, 0.0, 0.0, 0.0,
           0.0, yscale, 0.0, 0.0,
           0.0, 0.0, -1,0, -2*zNear,
@@ -10980,7 +10917,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     static frustumRHMatrix(left        , right        , top        , bottom        , zNear        , zFar        ) {
-      return new Matrix44$2(
+      return new Matrix44$1(
         2*zNear/(right-left), 0.0, (right+left)/(right-left), 0.0,
         0.0, 2*zNear/(top-bottom), (top+bottom)/(top-bottom), 0.0,
         0.0, 0.0, - (zFar+zNear)/(zFar-zNear), -1*2*zFar*zNear/(zFar-zNear),
@@ -11169,14 +11106,14 @@ albedo.rgb *= (1.0 - metallic);
     static orthoRHMatrix(left        , right        , bottom        , top        , near        , far        , xmag        , ymag        ) {
 
       if (xmag && ymag) {
-        return new Matrix44$2(
+        return new Matrix44$1(
           1/xmag, 0.0, 0.0, 0,
           0.0, 1/ymag, 0.0, 0,
           0.0, 0.0, -2/(far-near), -(far+near)/(far-near),
           0.0, 0.0, 0.0, 1.0
         );
       } else {
-        return new Matrix44$2(
+        return new Matrix44$1(
           2/(right-left), 0.0, 0.0, -(right+left)/(right-left),
           0.0, 2/(top-bottom), 0.0, -(top+bottom)/(top-bottom),
           0.0, 0.0, -2/(far-near), -(far+near)/(far-near),
@@ -14245,7 +14182,7 @@ albedo.rgb *= (1.0 - metallic);
         length = normals.length / 3;
         for (let i=0; i<length; i++) {
           let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
-          const invNormalMat = new Matrix33(Matrix44$2.invert(mat).transpose().invert());
+          const invNormalMat = new Matrix33(Matrix44$1.invert(mat).transpose().invert());
           let transformedNormalVec = invNormalMat.multiplyVector(normalVector3).normalize();
           normals[i*3] = transformedNormalVec.x;
           normals[i*3+1] = transformedNormalVec.y;
@@ -14333,7 +14270,7 @@ albedo.rgb *= (1.0 - metallic);
       var viewMatrix = camera.lookAtRHMatrix();
       var m_m = null;
       if (this.bindShapeMatrix) {
-        m_m = Matrix44$2.multiply(this.worldMatrix, this.bindShapeMatrix);
+        m_m = Matrix44$1.multiply(this.worldMatrix, this.bindShapeMatrix);
       } else {
         m_m = this.worldMatrix;
       }
@@ -14385,7 +14322,7 @@ albedo.rgb *= (1.0 - metallic);
       if (arg1 instanceof Vector3 && arg2 instanceof Vector3) {
         const origVecInWorld = arg1;
         const dirVec = arg2;
-        const invWorldMatrix = Matrix44$2.invert(this.worldMatrix);
+        const invWorldMatrix = Matrix44$1.invert(this.worldMatrix);
         origVecInLocal = new Vector3(invWorldMatrix.multiplyVector(new Vector4$1(origVecInWorld)));
         const distVecInWorld = Vector3.add(origVecInWorld, dirVec);
         const distVecInLocal = new Vector3(invWorldMatrix.multiplyVector(new Vector4$1(distVecInWorld)));
@@ -14393,7 +14330,7 @@ albedo.rgb *= (1.0 - metallic);
       } else {
         const x = arg1;
         const y = arg2;
-        const invPVW = Matrix44$2.multiply(camera.projectionRHMatrix(), Matrix44$2.multiply(camera.lookAtRHMatrix(), this.worldMatrix)).invert();
+        const invPVW = Matrix44$1.multiply(camera.projectionRHMatrix(), Matrix44$1.multiply(camera.lookAtRHMatrix(), this.worldMatrix)).invert();
         origVecInLocal = MathClassUtil.unProject(new Vector3(x, y, 0), invPVW, viewport);
         const distVecInLocal = MathClassUtil.unProject(new Vector3(x, y, 1), invPVW, viewport);
         dirVecInLocal = Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
@@ -16416,7 +16353,7 @@ albedo.rgb *= (1.0 - metallic);
           if (this.__webvrDisplay.stageParameters) {
             this.__webvrFrameData.sittingToStandingTransform = this.__webvrDisplay.stageParameters.sittingToStandingTransform;
           } else {
-            this.__webvrFrameData.sittingToStandingTransform = Matrix44$2.translate(this.__defaultUserSittingPositionInVR).flatten();
+            this.__webvrFrameData.sittingToStandingTransform = Matrix44$1.translate(this.__defaultUserSittingPositionInVR).flatten();
           }
         }
 
@@ -17227,7 +17164,7 @@ albedo.rgb *= (1.0 - metallic);
 
     // Use master element's worldMatrix.
     get worldMatrixInner() {
-      return Matrix44$2.identity();
+      return Matrix44$1.identity();
     }
 
     set worldPositionOfThisJoint(vec3) {
@@ -17289,10 +17226,10 @@ albedo.rgb *= (1.0 - metallic);
       this.length = new Vector3(length, length, length);
 
       this._isCalculatedJointGizmo = false;
-      this._jointPoseMatrix = Matrix44$2.identity();
+      this._jointPoseMatrix = Matrix44$1.identity();
       this._length = 1;
 
-      this._inverseBindMatrix = Matrix44$2.identity();
+      this._inverseBindMatrix = Matrix44$1.identity();
 
       this._skeletalMesh = null;
 
@@ -17405,7 +17342,7 @@ albedo.rgb *= (1.0 - metallic);
       this._rootJointName = rootJointName;
       this._jointsHierarchy = null;
       this._inverseBindMatrices = [];
-      this._bindShapeMatrix = Matrix44$2.identity();
+      this._bindShapeMatrix = Matrix44$1.identity();
       this._jointNames = []; // for glTF1.0
       this._gltfJointIndices = []; // for glTF2.0
       this._joints = [];
@@ -17433,9 +17370,9 @@ albedo.rgb *= (1.0 - metallic);
             this._joints.push(joints[j]);
             joints[j].skeletalMesh = this;
   //          joints[j].isVisible = true;
-            let inverseBindMatrix = (this._inverseBindMatrices[jointCount] !== void 0) ? this._inverseBindMatrices[jointCount] : Matrix44$2.identity(); 
+            let inverseBindMatrix = (this._inverseBindMatrices[jointCount] !== void 0) ? this._inverseBindMatrices[jointCount] : Matrix44$1.identity(); 
             joints[j].inverseBindMatrix = inverseBindMatrix;
-            joints[j].bindMatrix = Matrix44$2.invert(inverseBindMatrix);
+            joints[j].bindMatrix = Matrix44$1.invert(inverseBindMatrix);
             jointCount++;
             break;
           }
@@ -17449,9 +17386,9 @@ albedo.rgb *= (1.0 - metallic);
             this._joints.push(joints[j]);
             joints[j].skeletalMesh = this;
   //          joints[j].isVisible = true;
-            let inverseBindMatrix = (this._inverseBindMatrices[jointCount] !== void 0) ? this._inverseBindMatrices[jointCount] : Matrix44$2.identity(); 
+            let inverseBindMatrix = (this._inverseBindMatrices[jointCount] !== void 0) ? this._inverseBindMatrices[jointCount] : Matrix44$1.identity(); 
             joints[j].inverseBindMatrix = inverseBindMatrix;
-            joints[j].bindMatrix = Matrix44$2.invert(inverseBindMatrix);
+            joints[j].bindMatrix = Matrix44$1.invert(inverseBindMatrix);
             jointCount++;
             break;
           }
@@ -17653,7 +17590,7 @@ albedo.rgb *= (1.0 - metallic);
       let jointZeroWorldMatrix = null;
       let skeletalMeshWorldMatrix = null;
       let skeletalMeshTransformMatrixAccmulatedAncestry = skeletalMesh.getWorldMatrixAt(input);
-      let inverseSkeletalMeshTransformMatrixAccmulatedAncestry = Matrix44$2.invert(skeletalMeshTransformMatrixAccmulatedAncestry);
+      let inverseSkeletalMeshTransformMatrixAccmulatedAncestry = Matrix44$1.invert(skeletalMeshTransformMatrixAccmulatedAncestry);
 
       for (let i=joints.length-1; i>=0; i--) {
         let globalJointTransform = null;
@@ -17665,7 +17602,7 @@ albedo.rgb *= (1.0 - metallic);
           globalJointTransform = skeletalMeshTransformMatrixAccmulatedAncestry;
           skeletalMeshWorldMatrix = globalJointTransform;
           let bindMat = joints[i].bindMatrix;
-          globalJointTransform = Matrix44$2.multiply(skeletalMeshWorldMatrix, bindMat);
+          globalJointTransform = Matrix44$1.multiply(skeletalMeshWorldMatrix, bindMat);
         }
         if (i === 0) {
           jointZeroWorldMatrix = globalJointTransform;
@@ -17674,12 +17611,12 @@ albedo.rgb *= (1.0 - metallic);
         if (this._materialForSkeletals[0].shaderInstance && this._materialForSkeletals[0].shaderInstance.constructor === FreeShader) {
           matrices[i] = inverseSkeletalMeshTransformMatrixAccmulatedAncestry;
         } else {
-          matrices[i] = Matrix44$2.identity();
+          matrices[i] = Matrix44$1.identity();
         }
-        matrices[i] = Matrix44$2.multiply(matrices[i], globalJointTransform);
-        joints[i].jointPoseMatrix = Matrix44$2.multiply(Matrix44$2.identity(), globalJointTransform);
-        matrices[i] = Matrix44$2.multiply(matrices[i], inverseBindMatrix);
-        matrices[i] = Matrix44$2.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
+        matrices[i] = Matrix44$1.multiply(matrices[i], globalJointTransform);
+        joints[i].jointPoseMatrix = Matrix44$1.multiply(Matrix44$1.identity(), globalJointTransform);
+        matrices[i] = Matrix44$1.multiply(matrices[i], inverseBindMatrix);
+        matrices[i] = Matrix44$1.multiply(matrices[i], skeletalMesh.bindShapeMatrix);
       }
 
       GLBoost$1.JointGizmoUpdater.update(joints, jointZeroWorldMatrix);
@@ -18226,7 +18163,7 @@ albedo.rgb *= (1.0 - metallic);
       let xDir = Vector3.cross(yDir, _zDir);
       let zDir = Vector3.cross(xDir, yDir);
       
-      let result = Matrix44$2.identity();
+      let result = Matrix44$1.identity();
 
       result.m00 = xDir.x;
       result.m10 = xDir.y;
@@ -20230,7 +20167,7 @@ albedo.rgb *= (1.0 - metallic);
         element.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
       }
       if (nodeJson.matrix) {
-        element.matrix = new Matrix44$2(nodeJson.matrix, true);
+        element.matrix = new Matrix44$1(nodeJson.matrix, true);
       }
     }
 
@@ -20356,7 +20293,7 @@ albedo.rgb *= (1.0 - metallic);
         mesh = glBoostContext.createSkeletalMesh(geometry, null, rootJointStr);
         let skin = json.skins[skinStr];
 
-        mesh.bindShapeMatrix = new Matrix44$2(skin.bindShapeMatrix, true);
+        mesh.bindShapeMatrix = new Matrix44$1(skin.bindShapeMatrix, true);
         mesh.jointNames = skin.jointNames;
 
         let inverseBindMatricesAccessorStr = skin.inverseBindMatrices;
@@ -21350,7 +21287,7 @@ albedo.rgb *= (1.0 - metallic);
               for (let i=0; i<16; i++) {
                 matrixComponents[i] = dataView[dataViewMethod](pos+bytesPerComponent*i, littleEndian);
               }
-              vertexAttributeArray.push(new Matrix44$2(matrixComponents, true));
+              vertexAttributeArray.push(new Matrix44$1(matrixComponents, true));
               break;
           }
 
@@ -22279,7 +22216,7 @@ albedo.rgb *= (1.0 - metallic);
           group.quaternion = new Quaternion(nodeJson.rotation[0], nodeJson.rotation[1], nodeJson.rotation[2], nodeJson.rotation[3]);
         }
         if (nodeJson.matrix) {
-          group.matrix = new Matrix44$2(nodeJson.matrix, true);
+          group.matrix = new Matrix44$1(nodeJson.matrix, true);
         }
       }
     }
@@ -23039,7 +22976,7 @@ albedo.rgb *= (1.0 - metallic);
               for (let i=0; i<16; i++) {
                 matrixComponents[i] = dataView[dataViewMethod](pos+componentBytes*i, littleEndian);
               }
-              vertexAttributeArray.push(new Matrix44$2(matrixComponents, true));
+              vertexAttributeArray.push(new Matrix44$1(matrixComponents, true));
               break;
           }
 
@@ -24017,4 +23954,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-348-g27f7-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-350-gfbd1-mod branch: develop';

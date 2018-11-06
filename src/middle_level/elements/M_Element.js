@@ -72,37 +72,6 @@ export default class M_Element extends L_Element {
     }
   }
 
-
-  _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf, input) {
-    if (input === void 0 && this._activeAnimationLineName !== null) {
-      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-    }
-
-    let tempNumber = 0;
-    if (this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder !== input ||
-      this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
-      this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder === void 0)
-    {
-
-      let currentMatrix = null;
-      if (withMySelf) {
-        currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
-      } else {
-        currentMatrix = Matrix44.identity();
-      }
-  
-      if (this._parent === null) {
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = currentMatrix;
-        return currentMatrix;
-      }
-
-      this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
-      this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder = tempNumber;
-      this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
-    }
-    return this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder;
-  }
-
   get worldMatrixWithoutMySelf() {
     return this.getWorldMatrixWithoutMySelfAt(void 0);
   }
@@ -302,6 +271,8 @@ export default class M_Element extends L_Element {
     }
   }
 
+
+
   get gizmoScale() {
     if (this._gizmos.length === 0) {
       return 1.0;
@@ -424,46 +395,12 @@ export default class M_Element extends L_Element {
   
   }
 
-  get inverseTransformMatrixAccumulatedAncestryWithoutMySelf() {
-    if (this._parent === null) {
-      return Matrix44$1.identity();
-    }
-
-    return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).clone().invert();
-  }
-
-  _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf, input) {
-    if (input === null && this._activeAnimationLineName !== null) {
-      input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-    }
-
-    let tempNumber = 0;
-    if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder !== input ||
-      this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
-      this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder === void 0)
-    {
-
-      let currentMatrix = null;
-      if (withMySelf) {
-        currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
-      } else {
-        currentMatrix = Matrix44.identity();
-      }
-  
-      if (this._parent === null) {
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = currentMatrix;
-        return currentMatrix;
-      }
-
-      this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
-      this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder = tempNumber;
-      this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
-    }
-    return this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder;
-  }
-
   get gizmos() {
     return this._gizmos;
+  }
+
+  addGizmo(gizmo) {
+    this._gizmos.push(gizmo);
   }
 
   readyForDiscard() {
