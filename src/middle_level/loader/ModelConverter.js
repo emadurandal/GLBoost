@@ -211,7 +211,7 @@ export default class ModelConverter {
     for (let mesh of gltfModel.meshes) {
       let geometry = null;
       let glboostMesh = null;
-      if (mesh.extras && mesh.extras._skin) {
+      if (mesh.extras && mesh.extras._skin && mesh.extras._skin.jointsIndices.length > 0) {
         geometry = glBoostContext.createSkeletalGeometry();
         glboostMesh = glBoostContext.createSkeletalMesh(geometry, null);
         glboostMesh.gltfJointIndices = mesh.extras._skin.jointsIndices;

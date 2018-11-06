@@ -4959,55 +4959,6 @@
       return this._masterElement;
     }
 
-    get worldMatrixForJoints() {
-      return this.getWorldMatrixForJointsAt(void 0);
-    }
-
-    getWorldMatrixForJointsAt(input) {
-
-      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-      
-      if (this._accumulatedAncestryObjectUpdateNumberForJoints !== tempNumber || this._matrixAccumulatedAncestryForJoints === void 0) {
-        this._matrixAccumulatedAncestryForJoints = this._multiplyMyAndParentTransformMatricesForJoints(true, input);
-        this._accumulatedAncestryObjectUpdateNumberForJoints = tempNumber;
-      }
-
-      return this._matrixAccumulatedAncestryForJoints.clone();
-      
-    }
-
-    _multiplyMyAndParentTransformMatricesForJoints(withMySelf, input) {
-      if (input === void 0 && this._activeAnimationLineName !== null) {
-        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-      }
-
-      let tempNumber = 0;
-      if (this.__cache_input_multiplyMyAndParentTransformMatricesForJoints !== input ||
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints === void 0)
-      {
-
-          let currentMatrix = null;
-          if (withMySelf) {
-            currentMatrix = this.getRotateTranslateAt(input);
-          } else {
-            currentMatrix = Matrix44$1.identity();
-          }
-      
-          if (this._parent === null) {
-            this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = currentMatrix;
-            return currentMatrix;
-          }
-
-          this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44$1.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, input), currentMatrix);
-          this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints = tempNumber;
-          this.__cache_input_multiplyMyAndParentTransformMatricesForJoints = input;
-      }
-      return this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints;
-    
-    }
-
-
     get worldMatrix() {
       return this.getWorldMatrixAt(void 0);
     }
@@ -22296,7 +22247,7 @@ albedo.rgb *= (1.0 - metallic);
       for (let mesh of gltfModel.meshes) {
         let geometry = null;
         let glboostMesh = null;
-        if (mesh.extras && mesh.extras._skin) {
+        if (mesh.extras && mesh.extras._skin && mesh.extras._skin.jointsIndices.length > 0) {
           geometry = glBoostContext.createSkeletalGeometry();
           glboostMesh = glBoostContext.createSkeletalMesh(geometry, null);
           glboostMesh.gltfJointIndices = mesh.extras._skin.jointsIndices;
@@ -23954,4 +23905,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-350-gfbd1-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-351-ge2c4-mod branch: develop';
