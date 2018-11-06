@@ -352,11 +352,11 @@ export default class L_CameraController extends GLBoostObject {
 
   _getTargetAABB() {
     let targetAABB = null;
-    if (typeof this._target.updateAABB !== 'undefined') {
-      targetAABB = this._target.updateAABB();
-    } else {
-      targetAABB = this._target.AABB;
-    }
+//    if (typeof this._target.updateAABB !== 'undefined') {
+//      targetAABB = this._target.updateAABB();
+//    } else {
+    targetAABB = this._target.AABB;
+//    }
     return targetAABB;
   }
 

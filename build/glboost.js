@@ -11856,11 +11856,11 @@ albedo.rgb *= (1.0 - metallic);
 
     _getTargetAABB() {
       let targetAABB = null;
-      if (typeof this._target.updateAABB !== 'undefined') {
-        targetAABB = this._target.updateAABB();
-      } else {
-        targetAABB = this._target.AABB;
-      }
+  //    if (typeof this._target.updateAABB !== 'undefined') {
+  //      targetAABB = this._target.updateAABB();
+  //    } else {
+      targetAABB = this._target.AABB;
+  //    }
       return targetAABB;
     }
 
@@ -15320,7 +15320,7 @@ albedo.rgb *= (1.0 - metallic);
         if (!mesh.isPickable) {
           continue;
         }
-        if (ignoreInstanceNameList && ignoreInstanceNameList.indexOf(mesh.instanceName)) {
+        if (ignoreInstanceNameList && ignoreInstanceNameList.indexOf(mesh.instanceName) !== -1) {
           continue;
         }
         let result = null;
@@ -16354,6 +16354,7 @@ albedo.rgb *= (1.0 - metallic);
       this.__requestedToEnterWebVR = false;
       this.__isReadyForWebVR = false;
       this.__animationFrameObject = window;
+      this.__effekseerElements = [];
     }
 
 
@@ -16376,6 +16377,7 @@ albedo.rgb *= (1.0 - metallic);
           effekseerElement.update(camera);
         }
       }
+      this.__effekseerElements = effekseerElements;
 
       let unique = function(array) {
         return array.reduce(function(a, b) {
@@ -16391,7 +16393,7 @@ albedo.rgb *= (1.0 - metallic);
         mesh.geometry.update(mesh);
       }
 
-      if (typeof effekseer !== "undefined") {
+      if (typeof effekseer !== "undefined" && this.__effekseerElements.length > 0) {
         effekseer.update();
       }
 
@@ -16516,7 +16518,7 @@ albedo.rgb *= (1.0 - metallic);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   //      glem.drawBuffers(gl, [gl.BACK]);
 
-        if (typeof effekseer !== "undefined" && camera != null) {
+        if (typeof effekseer !== "undefined" && this.__effekseerElements.length > 0 && camera != null) {
           const projection = camera.projectionRHMatrix().m;
           const viewing = camera.lookAtRHMatrix().multiply(camera.inverseWorldMatrixWithoutMySelf).m; 
           effekseer.setProjectionMatrix(projection);
@@ -24065,4 +24067,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-339-g9c57-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-346-g0d71-mod branch: develop';
