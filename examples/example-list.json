@@ -2,6 +2,8 @@
   "test": [
     "basic",
     "index_buffer",
+    "texture",
+    "triangle_strip",
     "custom_shader",
     "custom_shader_2",
     "free_shader",
