@@ -36,7 +36,7 @@ export default class Geometry extends GLBoostObject {
   }
 
   /**
-   * 全ての頂点属性のリストを返す
+   * return all vertex attribute name list
    */
   _allVertexAttribs(vertices) {
     var attribNameArray = [];

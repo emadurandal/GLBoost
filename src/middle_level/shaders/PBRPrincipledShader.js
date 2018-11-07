@@ -33,6 +33,8 @@ export class PBRPrincipledShaderSource {
     }
     
     shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
+
+
     
 
     const sampler2D = this._sampler2DShadow_func();
@@ -194,7 +196,7 @@ export class PBRPrincipledShaderSource {
 
     shaderText += `
 vec3 surfaceColor = rt0.rgb;
-rt0 = vec4(0.0, 0.0, 0.0, 0.0);
+rt0 = vec4(0.0, 0.0, 0.0, rt0.a);
 
 // BaseColor
 vec3 baseColor = srgbToLinear(surfaceColor) * uBaseColorFactor.rgb;
@@ -298,8 +300,7 @@ albedo.rgb *= (1.0 - metallic);
     shaderText += '  rt0.xyz += emissive;\n';
 
     shaderText += '  rt0.xyz = linearToSrgb(rt0.xyz);\n';
-     
-    shaderText += '  rt0.a = 1.0;\n';
+    
 //    shaderText += '  rt0.xyz = vec3(texture2D(uOcclusionTexture, texcoord).r);\n';
 
 
@@ -354,6 +355,7 @@ export default class PBRPrincipledShader extends DecalShader {
     this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_OcclusionFactors'), occlusion, occlusionRateForDirectionalLight, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_EmissiveFactor'), emissive.x, emissive.y, emissive.z, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_IBLParameters'), IBLSpecularTextureMipmapCount, IBLDiffuseContribution, IBLSpecularContribution, true);
+    
 
     const ambient = Vector4.multiplyVector(new Vector4(1.0, 1.0, 1.0, 1.0), scene.getAmountOfAmbientLightsIntensity());
     this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);    

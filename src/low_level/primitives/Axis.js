@@ -1,10 +1,12 @@
+/* @flow */
+
 import GLBoost from '../../globals';
 import Geometry from '../../low_level/geometries/Geometry';
 import Vector4 from '../../low_level/math/Vector4';
 import Vector3 from '../../low_level/math/Vector3';
 
 export default class Axis extends Geometry {
-  constructor(glBoostContext, length) {
+  constructor(glBoostContext: Object, length: number) {
     super(glBoostContext);
 
     this._setupVertexData(length);

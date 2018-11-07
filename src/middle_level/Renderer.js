@@ -1,11 +1,13 @@
+// @flow
+
 import GLExtensionsManager from '../low_level/core/GLExtensionsManager';
 import GLBoostObject from '../low_level/core/GLBoostObject';
 import Matrix44 from '../low_level/math/Matrix44';
 import Vector3 from '../low_level/math/Vector3';
+import EffekseerElement from './plugins/EffekseerElement';
 
 /**
- * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>
- * ja: このクラスはレンダリングプロセスの制御を司ります。Canvasにイメージをレンダリングするために、このRendererクラスは他の要素のデータを集め、描画プロセスの計画を決定し、実行します。
+ * This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.
  */
 export default class Renderer extends GLBoostObject {
   constructor(glBoostContext, parameters) {
@@ -30,23 +32,30 @@ export default class Renderer extends GLBoostObject {
     this.__requestedToEnterWebVR = false;
     this.__isReadyForWebVR = false;
     this.__animationFrameObject = window;
+    this.__effekseerElements = [];
   }
 
 
   /**
-   * en: update things of elements of the expression.<br>
-   * @param {Expression} expression a instance of Expression class
+   * update things of elements of the expression.
+   * @param expression a instance of Expression class
    */
-  update(expression) {
+  update(expression: Expression) {
     
     let skeletalMeshes = [];
     let effekseerElements = [];
     // gather scenes as unique
     for (let renderPass of expression.renderPasses) {
       skeletalMeshes = skeletalMeshes.concat(renderPass._skeletalMeshes);
-      effekseerElements = effekseerElements.concat(renderPass._effekseerElements);
+//      effekseerElements = effekseerElements.concat(renderPass._effekseerElements);
+      effekseerElements = effekseerElements.concat(renderPass.scene.searchElementsByType(EffekseerElement));
       renderPass.scene.updateAmountOfAmbientLightsIntensity();
+      let camera = renderPass.scene.getMainCamera();
+      for (let effekseerElement of effekseerElements) {
+        effekseerElement.update(camera);
+      }
     }
+    this.__effekseerElements = effekseerElements;
 
     let unique = function(array) {
       return array.reduce(function(a, b) {
@@ -62,22 +71,17 @@ export default class Renderer extends GLBoostObject {
       mesh.geometry.update(mesh);
     }
 
-    for (let effekseerElement of effekseerElements) {
-      effekseerElement.update();
-    }
-
-    if (typeof effekseer !== "undefined") {
+    if (typeof effekseer !== "undefined" && this.__effekseerElements.length > 0) {
       effekseer.update();
     }
 
   }
 
   /**
-   * en: draw elements of the expression.<br>
-   * ja: sceneが持つオブジェクトを描画します
-   * @param {Expression} expression a instance of Expression class
+   * draw elements of the expression.
+   * @param expression a instance of Expression class
    */
-  draw(expression) {
+  draw(expression: Expression) {
     let renderPassTag = '';
     expression.renderPasses.forEach((renderPass, index)=>{
       if (!renderPass.isEnableToDraw || !renderPass.scene) {
@@ -172,7 +176,7 @@ export default class Renderer extends GLBoostObject {
 
       transparentMeshes.forEach((mesh)=> {
         //console.log(mesh.userFlavorName);
-        if (mesh.isVisible) {
+        if (mesh.isVisible && mesh.isTransparent) {
           mesh.draw({
             expression: expression,
             lights: lights,
@@ -192,11 +196,11 @@ export default class Renderer extends GLBoostObject {
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 //      glem.drawBuffers(gl, [gl.BACK]);
 
-      if (typeof effekseer !== "undefined") {
-        const projection = (camera === null) ? Matrix44.identity().m : camera.projectionRHMatrix().m;
-        const inverseWorld = (camera === null) ? Matrix44.identity().m : camera.inverseWorldMatrix.m; 
+      if (typeof effekseer !== "undefined" && this.__effekseerElements.length > 0 && camera != null) {
+        const projection = camera.projectionRHMatrix().m;
+        const viewing = camera.lookAtRHMatrix().multiply(camera.inverseWorldMatrixWithoutMySelf).m; 
         effekseer.setProjectionMatrix(projection);
-        effekseer.setCameraMatrix(inverseWorld);
+        effekseer.setCameraMatrix(viewing);
         effekseer.draw();
       }
 
@@ -263,13 +267,12 @@ export default class Renderer extends GLBoostObject {
   }
 
   /**
-   * en: clear color/depth/stencil of canvas.<br>
-   * ja: canvasのカラー、デプス、ステンシルのいずれか又は全てをクリアします。
-   * @param {boolean} color_flg true: clear color, false: don't clear color
-   * @param {boolean} depth_flg true: clear depth, false: don't clear depth
-   * @param {boolean} stencil_flg  true: clear stencil, false: don't clear stencil
+   * clear color/depth/stencil of canvas.
+   * @param color_flg true: clear color, false: don't clear color
+   * @param depth_flg true: clear depth, false: don't clear depth
+   * @param stencil_flg  true: clear stencil, false: don't clear stencil
    */
-  clearCanvas( color_flg, depth_flg, stencil_flg ) {
+  clearCanvas( color_flg: boolean, depth_flg: boolean, stencil_flg: boolean ) {
     const gl = this._glContext.gl;
 
     var bufferBits = 0;
@@ -283,22 +286,20 @@ export default class Renderer extends GLBoostObject {
   }
 
   /**
-   * en: Get WebGL context.<br>
-   * ja: WebGLコンテキストを取得します。
-   * @returns {webglcontext} a context of WebGL
+   * Get WebGL context.
+   * @returns a context of WebGL
    */
-  get glContext() {
+  get glContext(): webglcontext {
     return this._glContext.gl;
   }
 
 
   /**
-   * en: resize canvas and viewport.<br>
-   * ja: canvasとビューポートをリサイズします。
-   * @param {number} width en: width to resize, ja: リサイズする幅
-   * @param {number} height en: height to resize, ja:リサイズする高さ
+   * resize canvas and viewport.
+   * @param width width to resize.
+   * @param height height to resize.
    */
-  resize(width, height) {
+  resize(width: number, height: number) {
     this._glContext.canvasWidth = width;
     this._glContext.canvasHeight = height;
   }

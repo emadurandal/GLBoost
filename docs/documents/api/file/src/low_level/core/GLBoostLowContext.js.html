@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -168,7 +170,9 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/low_level/core/GLBoostLowContext.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">//import GLContext from &apos;./GLContext&apos;;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// @flow
+
+//import GLContext from &apos;./GLContext&apos;;
 //import L_GLBoostMonitor from &apos;./L_GLBoostMonitor&apos;;
 import GLExtensionsManager from &apos;./GLExtensionsManager&apos;;
 import GLBoostSystem from &apos;./GLBoostSystem&apos;;
@@ -192,9 +196,15 @@ import Axis from &apos;../primitives/Axis&apos;;
 import Particle from &apos;../primitives/Particle&apos;;
 import Screen from &apos;../primitives/Screen&apos;;
 import GLBoost from &apos;../../globals&apos;;
+import type Vector3 from &apos;../math/Vector3&apos;;
+import type Vector4 from &apos;../math/Vector4&apos;;
 
 export default class GLBoostLowContext {
-  constructor(canvas, initParameter, gl, width, height) {
+  __system: GLBoostSystem;
+  static _instanceCount: number;
+  _instanceName: string;
+
+  constructor(canvas: HTMLCanvasElement, initParameter: Object, gl:WebGLRenderingContext, width:number, height:number) {
     this._setName();
 
     this.__system = new GLBoostSystem(canvas, initParameter, gl, width, height, this);
@@ -256,23 +266,23 @@ export default class GLBoostLowContext {
     return new BlendShapeGeometry(this.__system);
   }
 
-  createCube(widthVector, vertexColor) {
+  createCube(widthVector: Vector3, vertexColor: Vector4) {
     return new Cube(this.__system, widthVector, vertexColor);
   }
 
-  createPlane(width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat) {
+  createPlane(width :number, height :number, uSpan :number, vSpan :number, customVertexAttributes:Object, isUVRepeat: boolean) {
     return new Plane(this.__system, width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat);
   }
 
-  createSphere(radius, widthSegments, heightSegments, vertexColor) {
+  createSphere(radius :number, widthSegments :number, heightSegments :number, vertexColor:Vector4) {
     return new Sphere(this.__system, radius, widthSegments, heightSegments, vertexColor);
   }
 
-  createAxis(length) {
+  createAxis(length :number) {
     return new Axis(this.__system, length);
   }
 
-  createParticle(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint) {
+  createParticle(centerPointData: Object, particleWidth :number, particleHeight :number, customVertexAttributes: Object, performanceHint: number) {
     return new Particle(this.__system, centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint);
   }
 
@@ -284,50 +294,50 @@ export default class GLBoostLowContext {
     return new PBRMetallicRoughnessMaterial(this.__system);
   }
 
-  createPerspectiveCamera(lookat, perspective) {
+  createPerspectiveCamera(lookat:Object, perspective:Object) {
     return new L_PerspectiveCamera(this.__system, true, lookat, perspective);
   }
 
-  createFrustumCamera(lookat, perspective) {
+  createFrustumCamera(lookat:Object, perspective:Object) {
     return new L_FrustumCamera(this.__system, true, lookat, perspective);
   }
 
-  createOrthoCamera(lookat, ortho) {
+  createOrthoCamera(lookat:Object, ortho:Object) {
     return new L_OrthoCamera(this.__system, true, lookat, ortho);
   }
 
-  createCameraController(options) {
+  createCameraController(options:Object) {
     return new L_CameraController(this.__system, options);
   }
 
-  createWalkThroughCameraController(options) {
+  createWalkThroughCameraController(options:Object) {
     return new L_WalkThroughCameraController(this.__system, options);
   }
 
-  createTexture(src, userFlavorName, parameters = null) {
+  createTexture(src:string, userFlavorName:string, parameters:?Object = null) {
     return new Texture(this.__system, src, userFlavorName, parameters);
   }
 
-  createPhinaTexture(width, height, fillStyle, parameters = null) {
+  createPhinaTexture(width:number, height:number, fillStyle: string, parameters:?Object = null) {
     return new PhinaTexture(this.__system, width, height, fillStyle, parameters);
   }
 
-  createCubeTexture(userFlavorName, parameters) {
+  createCubeTexture(userFlavorName?:string, parameters?:Object) {
     return new CubeTexture(this.__system, userFlavorName, parameters);
   }
 
-  createScreen(screen, customVertexAttributes) {
+  createScreen(screen:Object, customVertexAttributes:Object) {
     return new Screen(this.__system, screen, customVertexAttributes);
   }
 
   /**
    * create textures as render target. (and attach it to framebuffer object internally.)&lt;br&gt;
-   * @param {number} width - width of texture
-   * @param {number} height - height of texture
-   * @param {number} textureNum - the number of creation.
-   * @returns {Array} an array of created textures.
+   * @param  width - width of texture
+   * @param  height - height of texture
+   * @param  textureNum - the number of creation.
+   * @returns  an array of created textures.
    */
-  createTexturesForRenderTarget(width, height, textureNum) {
+  createTexturesForRenderTarget(width: number, height:number, textureNum:number): Array {
     var glContext = this.__system._glContext;
     var gl = glContext.gl;
 
@@ -367,7 +377,7 @@ export default class GLBoostLowContext {
     return fbo._glboostTextures.concat();
   }
 
-  createDepthTexturesForRenderTarget(width, height) {
+  createDepthTexturesForRenderTarget(width:number, height:number) {
     var glContext = this.__system._glContext;
 
     var gl = glContext.gl;
@@ -434,7 +444,7 @@ export default class GLBoostLowContext {
     return this.__system._glContext.belongingCanvasId;
   }
 
-  set globalStatesUsage(usageMode) {
+  set globalStatesUsage(usageMode: string) {
     this.__system._globalStatesUsage = usageMode;
   }
 
@@ -445,9 +455,11 @@ export default class GLBoostLowContext {
   reflectGlobalGLState() {
     let gl = this.__system._glContext.gl;
 
-    this.currentGlobalStates.forEach((state)=&gt;{
-      gl.enable(state);
-    });
+    if (this.currentGlobalStates != null) {
+      this.currentGlobalStates.forEach((state)=&gt;{
+        gl.enable(state);
+      });
+    }
 
     gl.depthFunc( gl.LEQUAL );
 
@@ -475,7 +487,7 @@ export default class GLBoostLowContext {
     });
   }
 
-  set currentGlobalStates(states) {
+  set currentGlobalStates(states: Array&lt;number&gt;) {
     this.__system._currentGlobalStates = states.concat();
   }
 
@@ -491,8 +503,8 @@ export default class GLBoostLowContext {
     return this.__system._glBoostMonitor;
   }
 
-  setPropertiesFromJson(arg, queryType = GLBoost.QUERY_TYPE_USER_FLAVOR_NAME) {
-    let json = arg;
+  setPropertiesFromJson(arg:Object|string, queryType:number = GLBoost.QUERY_TYPE_USER_FLAVOR_NAME) {
+    let json:any = arg;
     if (typeof arg === &quot;string&quot;) {
       json = JSON.parse(arg);
     }
@@ -502,9 +514,10 @@ export default class GLBoostLowContext {
     }
     let objects = null;
     if (queryType === GLBoost.QUERY_TYPE_USER_FLAVOR_NAME) {
-      objects = this.__system._glBoostMonitor.getGLBoostObjectsByUserFlavorName(json.targetUserFlavorName);
+      objects = this.__system._glBoostMonitor.getGLBoostObjectsByUserFlavorName((json.targetUserFlavorName: any));
     } else if (queryType === GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
-      const found = this.__system._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+      const targetInstanceName: any = (json: Object).targetInstanceName;
+      const found = this.__system._glBoostMonitor.getGLBoostObject(targetInstanceName);
       if (found != null &amp;&amp; found.userFlavorName === json.targetUserFlavorName) {
         objects = [found];
       } else {
@@ -515,7 +528,7 @@ export default class GLBoostLowContext {
       objects = [found];
     }
 
-    objects.forEach((obj)=&gt;{obj.setPropertiesFromJson(json);});
+    objects.forEach((obj:any)=&gt;{obj.setPropertiesFromJson(json);});
    
     return objects;
   }

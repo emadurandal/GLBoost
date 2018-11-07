@@ -1,7 +1,20 @@
+/* @flow */
+
 import L_AbstractCamera from './L_AbstractCamera';
 import Matrix44 from '../../math/Matrix44';
 
 export default class L_PerspectiveCamera extends L_AbstractCamera {
+  _fovy: number;
+  _aspect: number;
+  _zNear: number;
+  _zFar: number;
+  _zNearInner: number;
+  _zFarInner: number;
+  _xscale: number;
+  _yscale: number;
+  _dirtyProjection: boolean;
+  _updateCountAsCameraProjection: number;
+
   constructor(glBoostContext, toRegister, lookat, perspective) {
     super(glBoostContext, toRegister, lookat);
 
@@ -36,7 +49,7 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
     }
   }
 
-  static perspectiveRHMatrix(fovy, aspect, zNear, zFar) {
+  static perspectiveRHMatrix(fovy: number, aspect: number, zNear: number, zFar: number) {
 
     var yscale = 1.0 / Math.tan(0.5*fovy*Math.PI/180);
     var xscale = yscale / aspect;
@@ -61,7 +74,7 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
     this._xscale = xscale;
   }
 
-  set fovy(value) {
+  set fovy(value: number) {
     if (this._fovy === value) {
       return;
     }
@@ -73,7 +86,7 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
     return this._fovy;
   }
 
-  set aspect(value) {
+  set aspect(value: number) {
     if (this._aspect === value) {
       return;
     }
@@ -85,7 +98,7 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
     return this._aspect;
   }
 
-  set zNear(value) {
+  set zNear(value: number) {
     if (this._zNear === value) {
       return;
     }
@@ -97,7 +110,7 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
     return this._zNear;
   }
 
-  set zFar(value) {
+  set zFar(value: number) {
     if (this._zFar === value) {
       return;
     }
@@ -166,7 +179,7 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
     return info;
   }
 
-  set allInfo(info) {
+  set allInfo(info: Object) {
     super.allInfo = info;
   }
 }

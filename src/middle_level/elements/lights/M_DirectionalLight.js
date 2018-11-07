@@ -1,3 +1,5 @@
+// @flow
+
 import M_AbstractLight from './M_AbstractLight';
 import M_DirectionalLightGizmo from '../gizmos/M_DirectionalLightGizmo';
 import Vector3 from '../../../low_level/math/Vector3';
@@ -8,20 +10,19 @@ import Matrix44 from '../../../low_level/math/Matrix44';
 
 
 /**
- * [en] This is a Directional Light class.<br>
- * [ja] 平行光源クラスです。
+ * This is a Directional Light class.
  */
 export default class M_DirectionalLight extends M_AbstractLight {
 
   /**
    * The constructor of DirectionalLight class. 
    * 
-   * @param {glBoostSystem} glBoostSystem - glBoostSystem Instance
-   * @param {Vector4} intensity intensity as Vector4 Color
-   * @param {Vector3} rotate - initial rotation vector
-   * @param {number} length - length for DirectionalLightGizmo
+   * @param glBoostSystem - glBoostSystem Instance
+   * @param intensity intensity as Vector4 Color
+   * @param rotate - initial rotation vector
+   * @param length - length for DirectionalLightGizmo
    */
-  constructor(glBoostSystem, intensity, rotate = new Vector3(0, 0, 0), length = 1.0) {
+  constructor(glBoostSystem: glBoostSystem, intensity: Vector4, rotate: Vector3 = new Vector3(0, 0, 0), length: number = 1.0) {
     super(glBoostSystem);
 
     this._intensity = intensity;

@@ -1,3 +1,5 @@
+// @flow
+
 //import GLContext from './GLContext';
 //import L_GLBoostMonitor from './L_GLBoostMonitor';
 import GLExtensionsManager from './GLExtensionsManager';
@@ -22,9 +24,15 @@ import Axis from '../primitives/Axis';
 import Particle from '../primitives/Particle';
 import Screen from '../primitives/Screen';
 import GLBoost from '../../globals';
+import type Vector3 from '../math/Vector3';
+import type Vector4 from '../math/Vector4';
 
 export default class GLBoostLowContext {
-  constructor(canvas, initParameter, gl, width, height) {
+  __system: GLBoostSystem;
+  static _instanceCount: number;
+  _instanceName: string;
+
+  constructor(canvas: HTMLCanvasElement, initParameter: Object, gl:WebGLRenderingContext, width:number, height:number) {
     this._setName();
 
     this.__system = new GLBoostSystem(canvas, initParameter, gl, width, height, this);
@@ -86,23 +94,23 @@ export default class GLBoostLowContext {
     return new BlendShapeGeometry(this.__system);
   }
 
-  createCube(widthVector, vertexColor) {
+  createCube(widthVector: Vector3, vertexColor: Vector4) {
     return new Cube(this.__system, widthVector, vertexColor);
   }
 
-  createPlane(width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat) {
+  createPlane(width :number, height :number, uSpan :number, vSpan :number, customVertexAttributes:Object, isUVRepeat: boolean) {
     return new Plane(this.__system, width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat);
   }
 
-  createSphere(radius, widthSegments, heightSegments, vertexColor) {
+  createSphere(radius :number, widthSegments :number, heightSegments :number, vertexColor:Vector4) {
     return new Sphere(this.__system, radius, widthSegments, heightSegments, vertexColor);
   }
 
-  createAxis(length) {
+  createAxis(length :number) {
     return new Axis(this.__system, length);
   }
 
-  createParticle(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint) {
+  createParticle(centerPointData: Object, particleWidth :number, particleHeight :number, customVertexAttributes: Object, performanceHint: number) {
     return new Particle(this.__system, centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint);
   }
 
@@ -114,50 +122,50 @@ export default class GLBoostLowContext {
     return new PBRMetallicRoughnessMaterial(this.__system);
   }
 
-  createPerspectiveCamera(lookat, perspective) {
+  createPerspectiveCamera(lookat:Object, perspective:Object) {
     return new L_PerspectiveCamera(this.__system, true, lookat, perspective);
   }
 
-  createFrustumCamera(lookat, perspective) {
+  createFrustumCamera(lookat:Object, perspective:Object) {
     return new L_FrustumCamera(this.__system, true, lookat, perspective);
   }
 
-  createOrthoCamera(lookat, ortho) {
+  createOrthoCamera(lookat:Object, ortho:Object) {
     return new L_OrthoCamera(this.__system, true, lookat, ortho);
   }
 
-  createCameraController(options) {
+  createCameraController(options:Object) {
     return new L_CameraController(this.__system, options);
   }
 
-  createWalkThroughCameraController(options) {
+  createWalkThroughCameraController(options:Object) {
     return new L_WalkThroughCameraController(this.__system, options);
   }
 
-  createTexture(src, userFlavorName, parameters = null) {
+  createTexture(src:string, userFlavorName:string, parameters:?Object = null) {
     return new Texture(this.__system, src, userFlavorName, parameters);
   }
 
-  createPhinaTexture(width, height, fillStyle, parameters = null) {
+  createPhinaTexture(width:number, height:number, fillStyle: string, parameters:?Object = null) {
     return new PhinaTexture(this.__system, width, height, fillStyle, parameters);
   }
 
-  createCubeTexture(userFlavorName, parameters) {
+  createCubeTexture(userFlavorName?:string, parameters?:Object) {
     return new CubeTexture(this.__system, userFlavorName, parameters);
   }
 
-  createScreen(screen, customVertexAttributes) {
+  createScreen(screen:Object, customVertexAttributes:Object) {
     return new Screen(this.__system, screen, customVertexAttributes);
   }
 
   /**
    * create textures as render target. (and attach it to framebuffer object internally.)<br>
-   * @param {number} width - width of texture
-   * @param {number} height - height of texture
-   * @param {number} textureNum - the number of creation.
-   * @returns {Array} an array of created textures.
+   * @param  width - width of texture
+   * @param  height - height of texture
+   * @param  textureNum - the number of creation.
+   * @returns  an array of created textures.
    */
-  createTexturesForRenderTarget(width, height, textureNum) {
+  createTexturesForRenderTarget(width: number, height:number, textureNum:number): Array {
     var glContext = this.__system._glContext;
     var gl = glContext.gl;
 
@@ -197,7 +205,7 @@ export default class GLBoostLowContext {
     return fbo._glboostTextures.concat();
   }
 
-  createDepthTexturesForRenderTarget(width, height) {
+  createDepthTexturesForRenderTarget(width:number, height:number) {
     var glContext = this.__system._glContext;
 
     var gl = glContext.gl;
@@ -264,7 +272,7 @@ export default class GLBoostLowContext {
     return this.__system._glContext.belongingCanvasId;
   }
 
-  set globalStatesUsage(usageMode) {
+  set globalStatesUsage(usageMode: string) {
     this.__system._globalStatesUsage = usageMode;
   }
 
@@ -275,9 +283,11 @@ export default class GLBoostLowContext {
   reflectGlobalGLState() {
     let gl = this.__system._glContext.gl;
 
-    this.currentGlobalStates.forEach((state)=>{
-      gl.enable(state);
-    });
+    if (this.currentGlobalStates != null) {
+      this.currentGlobalStates.forEach((state)=>{
+        gl.enable(state);
+      });
+    }
 
     gl.depthFunc( gl.LEQUAL );
 
@@ -305,7 +315,7 @@ export default class GLBoostLowContext {
     });
   }
 
-  set currentGlobalStates(states) {
+  set currentGlobalStates(states: Array<number>) {
     this.__system._currentGlobalStates = states.concat();
   }
 
@@ -321,8 +331,8 @@ export default class GLBoostLowContext {
     return this.__system._glBoostMonitor;
   }
 
-  setPropertiesFromJson(arg, queryType = GLBoost.QUERY_TYPE_USER_FLAVOR_NAME) {
-    let json = arg;
+  setPropertiesFromJson(arg:Object|string, queryType:number = GLBoost.QUERY_TYPE_USER_FLAVOR_NAME) {
+    let json:any = arg;
     if (typeof arg === "string") {
       json = JSON.parse(arg);
     }
@@ -332,9 +342,10 @@ export default class GLBoostLowContext {
     }
     let objects = null;
     if (queryType === GLBoost.QUERY_TYPE_USER_FLAVOR_NAME) {
-      objects = this.__system._glBoostMonitor.getGLBoostObjectsByUserFlavorName(json.targetUserFlavorName);
+      objects = this.__system._glBoostMonitor.getGLBoostObjectsByUserFlavorName((json.targetUserFlavorName: any));
     } else if (queryType === GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
-      const found = this.__system._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+      const targetInstanceName: any = (json: Object).targetInstanceName;
+      const found = this.__system._glBoostMonitor.getGLBoostObject(targetInstanceName);
       if (found != null && found.userFlavorName === json.targetUserFlavorName) {
         objects = [found];
       } else {
@@ -345,7 +356,7 @@ export default class GLBoostLowContext {
       objects = [found];
     }
 
-    objects.forEach((obj)=>{obj.setPropertiesFromJson(json);});
+    objects.forEach((obj:any)=>{obj.setPropertiesFromJson(json);});
    
     return objects;
   }

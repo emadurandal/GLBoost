@@ -390,7 +390,8 @@ var global = ('global',eval)('this');
     c.define('QUERY_TYPE_INSTANCE_NAME');
     c.define('QUERY_TYPE_USER_FLAVOR_NAME');
     c.define('QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR');
-    c.define('QUERY_FORMAT_STRING');
+    c.define('QUERY_FORMAT_STRING_PARTIAL_MATCHING');
+    c.define('QUERY_FORMAT_STRING_PERFECT_MATCHING');
     c.define('QUERY_FORMAT_REGEXP');
 
     c.define('WORLD_MATRIX');

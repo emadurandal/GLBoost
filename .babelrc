@@ -3,7 +3,7 @@
     "env"
   ],
   "plugins": [
-    "transform-flow-strip-types",
+    "babel-plugin-transform-flow-strip-types",
     "babel-plugin-rewire",
     "babel-plugin-transform-object-rest-spread"
   ],

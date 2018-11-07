@@ -32,10 +32,10 @@ export default class M_Group extends M_Element {
 
   /**
    * Add the element to this group as a child.
-   * @param {Element} element - a instance of Element class
-   * @param {boolean} isDuplicateOk - allow duplicating if need
+   * @param element - a instance of Element class
+   * @param isDuplicateOk - allow duplicating if need
    */
-  addChild(element: any, isDuplicateOk: boolean = false) {
+  addChild(element: Element, isDuplicateOk: boolean = false) {
 
     if (isDuplicateOk){
       // if forgive duplicated register by copy
@@ -56,9 +56,8 @@ export default class M_Group extends M_Element {
   }
 
   /**
-   * [en] remove the element from this group.
-   * [ja] このグループから指定した要素を削除します。
-   * @param {Element} element [en] the element to remove [ja] 削除したい要素
+   * remove the element from this group.
+   * @param element the element to remove
    */
   removeChild(element: M_Element) {
     this._elements = this._elements.filter(function(elem) {
@@ -70,8 +69,7 @@ export default class M_Group extends M_Element {
   }
 
   /**
-   * [en] remove all elements from this group.
-   * [ja] このグループから全ての要素を削除します。
+   * remove all elements from this group.
    */
   removeAll() {
     this._elements = this._elements.filter(function(elem) {
@@ -200,9 +198,6 @@ export default class M_Group extends M_Element {
   }
 
   searchElementsByType(type: any, element:M_Element = this) {
-    if (element instanceof type) {
-      return element;
-    }
 
     if (type['name'].indexOf('Gizmo') !== -1 && element instanceof M_Element) {
       let gizmos = element._gizmos;
@@ -224,8 +219,17 @@ export default class M_Group extends M_Element {
           results.push(hitChildOrChildren);
         }
       }
+
+      if (type === M_Group) {
+        results.push(element);
+      }
       return results;
     }
+    
+    if (element instanceof type) {
+      return element;
+    }
+    
     return null;
   }
 
@@ -248,18 +252,39 @@ export default class M_Group extends M_Element {
         }
       }
     }
-
-    if (type === L_AbstractMaterial && element instanceof M_Mesh) {
+    
+    if (type.name.indexOf('Material') !== -1 && element instanceof M_Mesh) {
       let materials = element.getAppropriateMaterials();
       for (let material of materials) {
-        if (this._validateByQuery(material, query, queryMeta)) {
-          return material;
+        if (material instanceof type) {
+          if (this._validateByQuery(material, query, queryMeta)) {
+            return material;
+          }
         }
       }
       return null;
-    } else if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+    }
+    
+    if (type.name.indexOf('Texture') !== -1 && element instanceof M_Mesh) {
+      let materials = element.getAppropriateMaterials();
+      for (let material of materials) {
+        const textures = material.getTextures();
+        for (let texture of textures) {
+          if (texture instanceof type) {
+            if (this._validateByQuery(texture, query, queryMeta)) {
+              return texture;
+            }
+          }
+        }
+      }
+      return null;
+    }
+    
+    if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
       return element;
     }
+
+    return null;
   }
 
   searchGLBoostObjectsByNameAndType(query: any, type: GLBoostObject, queryMeta:QueryMeta = {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element: M_Group = this) {
@@ -284,16 +309,85 @@ export default class M_Group extends M_Element {
       }
       return objects;
     }
-
-    if (type === L_AbstractMaterial && element instanceof M_Mesh) {
+    
+    if (type.name.indexOf('Material') !== -1 && element instanceof M_Mesh) {
       let materials = element.getAppropriateMaterials();
       for (let material of materials) {
-        if (this._validateByQuery(material, query, queryMeta)) {
+        if (material instanceof type) {
+          if (this._validateByQuery(material, query, queryMeta)) {
+            objects.push(material);
+          }
+        }
+      }
+      return objects;
+    }
+    
+    if (type.name.indexOf('Texture') !== -1 && element instanceof M_Mesh) {
+      let materials = element.getAppropriateMaterials();
+      for (let material of materials) {
+        const textures = material.getTextures();
+        for (let texture of textures) {
+          if (texture instanceof type) {
+            if (this._validateByQuery(texture, query, queryMeta)) {
+              objects.push(texture);
+            }
+          }
+        }
+      }
+      return objects;
+    }
+    
+    if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+      return [element];
+    }
+    return objects;
+  }
+
+  searchGLBoostObjectsByType(type: GLBoostObject, element: M_Group = this) {
+    let objects = [];
+    if (element instanceof M_Group) {
+      let children = element.getChildren();
+      for (let i = 0; i < children.length; i++) {
+        let hitChildren = this.searchGLBoostObjectsByType(type, children[i]);
+        if (hitChildren.length > 0) {
+          objects = objects.concat(hitChildren);
+        }
+      }
+      return objects;
+    }
+
+    if (type.name.indexOf('Gizmo') !== -1 && element instanceof M_Element) {
+      let gizmos = element._gizmos;
+      for (let gizmo of gizmos) {
+        objects.push(gizmo);
+      }
+      return objects;
+    }
+
+    if (type.name.indexOf('Material') !== -1 && element instanceof M_Mesh) {
+      let materials = element.getAppropriateMaterials();
+      for (let material of materials) {
+        if (material instanceof type) {
           objects.push(material);
         }
       }
       return objects;
-    } else if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+    }
+    
+    if (type.name.indexOf('Texture') !== -1 && element instanceof M_Mesh) {
+      let materials = element.getAppropriateMaterials();
+      for (let material of materials) {
+        const textures = material.getTextures();
+        for (let texture of textures) {
+          if (texture instanceof type) {
+            objects.push(texture);
+          }
+        }
+      }
+      return objects;
+    }
+
+    if (element instanceof type) {
       return [element];
     }
     return objects;
@@ -425,7 +519,7 @@ export default class M_Group extends M_Element {
   }
 
   set isVisible(flg: boolean) {
-    let collectVisibility = function(elem: M_Group) {
+    let collectVisibility = function(elem: M_Element) {
       elem._isVisible = flg;
       if (elem instanceof M_Group) {
         let children = elem.getChildren();
@@ -439,6 +533,35 @@ export default class M_Group extends M_Element {
 
   get isVisible() {
     return this._isVisible;
+  }
+
+  setSpecifiedPropertyRecursively(propertyName: string , value: any) {
+    let setValueRecursively = function(elem: M_Element) {
+      elem[propertyName] = value;
+      if (elem instanceof M_Group) {
+        let children = elem.getChildren();
+        children.forEach(function(child) {
+          setValueRecursively(child);
+        });
+      }
+    };
+    setValueRecursively(this);
+  }
+
+  executeSpecifiedFunctionRecursively(func: Function, thisObj: any, args: Array<any>, childIndexToInsertToArgs = null) {
+    let execRecursively = function(elem: M_Element) {
+      if (childIndexToInsertToArgs != null) {
+        args[childIndexToInsertToArgs] = elem;
+      }
+      func.apply(thisObj, args);
+      if (elem instanceof M_Group) {
+        let children = elem.getChildren();
+        children.forEach(function(child) {
+          execRecursively(child);
+        });
+      }
+    };
+    execRecursively(this);
   }
 
   _updateAABBGizmo() {
@@ -475,7 +598,7 @@ export default class M_Group extends M_Element {
     this.removeAll();
   }
 
-  rayCast(arg1: number, arg2: number, camera: any, viewport: any) {
+  rayCast(arg1: number, arg2: number, camera: any, viewport: any, ignoreInstanceNameList:Array<any>) {
     const meshes = this.searchElementsByType(M_Mesh);
     let currentShortestT = Number.MAX_VALUE;
     let currentShortestIntersectedPosVec3 = null;
@@ -485,6 +608,9 @@ export default class M_Group extends M_Element {
         continue;
       }
       if (!mesh.isPickable) {
+        continue;
+      }
+      if (ignoreInstanceNameList && ignoreInstanceNameList.indexOf(mesh.instanceName) !== -1) {
         continue;
       }
       let result = null;

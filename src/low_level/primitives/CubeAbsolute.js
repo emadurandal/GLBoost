@@ -1,3 +1,5 @@
+/* @flow */
+
 import GLBoost from '../../globals';
 import Geometry from '../../low_level/geometries/Geometry';
 import Vector4 from '../../low_level/math/Vector4';
@@ -6,6 +8,9 @@ import Vector2 from '../../low_level/math/Vector2';
 import MathUtil from '../../low_level/math/MathUtil';
 
 export default class CubeAbsolute extends Geometry {
+  _indices: Array<number>;
+  _vertexData: Object;
+
   constructor(glBoostContext) {
     super(glBoostContext);
 
@@ -18,7 +23,7 @@ export default class CubeAbsolute extends Geometry {
     this.setVerticesData(this._vertexData, [this._indices]);
   }
 
-  _setupVertexData(minPosition, maxPosition, vertexColor) {
+  _setupVertexData(minPosition: Object, maxPosition: Object, vertexColor) {
     this._indices = [
       3, 1, 0, 2, 1, 3,
       4, 5, 7, 7, 5, 6,
@@ -169,7 +174,7 @@ export default class CubeAbsolute extends Geometry {
     return this._vertexData;
   }
 
-  update(minPosition, maxPosition) {
+  update(minPosition: Object, maxPosition: Object) {
     this._vertexData = this._setupVertexData(minPosition, maxPosition);
     this.updateVerticesData(this._vertexData, [this._indices]);
   }

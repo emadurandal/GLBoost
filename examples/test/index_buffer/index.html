@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>GLBoost Index Buffer example</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="app.css">
+  <script src="../../../build/glboost.js"></script>
+</head>
+
+<body>
+  <header>
+    <p class="header-title">GLBoost Index Buffer example</p>
+  </header>
+  <main>
+    <canvas id="world" width="600" height="600"></canvas>
+  </main>
+  <script>
+
+    var canvas = document.getElementById("world");
+    var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
+
+    var renderer = glBoostContext.createRenderer({
+      canvas: canvas,
+      clearColor: {
+        red: 0.6,
+        green: 0.6,
+        blue: 0.6,
+        alpha: 1
+      }
+    });
+
+    var scene = glBoostContext.createScene();
+
+    var indices = [
+      0, 1, 3, 3, 1, 2
+    ];
+
+    var positions = [
+      new GLBoost.Vector3(-1.5, -0.5, 0.0),
+      new GLBoost.Vector3(-0.5, -0.5, 0.0),
+      new GLBoost.Vector3(-0.5, 0.5, 0.0),
+      new GLBoost.Vector3(-1.5, 0.5, 0.0)
+    ];
+    var colors = [
+      new GLBoost.Vector3(0.0, 1.0, 1.0),
+      new GLBoost.Vector3(1.0, 1.0, 0.0),
+      new GLBoost.Vector3(1.0, 0.0, 0.0),
+      new GLBoost.Vector3(0.0, 0.0, 1.0)
+    ];
+
+    var geometry1 = glBoostContext.createGeometry();
+    geometry1.setVerticesData({
+      position: positions,
+      color: colors
+    }, [indices]);
+    var mesh1 = glBoostContext.createMesh(geometry1, null);
+    scene.addChild(mesh1);
+
+    var positions = [
+      new GLBoost.Vector3(0.5, -0.5, 0.0),
+      new GLBoost.Vector3(1.5, -0.5, 0.0),
+      new GLBoost.Vector3(1.5, 0.5, 0.0),
+      new GLBoost.Vector3(0.5, 0.5, 0.0)
+    ];
+    var texcoords = [
+      new GLBoost.Vector2(0.0, 1.0),
+      new GLBoost.Vector2(1.0, 1.0),
+      new GLBoost.Vector2(1.0, 0.0),
+      new GLBoost.Vector2(0.0, 0.0)
+    ];
+
+    var geometry2 = glBoostContext.createGeometry();
+    var texture = glBoostContext.createTexture('resources/texture.png');
+    var material = glBoostContext.createClassicMaterial();
+    material.setTexture(texture);
+    geometry2.setVerticesData({
+      position: positions,
+      texcoord: texcoords
+    }, [indices]);
+    var mesh2 = glBoostContext.createMesh(geometry2, material);
+    scene.addChild(mesh2);
+
+    var camera = glBoostContext.createPerspectiveCamera({
+      eye: new GLBoost.Vector3(0.0, 0, 5.0),
+      center: new GLBoost.Vector3(0.0, 0.0, 0.0),
+      up: new GLBoost.Vector3(0.0, 1.0, 0.0)
+    }, {
+        fovy: 45.0,
+        aspect: 1.0,
+        zNear: 0.1,
+        zFar: 1000.0
+      });
+    scene.addChild(camera);
+
+    var expression = glBoostContext.createExpressionAndRenderPasses(1);
+    expression.renderPasses[0].scene = scene;
+    expression.renderPasses[0].setClearColor(new GLBoost.Vector4(0.8, 0.8, 0.8, 1));
+    expression.prepareToRender();
+
+    var render = function () {
+      renderer.clearCanvas();
+      renderer.update(expression);
+      renderer.draw(expression);
+      requestAnimationFrame(render);
+    };
+    render();
+  </script>
+
+</body>
+
+</html>

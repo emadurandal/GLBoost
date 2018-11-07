@@ -1,10 +1,12 @@
+/* @flow */
+
 import GLBoost from '../../globals';
 import Geometry from '../../low_level/geometries/Geometry';
 import Vector3 from '../../low_level/math/Vector3';
 import Vector4 from '../../low_level/math/Vector4';
 
 export default class Arrow extends Geometry {
-  constructor(glBoostSystem, length, lineCount = 1) {
+  constructor(glBoostSystem: Object, length: number, lineCount: number = 1) {
     super(glBoostSystem);
 
     this._setupVertexData(length, lineCount);

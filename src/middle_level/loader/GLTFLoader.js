@@ -1,3 +1,5 @@
+// @flow
+
 import GLBoost from '../../globals';
 import M_OrthoCamera from '../elements/cameras/M_OrthoCamera';
 import M_PerspectiveCamera from '../elements/cameras/M_PerspectiveCamera';
@@ -24,28 +26,25 @@ let singleton = Symbol();
 let singletonEnforcer = Symbol();
 
 /**
- * [en] This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .<br>
- * [ja] glTFファイルを読み込むためのローダークラスです。glTFファイルフォーマットについての詳細は https://github.com/KhronosGroup/glTF をご覧ください。
+ * This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .
  */
 export default class GLTFLoader {
 
   /**
-   * [en] The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.<br>
-   * [ja] GLTFLoaderクラスのコンストラクタです。しかし本クラスはシングルトンであるため、このコンストラクタは直接呼び出せません。getInstance()静的メソッドを使ってください。
-   * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] このコンストラクタの直接呼び出しを禁止するためのシンボル
+   * The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+   * @param enforcer a Symbol to forbid calling this constructor directly
    */
-  constructor(enforcer) {
+  constructor(enforcer: Symbol) {
     if (enforcer !== singletonEnforcer) {
       throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
     }
   }
 
   /**
-   * [en] The static method to get singleton instance of this class.<br>
-   * [ja] このクラスのシングルトンインスタンスを取得するための静的メソッド。
-   * @return {GLTFLoader} [en] the singleton instance of GLTFLoader class [ja] GLTFLoaderクラスのシングルトンインスタンス
+   * The static method to get singleton instance of this class.<br>
+   * @return The singleton instance of GLTFLoader class
    */
-  static getInstance() {
+  static getInstance(): GLTFLoader {
     if (!this[singleton]) {
       this[singleton] = new GLTFLoader(singletonEnforcer);
     }
@@ -112,12 +111,12 @@ export default class GLTFLoader {
 
   /**
    * the method to load glTF file.
-   * @param {glBoostContext} glBoostContext - glBoostContext instance
-   * @param {string} url - url of glTF file
-   * @param {Object} options - option data for loading
-   * @return {Promise} a promise object
+   * @param glBoostContext - glBoostContext instance
+   * @param url - url of glTF file
+   * @param options - option data for loading
+   * @return a promise object
    */
-  loadGLTF(glBoostContext, url, options) {
+  loadGLTF(glBoostContext: glBoostContext, url: string, options: Object): Promise {
     let defaultOptions = {
       files: { 
         //        "foo.gltf": content of file as ArrayBuffer, 
@@ -133,6 +132,7 @@ export default class GLTFLoader {
       defaultMaterial: ClassicMaterial,
       defaultShaderClass: null,
       isMeshTransparentAsDefault: false,
+      ignoreMeshList: [],
       defaultStates: {
         states: {
           enable: [
@@ -413,6 +413,8 @@ export default class GLTFLoader {
       this._IterateNodeOfScene(glBoostContext, buffers, json, defaultShader, shaders, textures, glTFVer, resolve, options);
     }
 
+    
+
   }
 
   _IterateNodeOfScene(glBoostContext, buffers, json, defaultShader, shaders, textures, glTFVer, resolve, options) {
@@ -450,15 +452,18 @@ export default class GLTFLoader {
       // Animation
       this._loadAnimation(group, buffers, json, glTFVer, options);
 
-      if (options && options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
-        options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
-      }
-
       rootGroup.addChild(group);
 
     }
 
     rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
+
+    if (options && options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
+      options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
+    }
+    if (options && options.loaderExtension && options.loaderExtension.loadExtensionInfoAndSetToRootGroup) {
+      options.loaderExtension.loadExtensionInfoAndSetToRootGroup(rootGroup, json, glBoostContext);
+    }
 
     resolve(rootGroup);
   }
@@ -507,12 +512,18 @@ export default class GLTFLoader {
       let cameraStr = nodeJson.camera;
       let cameraJson = json.cameras[cameraStr];
       let camera = null;
+
+      let centerVec = new Vector3(0.0, 0.0, -1.0);
+      if (json.asset && json.asset.LastSaved_ApplicationVendor) {
+        // For backwards compatibility
+        centerVec = new Vector3(1.0, 0.0, 0.0);
+      }
       if (cameraJson.type === 'perspective') {
         let perspective = cameraJson.perspective;
         camera = glBoostContext.createPerspectiveCamera(
           {
             eye: new Vector3(0.0, 0.0, 0),
-            center: new Vector3(1.0, 0.0, 0.0),
+            center: centerVec,
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
@@ -527,7 +538,7 @@ export default class GLTFLoader {
         camera = glBoostContext.createOrthoCamera(
           {
             eye: new Vector3(0.0, 0.0, 0),
-            center: new Vector3(1.0, 0.0, 0.0),
+            center: centerVec,
             up: new Vector3(0.0, 1.0, 0.0)
           },
           {
@@ -604,10 +615,14 @@ export default class GLTFLoader {
       mesh = glBoostContext.createMesh(geometry);
     }
     mesh.userFlavorName = meshStr;
-    group.addChild(mesh);
 
-    if (options && options.isMeshTransparentAsDefault) {
-      mesh.isTransparentForce = true;
+    if (!(options.ignoreMeshList != null) || options.ignoreMeshList.indexOf(mesh.userFlavorName) === -1) {
+      // if the mesh name is not in ignore list, add it to the group.
+      group.addChild(mesh);
+    }
+
+    if (options && options.isMeshTransparentAsDefault || options && options.defaultStates && options.defaultStates.isTransparent) {
+      mesh.isTransparent = true;
     }
 
     let _indicesArray = [];
@@ -749,7 +764,7 @@ export default class GLTFLoader {
                 group.getChildren().forEach((elem)=>{
                   let isMatch = this.isTargetMatch(statesInfo, elem, target);
                   if (isMatch) {
-                    elem.isTransparentForce = statesInfo.isTransparent !== void 0 ? statesInfo.isTransparent : false;
+                    elem.isTransparent = statesInfo.isTransparent !== void 0 ? statesInfo.isTransparent : false;
                     if (statesInfo.states) {
                       material.states = statesInfo.states;
                     }
@@ -1067,6 +1082,17 @@ export default class GLTFLoader {
       if (typeof value !== 'string') {
         material[valueName + 'Color'] = MathClassUtil.arrayToVectorOrMatrix(value);
       }
+      if (valueName === 'transparent') {
+        material.isTransparent = value;
+        let enables = [3042];
+        material.states.enable = material.states.enable.concat(enables);
+      }
+      if (valueName === 'transparency') {
+        material.baseColor.w = 1.0 - value;
+        material.diffuseColor.w = 1.0 - value;
+        material.specularColor.w = 1.0 - value;
+        material.ambientColor.w = 1.0 - value;
+      }
     }
 
     if (indices !== null) {
@@ -1321,7 +1347,7 @@ export default class GLTFLoader {
 
   _sliceBufferViewToArrayBuffer(json, bufferViewStr, arrayBuffer) {
     let bufferViewJson = json.bufferViews[bufferViewStr];
-    let byteOffset = bufferViewJson.byteOffset;
+    let byteOffset = (bufferViewJson.byteOffset != null) ? bufferViewJson.byteOffset : 0;
     let byteLength = bufferViewJson.byteLength;
     let arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
     return arrayBufferSliced;

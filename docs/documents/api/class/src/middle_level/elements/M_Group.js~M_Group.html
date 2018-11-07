@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -226,7 +228,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-constructor-constructor">constructor</a></span></span><span class="code" data-ice="signature">(glBoostContext: <span>*</span>)</span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-constructor-constructor">constructor</a></span></span><span class="code" data-ice="signature">(glBoostContext: <span>glBoostContext</span>)</span>
         </p>
       </div>
       <div>
@@ -379,7 +381,63 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-member-_elements">_elements</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span>&gt;</span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-member-_elements">_elements</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span>any</span>&gt;</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">private</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-member-_gizmos">_gizmos</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">private</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-member-_glBoostSystem">_glBoostSystem</a></span></span><span class="code" data-ice="signature">: <span>glBoostSystem</span></span>
         </p>
       </div>
       <div>
@@ -499,7 +557,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-clone">clone</a></span></span><span class="code" data-ice="signature">(clonedOriginalRootElement: <span>*</span>, clonedRootElement: <span>*</span>, onCompleteFuncs: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-clone">clone</a></span></span><span class="code" data-ice="signature">(clonedOriginalRootElement: <span>any</span>, clonedRootElement: <span>any</span>, onCompleteFuncs: <span>any</span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -527,7 +585,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-getAnyJointAsChild">getAnyJointAsChild</a></span></span><span class="code" data-ice="signature">(): <span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-executeSpecifiedFunctionRecursively">executeSpecifiedFunctionRecursively</a></span></span><span class="code" data-ice="signature">(func: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function">Function</a></span>, thisObj: <span>any</span>, args: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span>any</span>&gt;, childIndexToInsertToArgs: <span>*</span>)</span>
         </p>
       </div>
       <div>
@@ -555,7 +613,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-getChildren">getChildren</a></span></span><span class="code" data-ice="signature">(): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span>&gt;</span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-getAnyJointAsChild">getAnyJointAsChild</a></span></span><span class="code" data-ice="signature">(): <span><a href="class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html">M_Joint</a></span> | <span>nullliteral</span></span>
         </p>
       </div>
       <div>
@@ -583,7 +641,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-getEndAnimationInputValue">getEndAnimationInputValue</a></span></span><span class="code" data-ice="signature">(inputLineName: <span>*</span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-getChildren">getChildren</a></span></span><span class="code" data-ice="signature">(): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>&gt;</span>
         </p>
       </div>
       <div>
@@ -611,7 +669,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-getStartAnimationInputValue">getStartAnimationInputValue</a></span></span><span class="code" data-ice="signature">(inputLineName: <span>*</span>, element: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-getEndAnimationInputValue">getEndAnimationInputValue</a></span></span><span class="code" data-ice="signature">(inputLineName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -639,7 +697,35 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-rayCast">rayCast</a></span></span><span class="code" data-ice="signature">(arg1: <span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span>, arg2: <span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span>, camera: <span>*</span>, viewport: <span>*</span>): <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></span><span>[]</span></span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-getStartAnimationInputValue">getStartAnimationInputValue</a></span></span><span class="code" data-ice="signature">(inputLineName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-rayCast">rayCast</a></span></span><span class="code" data-ice="signature">(arg1: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, arg2: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, camera: <span>any</span>, viewport: <span>any</span>): <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></span><span>[]</span></span></span>
         </p>
       </div>
       <div>
@@ -701,7 +787,7 @@
       <div>
         
         
-        <div data-ice="description"><p>[en] remove all elements from this group.</p>
+        <div data-ice="description"><p>remove all elements from this group.</p>
 </div>
       </div>
     </td>
@@ -724,13 +810,13 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-removeChild">removeChild</a></span></span><span class="code" data-ice="signature">(element: <span>Element</span>)</span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-removeChild">removeChild</a></span></span><span class="code" data-ice="signature">(element: <span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span>)</span>
         </p>
       </div>
       <div>
         
         
-        <div data-ice="description"><p>[en] remove the element from this group.</p>
+        <div data-ice="description"><p>remove the element from this group.</p>
 </div>
       </div>
     </td>
@@ -753,7 +839,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-searchElement">searchElement</a></span></span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, queryMeta: <span>QueryMeta</span>, element: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-searchElement">searchElement</a></span></span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, queryMeta: <span>QueryMeta</span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -781,7 +867,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-searchElementByNameAndType">searchElementByNameAndType</a></span></span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, queryMeta: <span>QueryMeta</span>, element: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-searchElementByNameAndType">searchElementByNameAndType</a></span></span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, queryMeta: <span>QueryMeta</span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -809,7 +895,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-searchElementsByNameAndType">searchElementsByNameAndType</a></span></span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, queryMeta: <span>QueryMeta</span>, element: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-searchElementsByNameAndType">searchElementsByNameAndType</a></span></span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, queryMeta: <span>QueryMeta</span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -837,7 +923,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-searchElementsByType">searchElementsByType</a></span></span><span class="code" data-ice="signature">(type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, element: <span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-searchElementsByType">searchElementsByType</a></span></span><span class="code" data-ice="signature">(type: <span>any</span>, element: <span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -865,7 +951,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-searchGLBoostObjectByNameAndType">searchGLBoostObjectByNameAndType</a></span></span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, queryMeta: <span>QueryMeta</span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-searchGLBoostObjectByNameAndType">searchGLBoostObjectByNameAndType</a></span></span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, queryMeta: <span>QueryMeta</span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span> | <span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span> | <span><a href="class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html">M_Mesh</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -893,7 +979,35 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-searchGLBoostObjectsByNameAndType">searchGLBoostObjectsByNameAndType</a></span></span><span class="code" data-ice="signature">(query: <span>*</span>, type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, queryMeta: <span>QueryMeta</span>, element: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-searchGLBoostObjectsByNameAndType">searchGLBoostObjectsByNameAndType</a></span></span><span class="code" data-ice="signature">(query: <span>any</span>, type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, queryMeta: <span>QueryMeta</span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>): <span>*</span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html#instance-method-setSpecifiedPropertyRecursively">setSpecifiedPropertyRecursively</a></span></span><span class="code" data-ice="signature">(propertyName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, value: <span>any</span>)</span>
         </p>
       </div>
       <div>
@@ -1090,6 +1204,90 @@
   <tbody>
   
   <tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      <span data-ice="static">static</span>
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#static-member-classInfoDic">classInfoDic</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">private</span>
+      <span data-ice="static">static</span>
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#static-member-__entities">__entities</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span>any</span>&gt;</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">private</span>
+      <span data-ice="static">static</span>
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#static-member-_objectExistArray">_objectExistArray</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span>any</span>&gt;</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
     <td>
       <span class="access" data-ice="access">public</span>
       
@@ -1357,34 +1555,6 @@
           
           
           <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#instance-set-userFlavorName">userFlavorName</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
-        </p>
-      </div>
-      <div>
-        
-        
-        
-      </div>
-    </td>
-    <td>
-      
-      
-    </td>
-  </tr>
-<tr data-ice="target">
-    <td>
-      <span class="access" data-ice="access">public</span>
-      
-      
-      
-      <span class="override" data-ice="override"></span>
-    </td>
-    <td>
-      <div>
-        <p>
-          
-          
-          
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#instance-member-[&apos;_&apos; + typeName + &apos;Index&apos;]">[&apos;_&apos; + typeName + &apos;Index&apos;]</a></span></span><span class="code" data-ice="signature">: <span>*</span></span>
         </p>
       </div>
       <div>
@@ -1782,7 +1952,7 @@
       <div>
         
         
-        <div data-ice="description"><p>[en] Return instance name.</p>
+        <div data-ice="description"><p>Return instance name.</p>
 </div>
       </div>
     </td>
@@ -3072,7 +3242,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/elements/L_Element.js~L_Element.html#instance-method-getRotateAt">getRotateAt</a></span></span><span class="code" data-ice="signature">(lineName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, inputValue: <span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/elements/L_Element.js~L_Element.html#instance-method-getRotateAt">getRotateAt</a></span></span><span class="code" data-ice="signature">(lineName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, inputValue: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -3100,7 +3270,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/elements/L_Element.js~L_Element.html#instance-method-getRotateAtOrStatic">getRotateAtOrStatic</a></span></span><span class="code" data-ice="signature">(lineName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, inputValue: <span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/elements/L_Element.js~L_Element.html#instance-method-getRotateAtOrStatic">getRotateAtOrStatic</a></span></span><span class="code" data-ice="signature">(lineName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, inputValue: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span>*</span></span>
         </p>
       </div>
       <div>
@@ -3268,7 +3438,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/elements/L_Element.js~L_Element.html#instance-method-getTranslateAt">getTranslateAt</a></span></span><span class="code" data-ice="signature">(lineName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, inputValue: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span> | <span>nullliteral</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/elements/L_Element.js~L_Element.html#instance-method-getTranslateAt">getTranslateAt</a></span></span><span class="code" data-ice="signature">(lineName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, inputValue: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>): <span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span></span>
         </p>
       </div>
       <div>
@@ -3520,13 +3690,13 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/elements/L_Element.js~L_Element.html#instance-method-setCurrentAnimationValue">setCurrentAnimationValue</a></span></span><span class="code" data-ice="signature">(inputName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, inputValue: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span> | <span><a href="class/src/low_level/math/Vector2.js~Vector2.html">Vector2</a></span> | <span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span> | <span><a href="class/src/low_level/math/Vector4.js~Vector4.html">Vector4</a></span> | <span>*</span>)</span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/elements/L_Element.js~L_Element.html#instance-method-setCurrentAnimationValue">setCurrentAnimationValue</a></span></span><span class="code" data-ice="signature">(inputName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, inputValue: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span> | <span><a href="class/src/low_level/math/Vector2.js~Vector2.html">Vector2</a></span> | <span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span> | <span><a href="class/src/low_level/math/Vector4.js~Vector4.html">Vector4</a></span> | <span><a href="class/src/low_level/math/Quaternion.js~Quaternion.html">Quaternion</a></span>)</span>
         </p>
       </div>
       <div>
         
         
-        <div data-ice="description"><p>[en] Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).</p>
+        <div data-ice="description"><p>Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).</p>
 </div>
       </div>
     </td>
@@ -3801,7 +3971,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/elements/L_Element.js~L_Element.html#instance-method-_getCurrentAnimationInputValue">_getCurrentAnimationInputValue</a></span></span><span class="code" data-ice="signature">(inputName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span> | <span>nullliteral</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/elements/L_Element.js~L_Element.html#instance-method-_getCurrentAnimationInputValue">_getCurrentAnimationInputValue</a></span></span><span class="code" data-ice="signature">(inputName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
         </p>
       </div>
       <div>
@@ -4424,7 +4594,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-set-isTransparentForce">isTransparentForce</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-set-isTransparent">isTransparent</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></span>
         </p>
       </div>
       <div>
@@ -4928,7 +5098,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-member-__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder">__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder</a></span></span><span class="code" data-ice="signature">: <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-member-__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder">__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder</a></span></span><span class="code" data-ice="signature">: <span><a href="class/src/low_level/math/Matrix44.js~Matrix44.html">Matrix44</a></span></span>
         </p>
       </div>
       <div>
@@ -5068,7 +5238,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-member-__updateInfoString_multiplyMyAndParentTransformMatricesForJoints">__updateInfoString_multiplyMyAndParentTransformMatricesForJoints</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-member-__updateInfoString_multiplyMyAndParentTransformMatricesForJoints">__updateInfoString_multiplyMyAndParentTransformMatricesForJoints</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
         </p>
       </div>
       <div>
@@ -5096,7 +5266,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-member-__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder">__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder</a></span></span><span class="code" data-ice="signature">: <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-member-__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder">__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder</a></span></span><span class="code" data-ice="signature">: <span><a href="class/src/low_level/math/Matrix44.js~Matrix44.html">Matrix44</a></span></span>
         </p>
       </div>
       <div>
@@ -5124,7 +5294,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-member-_accumulatedAncestryObjectUpdateNumber">_accumulatedAncestryObjectUpdateNumber</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-member-_accumulatedAncestryObjectUpdateNumber">_accumulatedAncestryObjectUpdateNumber</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
         </p>
       </div>
       <div>
@@ -5208,7 +5378,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-member-_accumulatedAncestryObjectUpdateNumberInverse">_accumulatedAncestryObjectUpdateNumberInverse</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-member-_accumulatedAncestryObjectUpdateNumberInverse">_accumulatedAncestryObjectUpdateNumberInverse</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
         </p>
       </div>
       <div>
@@ -5264,7 +5434,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-member-_accumulatedAncestryObjectUpdateNumberNormal">_accumulatedAncestryObjectUpdateNumberNormal</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-member-_accumulatedAncestryObjectUpdateNumberNormal">_accumulatedAncestryObjectUpdateNumberNormal</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
         </p>
       </div>
       <div>
@@ -5320,7 +5490,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-member-_accumulatedWithoutMySelfAncestryObjectUpdateNumber">_accumulatedWithoutMySelfAncestryObjectUpdateNumber</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-member-_accumulatedWithoutMySelfAncestryObjectUpdateNumber">_accumulatedWithoutMySelfAncestryObjectUpdateNumber</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span> | <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></span>
         </p>
       </div>
       <div>
@@ -6526,11 +6696,11 @@
     
     
     
-    <span class="code" data-ice="name">constructor</span><span class="code" data-ice="signature">(glBoostContext: <span>*</span>)</span>
+    <span class="code" data-ice="name">constructor</span><span class="code" data-ice="signature">(glBoostContext: <span>glBoostContext</span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber20">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber22">source</a></span></span>
     </span>
   </h3>
 
@@ -6551,7 +6721,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">glBoostContext</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span>glBoostContext</span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -6592,7 +6762,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber393">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber400">source</a></span></span>
     </span>
   </h3>
 
@@ -6635,7 +6805,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber425">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber432">source</a></span></span>
     </span>
   </h3>
 
@@ -6678,7 +6848,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber438">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber445">source</a></span></span>
     </span>
   </h3>
 
@@ -6762,7 +6932,7 @@
     
     
     
-    <span class="code" data-ice="name">_elements</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span>&gt;</span>
+    <span class="code" data-ice="name">_elements</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span>any</span>&gt;</span>
     <span class="right-info">
       
       
@@ -6776,6 +6946,92 @@
   
 
   
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-member-_gizmos">
+    <span class="access" data-ice="access">private</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">_gizmos</span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber20">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  <div data-ice="override"><h4>Override:</h4><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html#instance-member-_gizmos">M_Element#_gizmos</a></span></div>
+
+  <div data-ice="properties">
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-member-_glBoostSystem">
+    <span class="access" data-ice="access">private</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">_glBoostSystem</span><span class="code" data-ice="signature">: <span>glBoostSystem</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber19">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  <div data-ice="override"><h4>Override:</h4><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#instance-member-_glBoostSystem">GLBoostObject#_glBoostSystem</a></span></div>
 
   <div data-ice="properties">
 </div>
@@ -6898,7 +7154,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber36">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber38">source</a></span></span>
     </span>
   </h3>
 
@@ -6928,7 +7184,8 @@
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">isDuplicateOk</td>
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean">boolean</a></span></td>
-      <td data-ice="appendix"></td>
+      <td data-ice="appendix"><ul><li>optional</li>
+<li>default: undefined</li></ul></td>
       <td data-ice="description"><p>allow duplicating if need</p>
 </td>
     </tr>
@@ -6962,11 +7219,11 @@
     
     
     
-    <span class="code" data-ice="name">clone</span><span class="code" data-ice="signature">(clonedOriginalRootElement: <span>*</span>, clonedRootElement: <span>*</span>, onCompleteFuncs: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">clone</span><span class="code" data-ice="signature">(clonedOriginalRootElement: <span>any</span>, clonedRootElement: <span>any</span>, onCompleteFuncs: <span>any</span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber397">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber404">source</a></span></span>
     </span>
   </h3>
 
@@ -6987,21 +7244,21 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">clonedOriginalRootElement</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span>any</span></td>
       <td data-ice="appendix"><ul><li>optional</li>
 <li>default: undefined</li></ul></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">clonedRootElement</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span>any</span></td>
       <td data-ice="appendix"><ul><li>optional</li>
 <li>default: undefined</li></ul></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">onCompleteFuncs</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span>any</span></td>
       <td data-ice="appendix"><ul><li>optional</li>
 <li>default: undefined</li></ul></td>
       <td data-ice="description"></td>
@@ -7041,6 +7298,84 @@
   
 </div>
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-executeSpecifiedFunctionRecursively">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">executeSpecifiedFunctionRecursively</span><span class="code" data-ice="signature">(func: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function">Function</a></span>, thisObj: <span>any</span>, args: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span>any</span>&gt;, childIndexToInsertToArgs: <span>*</span>)</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber462">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">func</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function">Function</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">thisObj</td>
+      <td data-ice="type" class="code"><span>any</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">args</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span>any</span>&gt;</td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">childIndexToInsertToArgs</td>
+      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="appendix"><ul><li>optional</li>
+<li>default: undefined</li></ul></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="instance-method-getAnyJointAsChild">
     <span class="access" data-ice="access">public</span>
     
@@ -7048,7 +7383,7 @@
     
     
     
-    <span class="code" data-ice="name">getAnyJointAsChild</span><span class="code" data-ice="signature">(): <span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span></span>
+    <span class="code" data-ice="name">getAnyJointAsChild</span><span class="code" data-ice="signature">(): <span><a href="class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html">M_Joint</a></span> | <span>nullliteral</span></span>
     <span class="right-info">
       
       
@@ -7071,7 +7406,7 @@
     <table>
       <tbody>
         <tr>
-          <td class="return-type code" data-ice="returnType"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span></td>
+          <td class="return-type code" data-ice="returnType"><span><a href="class/src/middle_level/elements/skeletons/M_Joint.js~M_Joint.html">M_Joint</a></span> | <span>nullliteral</span></td>
           
         </tr>
       </tbody>
@@ -7103,7 +7438,7 @@
     
     
     
-    <span class="code" data-ice="name">getChildren</span><span class="code" data-ice="signature">(): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span>&gt;</span>
+    <span class="code" data-ice="name">getChildren</span><span class="code" data-ice="signature">(): <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>&gt;</span>
     <span class="right-info">
       
       
@@ -7126,7 +7461,7 @@
     <table>
       <tbody>
         <tr>
-          <td class="return-type code" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span>&gt;</td>
+          <td class="return-type code" data-ice="returnType"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>&gt;</td>
           
         </tr>
       </tbody>
@@ -7158,11 +7493,11 @@
     
     
     
-    <span class="code" data-ice="name">getEndAnimationInputValue</span><span class="code" data-ice="signature">(inputLineName: <span>*</span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>): <span>*</span></span>
+    <span class="code" data-ice="name">getEndAnimationInputValue</span><span class="code" data-ice="signature">(inputLineName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber328">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber335">source</a></span></span>
     </span>
   </h3>
 
@@ -7183,7 +7518,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">inputLineName</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -7236,11 +7571,11 @@
     
     
     
-    <span class="code" data-ice="name">getStartAnimationInputValue</span><span class="code" data-ice="signature">(inputLineName: <span>*</span>, element: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">getStartAnimationInputValue</span><span class="code" data-ice="signature">(inputLineName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber300">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber307">source</a></span></span>
     </span>
   </h3>
 
@@ -7261,13 +7596,13 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">inputLineName</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">element</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span></td>
       <td data-ice="appendix"><ul><li>optional</li>
 <li>default: undefined</li></ul></td>
       <td data-ice="description"></td>
@@ -7314,11 +7649,11 @@
     
     
     
-    <span class="code" data-ice="name">rayCast</span><span class="code" data-ice="signature">(arg1: <span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span>, arg2: <span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span>, camera: <span>*</span>, viewport: <span>*</span>): <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></span><span>[]</span></span></span>
+    <span class="code" data-ice="name">rayCast</span><span class="code" data-ice="signature">(arg1: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, arg2: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span>, camera: <span>any</span>, viewport: <span>any</span>): <span><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></span><span>[]</span></span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber476">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber512">source</a></span></span>
     </span>
   </h3>
 
@@ -7339,25 +7674,25 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">arg1</td>
-      <td data-ice="type" class="code"><span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">arg2</td>
-      <td data-ice="type" class="code"><span><a href="class/src/low_level/math/Vector3.js~Vector3.html">Vector3</a></span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">camera</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span>any</span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">viewport</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span>any</span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -7407,7 +7742,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber454">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber490">source</a></span></span>
     </span>
   </h3>
 
@@ -7457,8 +7792,7 @@
   
   
   
-  <div data-ice="description"><p>[en] remove all elements from this group.
-[ja] &#x3053;&#x306E;&#x30B0;&#x30EB;&#x30FC;&#x30D7;&#x304B;&#x3089;&#x5168;&#x3066;&#x306E;&#x8981;&#x7D20;&#x3092;&#x524A;&#x9664;&#x3057;&#x307E;&#x3059;&#x3002; </p>
+  <div data-ice="description"><p>remove all elements from this group. </p>
 </div>
 
   
@@ -7491,19 +7825,18 @@
     
     
     
-    <span class="code" data-ice="name">removeChild</span><span class="code" data-ice="signature">(element: <span>Element</span>)</span>
+    <span class="code" data-ice="name">removeChild</span><span class="code" data-ice="signature">(element: <span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber61">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber62">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  <div data-ice="description"><p>[en] remove the element from this group.
-[ja] &#x3053;&#x306E;&#x30B0;&#x30EB;&#x30FC;&#x30D7;&#x304B;&#x3089;&#x6307;&#x5B9A;&#x3057;&#x305F;&#x8981;&#x7D20;&#x3092;&#x524A;&#x9664;&#x3057;&#x307E;&#x3059;&#x3002; </p>
+  <div data-ice="description"><p>remove the element from this group. </p>
 </div>
 
   
@@ -7518,9 +7851,9 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">element</td>
-      <td data-ice="type" class="code"><span>Element</span></td>
+      <td data-ice="type" class="code"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"><p>[en] the element to remove [ja] &#x524A;&#x9664;&#x3057;&#x305F;&#x3044;&#x8981;&#x7D20;</p>
+      <td data-ice="description"><p>the element to remove</p>
 </td>
     </tr>
 </tbody>
@@ -7553,7 +7886,7 @@
     
     
     
-    <span class="code" data-ice="name">searchElement</span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, queryMeta: <span>QueryMeta</span>, element: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">searchElement</span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, queryMeta: <span>QueryMeta</span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
@@ -7591,7 +7924,7 @@
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">element</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span></td>
       <td data-ice="appendix"><ul><li>optional</li>
 <li>default: undefined</li></ul></td>
       <td data-ice="description"></td>
@@ -7638,271 +7971,11 @@
     
     
     
-    <span class="code" data-ice="name">searchElementByNameAndType</span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, queryMeta: <span>QueryMeta</span>, element: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">searchElementByNameAndType</span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, queryMeta: <span>QueryMeta</span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
       <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber158">source</a></span></span>
-    </span>
-  </h3>
-
-  
-  
-  
-  
-
-  
-
-  <div data-ice="properties"><div data-ice="properties">
-  <h4 data-ice="title">Params:</h4>
-  <table class="params">
-    <thead>
-    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
-    </thead>
-    <tbody>
-    
-    <tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">query</td>
-      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
-      <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
-    </tr>
-<tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">type</td>
-      <td data-ice="type" class="code"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span></td>
-      <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
-    </tr>
-<tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">queryMeta</td>
-      <td data-ice="type" class="code"><span>QueryMeta</span></td>
-      <td data-ice="appendix"><ul><li>optional</li>
-<li>default: {[object Object],[object Object]}</li></ul></td>
-      <td data-ice="description"></td>
-    </tr>
-<tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">element</td>
-      <td data-ice="type" class="code"><span>*</span></td>
-      <td data-ice="appendix"><ul><li>optional</li>
-<li>default: undefined</li></ul></td>
-      <td data-ice="description"></td>
-    </tr>
-</tbody>
-  </table>
-</div>
-</div>
-
-  <div class="return-params" data-ice="returnParams">
-    <h4>Return:</h4>
-    <table>
-      <tbody>
-        <tr>
-          <td class="return-type code" data-ice="returnType"><span>*</span></td>
-          
-        </tr>
-      </tbody>
-    </table>
-    <div data-ice="returnProperties">
-</div>
-  </div>
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-</div>
-<div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="instance-method-searchElementsByNameAndType">
-    <span class="access" data-ice="access">public</span>
-    
-    
-    
-    
-    
-    <span class="code" data-ice="name">searchElementsByNameAndType</span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, queryMeta: <span>QueryMeta</span>, element: <span>*</span>): <span>*</span></span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber176">source</a></span></span>
-    </span>
-  </h3>
-
-  
-  
-  
-  
-
-  
-
-  <div data-ice="properties"><div data-ice="properties">
-  <h4 data-ice="title">Params:</h4>
-  <table class="params">
-    <thead>
-    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
-    </thead>
-    <tbody>
-    
-    <tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">query</td>
-      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
-      <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
-    </tr>
-<tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">type</td>
-      <td data-ice="type" class="code"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span></td>
-      <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
-    </tr>
-<tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">queryMeta</td>
-      <td data-ice="type" class="code"><span>QueryMeta</span></td>
-      <td data-ice="appendix"><ul><li>optional</li>
-<li>default: {[object Object],[object Object]}</li></ul></td>
-      <td data-ice="description"></td>
-    </tr>
-<tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">element</td>
-      <td data-ice="type" class="code"><span>*</span></td>
-      <td data-ice="appendix"><ul><li>optional</li>
-<li>default: undefined</li></ul></td>
-      <td data-ice="description"></td>
-    </tr>
-</tbody>
-  </table>
-</div>
-</div>
-
-  <div class="return-params" data-ice="returnParams">
-    <h4>Return:</h4>
-    <table>
-      <tbody>
-        <tr>
-          <td class="return-type code" data-ice="returnType"><span>*</span></td>
-          
-        </tr>
-      </tbody>
-    </table>
-    <div data-ice="returnProperties">
-</div>
-  </div>
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-</div>
-<div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="instance-method-searchElementsByType">
-    <span class="access" data-ice="access">public</span>
-    
-    
-    
-    
-    
-    <span class="code" data-ice="name">searchElementsByType</span><span class="code" data-ice="signature">(type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, element: <span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span>): <span>*</span></span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber200">source</a></span></span>
-    </span>
-  </h3>
-
-  
-  
-  
-  
-
-  
-
-  <div data-ice="properties"><div data-ice="properties">
-  <h4 data-ice="title">Params:</h4>
-  <table class="params">
-    <thead>
-    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
-    </thead>
-    <tbody>
-    
-    <tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">type</td>
-      <td data-ice="type" class="code"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span></td>
-      <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
-    </tr>
-<tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">element</td>
-      <td data-ice="type" class="code"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span></td>
-      <td data-ice="appendix"><ul><li>optional</li>
-<li>default: undefined</li></ul></td>
-      <td data-ice="description"></td>
-    </tr>
-</tbody>
-  </table>
-</div>
-</div>
-
-  <div class="return-params" data-ice="returnParams">
-    <h4>Return:</h4>
-    <table>
-      <tbody>
-        <tr>
-          <td class="return-type code" data-ice="returnType"><span>*</span></td>
-          
-        </tr>
-      </tbody>
-    </table>
-    <div data-ice="returnProperties">
-</div>
-  </div>
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-  
-</div>
-<div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="instance-method-searchGLBoostObjectByNameAndType">
-    <span class="access" data-ice="access">public</span>
-    
-    
-    
-    
-    
-    <span class="code" data-ice="name">searchGLBoostObjectByNameAndType</span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, queryMeta: <span>QueryMeta</span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>): <span>*</span></span>
-    <span class="right-info">
-      
-      
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber230">source</a></span></span>
     </span>
   </h3>
 
@@ -7982,18 +8055,18 @@
   
 </div>
 <div class="detail" data-ice="detail">
-  <h3 data-ice="anchor" id="instance-method-searchGLBoostObjectsByNameAndType">
+  <h3 data-ice="anchor" id="instance-method-searchElementsByNameAndType">
     <span class="access" data-ice="access">public</span>
     
     
     
     
     
-    <span class="code" data-ice="name">searchGLBoostObjectsByNameAndType</span><span class="code" data-ice="signature">(query: <span>*</span>, type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, queryMeta: <span>QueryMeta</span>, element: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">searchElementsByNameAndType</span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, queryMeta: <span>QueryMeta</span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>): <span>*</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber263">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber176">source</a></span></span>
     </span>
   </h3>
 
@@ -8014,7 +8087,7 @@
     
     <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">query</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"></td>
     </tr>
@@ -8033,7 +8106,7 @@
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">element</td>
-      <td data-ice="type" class="code"><span>*</span></td>
+      <td data-ice="type" class="code"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span></td>
       <td data-ice="appendix"><ul><li>optional</li>
 <li>default: undefined</li></ul></td>
       <td data-ice="description"></td>
@@ -8073,6 +8146,331 @@
   
 </div>
 <div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-searchElementsByType">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">searchElementsByType</span><span class="code" data-ice="signature">(type: <span>any</span>, element: <span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span>): <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber200">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">type</td>
+      <td data-ice="type" class="code"><span>any</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">element</td>
+      <td data-ice="type" class="code"><span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span></td>
+      <td data-ice="appendix"><ul><li>optional</li>
+<li>default: undefined</li></ul></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span>*</span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-searchGLBoostObjectByNameAndType">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">searchGLBoostObjectByNameAndType</span><span class="code" data-ice="signature">(query: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, queryMeta: <span>QueryMeta</span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span> | <span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span> | <span><a href="class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html">M_Mesh</a></span>): <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber237">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">query</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">type</td>
+      <td data-ice="type" class="code"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">queryMeta</td>
+      <td data-ice="type" class="code"><span>QueryMeta</span></td>
+      <td data-ice="appendix"><ul><li>optional</li>
+<li>default: {[object Object],[object Object]}</li></ul></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">element</td>
+      <td data-ice="type" class="code"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span> | <span><a href="class/src/middle_level/elements/M_Element.js~M_Element.html">M_Element</a></span> | <span><a href="class/src/middle_level/elements/meshes/M_Mesh.js~M_Mesh.html">M_Mesh</a></span></td>
+      <td data-ice="appendix"><ul><li>optional</li>
+<li>default: undefined</li></ul></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span>*</span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-searchGLBoostObjectsByNameAndType">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">searchGLBoostObjectsByNameAndType</span><span class="code" data-ice="signature">(query: <span>any</span>, type: <span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span>, queryMeta: <span>QueryMeta</span>, element: <span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span>): <span>*</span></span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber270">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">query</td>
+      <td data-ice="type" class="code"><span>any</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">type</td>
+      <td data-ice="type" class="code"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html">GLBoostObject</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">queryMeta</td>
+      <td data-ice="type" class="code"><span>QueryMeta</span></td>
+      <td data-ice="appendix"><ul><li>optional</li>
+<li>default: {[object Object],[object Object]}</li></ul></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">element</td>
+      <td data-ice="type" class="code"><span><a href="class/src/middle_level/elements/M_Group.js~M_Group.html">M_Group</a></span></td>
+      <td data-ice="appendix"><ul><li>optional</li>
+<li>default: undefined</li></ul></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  <div class="return-params" data-ice="returnParams">
+    <h4>Return:</h4>
+    <table>
+      <tbody>
+        <tr>
+          <td class="return-type code" data-ice="returnType"><span>*</span></td>
+          
+        </tr>
+      </tbody>
+    </table>
+    <div data-ice="returnProperties">
+</div>
+  </div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
+  <h3 data-ice="anchor" id="instance-method-setSpecifiedPropertyRecursively">
+    <span class="access" data-ice="access">public</span>
+    
+    
+    
+    
+    
+    <span class="code" data-ice="name">setSpecifiedPropertyRecursively</span><span class="code" data-ice="signature">(propertyName: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span>, value: <span>any</span>)</span>
+    <span class="right-info">
+      
+      
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber449">source</a></span></span>
+    </span>
+  </h3>
+
+  
+  
+  
+  
+
+  
+
+  <div data-ice="properties"><div data-ice="properties">
+  <h4 data-ice="title">Params:</h4>
+  <table class="params">
+    <thead>
+    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
+    </thead>
+    <tbody>
+    
+    <tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">propertyName</td>
+      <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">value</td>
+      <td data-ice="type" class="code"><span>any</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"></td>
+    </tr>
+</tbody>
+  </table>
+</div>
+</div>
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+</div>
+<div class="detail" data-ice="detail">
   <h3 data-ice="anchor" id="instance-method-updateAABB">
     <span class="access" data-ice="access">public</span>
     
@@ -8084,7 +8482,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber359">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber366">source</a></span></span>
     </span>
   </h3>
 
@@ -8141,7 +8539,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber419">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber426">source</a></span></span>
     </span>
   </h3>
 
@@ -8200,7 +8598,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber508">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber544">source</a></span></span>
     </span>
   </h3>
 
@@ -8314,7 +8712,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber442">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/elements/M_Group.js.html#lineNumber478">source</a></span></span>
     </span>
   </h3>
 

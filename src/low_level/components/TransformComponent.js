@@ -1,4 +1,5 @@
 // @flow
+import GLBoost from '../../globals';
 import Vector2 from '../math/Vector2';
 import Vector3 from '../math/Vector3';
 import Vector4 from '../math/Vector4';
@@ -338,7 +339,7 @@ export default class TransformComponent extends Component {
     this.__updateRotation();
     this.__updateTranslate();
     this.__updateScale();
-    this.__updateMatrix();
+    //this.__updateMatrix();
     this._needUpdate();
   }
 
@@ -377,7 +378,7 @@ export default class TransformComponent extends Component {
       this._is_scale_updated = true;
     }
   }
-
+/*
   __updateMatrix() {
     if (!this._is_trs_matrix_updated && this._is_translate_updated && this._is_quaternion_updated && this._is_scale_updated) {
       const rotationMatrix = new Matrix44(this.getQuaternionNotAnimated());
@@ -393,6 +394,7 @@ export default class TransformComponent extends Component {
       this._is_trs_matrix_updated = true;
     }
   }
+  
 
   setPropertiesFromJson(arg: JSON) {
     let json = arg;
@@ -409,7 +411,7 @@ export default class TransformComponent extends Component {
       }
     }
   }
-
+*/
   setRotationFromNewUpAndFront(UpVec: Vector3, FrontVec: Vector3) {
     let yDir = UpVec;
     let xDir = Vector3.cross(yDir, FrontVec);

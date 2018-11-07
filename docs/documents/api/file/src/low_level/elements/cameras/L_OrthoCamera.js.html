@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -168,12 +170,28 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/low_level/elements/cameras/L_OrthoCamera.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import L_AbstractCamera from &apos;./L_AbstractCamera&apos;;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/* @flow */
+
+import L_AbstractCamera from &apos;./L_AbstractCamera&apos;;
 import Matrix44 from &apos;../../math/Matrix44&apos;;
 
 export default class L_OrthoCamera extends L_AbstractCamera {
-  constructor(glBoostContext, toRegister, lookat, ortho) {
-    super(glBoostContext, toRegister, lookat);
+  _left: number;
+  _right: number;
+  _bottom: number;
+  _top: number;
+  _zNear: number;
+  _zFar: number;
+  _xmag: number;
+  _ymag: number;
+  _dirtyProjection: boolean;
+  _updateCountAsCameraProjection: number;
+  _dirtyProjection: boolean;
+  _updateCountAsCameraProjection: number;
+  _projectionMatrix: Matrix44;
+
+  constructor(glBoostSystem:GLBoostSystem, toRegister:boolean, lookat:Object, ortho:Object) {
+    super(glBoostSystem, toRegister, lookat);
 
     this._left = (typeof ortho.left === &quot;undefined&quot;) ? -1:ortho.left;
     this._right = (typeof ortho.right === &quot;undefined&quot;) ? 1:ortho.right;
@@ -207,7 +225,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     }
   }
 
-  static orthoRHMatrix(left, right, bottom, top, near, far, xmag, ymag) {
+  static orthoRHMatrix(left: number, right: number, bottom: number, top: number, near: number, far: number, xmag: number, ymag: number) {
 
     if (xmag &amp;&amp; ymag) {
       return new Matrix44(
@@ -226,7 +244,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     }
   }
 
-  set left(value) {
+  set left(value: number) {
     if (this._left === value) {
       return;
     }
@@ -238,7 +256,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     return this._left;
   }
 
-  set right(value) {
+  set right(value: number) {
     if (this._right === value) {
       return;
     }
@@ -250,7 +268,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     return this._right;
   }
 
-  set bottom(value) {
+  set bottom(value: number) {
     if (this._bottom === value) {
       return;
     }
@@ -262,7 +280,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     return this._bottom;
   }
 
-  set top(value) {
+  set top(value: number) {
     if (this._top === value) {
       return;
     }
@@ -274,7 +292,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     return this._top;
   }
 
-  set zNear(value) {
+  set zNear(value: number) {
     if (this._zNear === value) {
       return;
     }
@@ -286,7 +304,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     return this._zNear;
   }
 
-  set zFar(value) {
+  set zFar(value: number) {
     if (this._zFar === value) {
       return;
     }
@@ -298,7 +316,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     return this._zFar;
   }
 
-  set xmag(value) {
+  set xmag(value: number) {
     if (this._xmag === value) {
       return;
     }
@@ -310,7 +328,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     return this._xmag;
   }
 
-  set ymag(value) {
+  set ymag(value: number) {
     if (this._ymag === value) {
       return;
     }
@@ -374,7 +392,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
   }
 
   
-  set allInfo(info) {
+  set allInfo(info: Object) {
     super.allInfo = info;
   }
 }

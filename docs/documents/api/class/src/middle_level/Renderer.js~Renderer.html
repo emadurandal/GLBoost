@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -194,8 +196,7 @@
 
   
   
-  <div class="description" data-ice="description"><p>en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements&apos; data, decides a plan of drawing process, and then just execute it.<br>
-ja: &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x30EC;&#x30F3;&#x30C0;&#x30EA;&#x30F3;&#x30B0;&#x30D7;&#x30ED;&#x30BB;&#x30B9;&#x306E;&#x5236;&#x5FA1;&#x3092;&#x53F8;&#x308A;&#x307E;&#x3059;&#x3002;Canvas&#x306B;&#x30A4;&#x30E1;&#x30FC;&#x30B8;&#x3092;&#x30EC;&#x30F3;&#x30C0;&#x30EA;&#x30F3;&#x30B0;&#x3059;&#x308B;&#x305F;&#x3081;&#x306B;&#x3001;&#x3053;&#x306E;Renderer&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x4ED6;&#x306E;&#x8981;&#x7D20;&#x306E;&#x30C7;&#x30FC;&#x30BF;&#x3092;&#x96C6;&#x3081;&#x3001;&#x63CF;&#x753B;&#x30D7;&#x30ED;&#x30BB;&#x30B9;&#x306E;&#x8A08;&#x753B;&#x3092;&#x6C7A;&#x5B9A;&#x3057;&#x3001;&#x5B9F;&#x884C;&#x3057;&#x307E;&#x3059;&#x3002;</p>
+  <div class="description" data-ice="description"><p>This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements&apos; data, decides a plan of drawing process, and then just execute it.</p>
 </div>
   
 
@@ -263,13 +264,13 @@ ja: &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x30EC;&#x30F3;&#x30C0;&#x3
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/middle_level/Renderer.js~Renderer.html#instance-get-glContext">glContext</a></span></span><span class="code" data-ice="signature">: <span>webglcontext</span>: <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/middle_level/Renderer.js~Renderer.html#instance-get-glContext">glContext</a></span></span><span class="code" data-ice="signature">: <span>*</span>: <span>webglcontext</span></span>
         </p>
       </div>
       <div>
         
         
-        <div data-ice="description"><p>en: Get WebGL context.</p>
+        <div data-ice="description"><p>Get WebGL context.</p>
 </div>
       </div>
     </td>
@@ -703,7 +704,7 @@ ja: &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x30EC;&#x30F3;&#x30C0;&#x3
       <div>
         
         
-        <div data-ice="description"><p>en: clear color/depth/stencil of canvas.</p>
+        <div data-ice="description"><p>clear color/depth/stencil of canvas.</p>
 </div>
       </div>
     </td>
@@ -817,7 +818,7 @@ ja: &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x30EC;&#x30F3;&#x30C0;&#x3
       <div>
         
         
-        <div data-ice="description"><p>en: draw elements of the expression.</p>
+        <div data-ice="description"><p>draw elements of the expression.</p>
 </div>
       </div>
     </td>
@@ -930,7 +931,7 @@ ja: &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x30EC;&#x30F3;&#x30C0;&#x3
       <div>
         
         
-        <div data-ice="description"><p>en: resize canvas and viewport.</p>
+        <div data-ice="description"><p>resize canvas and viewport.</p>
 </div>
       </div>
     </td>
@@ -987,7 +988,7 @@ ja: &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x30EC;&#x30F3;&#x30C0;&#x3
       <div>
         
         
-        <div data-ice="description"><p>en: update things of elements of the expression.</p>
+        <div data-ice="description"><p>update things of elements of the expression.</p>
 </div>
       </div>
     </td>
@@ -1095,6 +1096,90 @@ ja: &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x30EC;&#x30F3;&#x30C0;&#x3
   <tbody>
   
   <tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">public</span>
+      <span data-ice="static">static</span>
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#static-member-classInfoDic">classInfoDic</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></span></span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">private</span>
+      <span data-ice="static">static</span>
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#static-member-__entities">__entities</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span>any</span>&gt;</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
+    <td>
+      <span class="access" data-ice="access">private</span>
+      <span data-ice="static">static</span>
+      
+      
+      <span class="override" data-ice="override"></span>
+    </td>
+    <td>
+      <div>
+        <p>
+          
+          
+          
+          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#static-member-_objectExistArray">_objectExistArray</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array">Array</a></span>&lt;<span>any</span>&gt;</span>
+        </p>
+      </div>
+      <div>
+        
+        
+        
+      </div>
+    </td>
+    <td>
+      
+      
+    </td>
+  </tr>
+<tr data-ice="target">
     <td>
       <span class="access" data-ice="access">public</span>
       
@@ -1362,34 +1447,6 @@ ja: &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x30EC;&#x30F3;&#x30C0;&#x3
           
           
           <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#instance-set-userFlavorName">userFlavorName</a></span></span><span class="code" data-ice="signature">: <span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></span></span>
-        </p>
-      </div>
-      <div>
-        
-        
-        
-      </div>
-    </td>
-    <td>
-      
-      
-    </td>
-  </tr>
-<tr data-ice="target">
-    <td>
-      <span class="access" data-ice="access">public</span>
-      
-      
-      
-      <span class="override" data-ice="override"></span>
-    </td>
-    <td>
-      <div>
-        <p>
-          
-          
-          
-          <span class="code" data-ice="name"><span><a href="class/src/low_level/core/GLBoostObject.js~GLBoostObject.html#instance-member-[&apos;_&apos; + typeName + &apos;Index&apos;]">[&apos;_&apos; + typeName + &apos;Index&apos;]</a></span></span><span class="code" data-ice="signature">: <span>*</span></span>
         </p>
       </div>
       <div>
@@ -1787,7 +1844,7 @@ ja: &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x30EC;&#x30F3;&#x30C0;&#x3
       <div>
         
         
-        <div data-ice="description"><p>[en] Return instance name.</p>
+        <div data-ice="description"><p>Return instance name.</p>
 </div>
       </div>
     </td>
@@ -1964,19 +2021,18 @@ ja: &#x3053;&#x306E;&#x30AF;&#x30E9;&#x30B9;&#x306F;&#x30EC;&#x30F3;&#x30C0;&#x3
     
     
     
-    <span class="code" data-ice="name">glContext</span><span class="code" data-ice="signature">: <span>webglcontext</span>: <span>*</span></span>
+    <span class="code" data-ice="name">glContext</span><span class="code" data-ice="signature">: <span>*</span>: <span>webglcontext</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber290">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber288">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  <div data-ice="description"><p>en: Get WebGL context.<br>
-ja: WebGL&#x30B3;&#x30F3;&#x30C6;&#x30AD;&#x30B9;&#x30C8;&#x3092;&#x53D6;&#x5F97;&#x3057;&#x307E;&#x3059;&#x3002;</p>
+  <div data-ice="description"><p>Get WebGL context. </p>
 </div>
 
   
@@ -1989,7 +2045,7 @@ ja: WebGL&#x30B3;&#x30F3;&#x30C6;&#x30AD;&#x30B9;&#x30C8;&#x3092;&#x53D6;&#x5F97
     <table>
       <tbody>
         <tr>
-          <td class="return-type code" data-ice="returnType"><span>webglcontext</span></td>
+          <td class="return-type code" data-ice="returnType"><span>*</span></td>
           <td class="return-desc" data-ice="returnDescription"><p>a context of WebGL</p>
 </td>
         </tr>
@@ -2026,7 +2082,7 @@ ja: WebGL&#x30B3;&#x30F3;&#x30C6;&#x30AD;&#x30B9;&#x30C8;&#x3092;&#x53D6;&#x5F97
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber469">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber466">source</a></span></span>
     </span>
   </h3>
 
@@ -2069,7 +2125,7 @@ ja: WebGL&#x30B3;&#x30F3;&#x30C6;&#x30AD;&#x30B9;&#x30C8;&#x3092;&#x53D6;&#x5F97
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber465">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber462">source</a></span></span>
     </span>
   </h3>
 
@@ -2415,7 +2471,7 @@ ja: WebGL&#x30B3;&#x30F3;&#x30C6;&#x30AD;&#x30B9;&#x30C8;&#x3092;&#x53D6;&#x5F97
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber360">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber357">source</a></span></span>
     </span>
   </h3>
 
@@ -2458,7 +2514,7 @@ ja: WebGL&#x30B3;&#x30F3;&#x30C6;&#x30AD;&#x30B9;&#x30C8;&#x3092;&#x53D6;&#x5F97
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber359">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber356">source</a></span></span>
     </span>
   </h3>
 
@@ -2633,15 +2689,14 @@ ja: WebGL&#x30B3;&#x30F3;&#x30C6;&#x30AD;&#x30B9;&#x30C8;&#x3092;&#x53D6;&#x5F97
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber272">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber271">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  <div data-ice="description"><p>en: clear color/depth/stencil of canvas.<br>
-ja: canvas&#x306E;&#x30AB;&#x30E9;&#x30FC;&#x3001;&#x30C7;&#x30D7;&#x30B9;&#x3001;&#x30B9;&#x30C6;&#x30F3;&#x30B7;&#x30EB;&#x306E;&#x3044;&#x305A;&#x308C;&#x304B;&#x53C8;&#x306F;&#x5168;&#x3066;&#x3092;&#x30AF;&#x30EA;&#x30A2;&#x3057;&#x307E;&#x3059;&#x3002; </p>
+  <div data-ice="description"><p>clear color/depth/stencil of canvas. </p>
 </div>
 
   
@@ -2709,7 +2764,7 @@ ja: canvas&#x306E;&#x30AB;&#x30E9;&#x30FC;&#x3001;&#x30C7;&#x30D7;&#x30B9;&#x300
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber454">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber451">source</a></span></span>
     </span>
   </h3>
 
@@ -2752,7 +2807,7 @@ ja: canvas&#x306E;&#x30AB;&#x30E9;&#x30FC;&#x3001;&#x30C7;&#x30D7;&#x30B9;&#x300
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber321">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber318">source</a></span></span>
     </span>
   </h3>
 
@@ -2829,7 +2884,7 @@ ja: canvas&#x306E;&#x30AB;&#x30E9;&#x30FC;&#x3001;&#x30C7;&#x30D7;&#x30B9;&#x300
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber309">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber306">source</a></span></span>
     </span>
   </h3>
 
@@ -2908,8 +2963,7 @@ ja: canvas&#x306E;&#x30AB;&#x30E9;&#x30FC;&#x3001;&#x30C7;&#x30D7;&#x30B9;&#x300
   
   
   
-  <div data-ice="description"><p>en: draw elements of the expression.<br>
-ja: scene&#x304C;&#x6301;&#x3064;&#x30AA;&#x30D6;&#x30B8;&#x30A7;&#x30AF;&#x30C8;&#x3092;&#x63CF;&#x753B;&#x3057;&#x307E;&#x3059; </p>
+  <div data-ice="description"><p>draw elements of the expression. </p>
 </div>
 
   
@@ -2963,7 +3017,7 @@ ja: scene&#x304C;&#x6301;&#x3064;&#x30AA;&#x30D6;&#x30B8;&#x30A7;&#x30AF;&#x30C8
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber355">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber352">source</a></span></span>
     </span>
   </h3>
 
@@ -3048,7 +3102,7 @@ ja: scene&#x304C;&#x6301;&#x3064;&#x30AA;&#x30D6;&#x30B8;&#x30A7;&#x30AF;&#x30C8
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber443">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber440">source</a></span></span>
     </span>
   </h3>
 
@@ -3091,7 +3145,7 @@ ja: scene&#x304C;&#x6301;&#x3064;&#x30AA;&#x30D6;&#x30B8;&#x30A7;&#x30AF;&#x30C8
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber388">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber385">source</a></span></span>
     </span>
   </h3>
 
@@ -3162,15 +3216,14 @@ ja: scene&#x304C;&#x6301;&#x3064;&#x30AA;&#x30D6;&#x30B8;&#x30A7;&#x30AF;&#x30C8
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber301">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber298">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  <div data-ice="description"><p>en: resize canvas and viewport.<br>
-ja: canvas&#x3068;&#x30D3;&#x30E5;&#x30FC;&#x30DD;&#x30FC;&#x30C8;&#x3092;&#x30EA;&#x30B5;&#x30A4;&#x30BA;&#x3057;&#x307E;&#x3059;&#x3002; </p>
+  <div data-ice="description"><p>resize canvas and viewport. </p>
 </div>
 
   
@@ -3187,14 +3240,14 @@ ja: canvas&#x3068;&#x30D3;&#x30E5;&#x30FC;&#x30DD;&#x30FC;&#x30C8;&#x3092;&#x30E
       <td data-ice="name" class="code" data-depth="0">width</td>
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"><p>en: width to resize, ja: &#x30EA;&#x30B5;&#x30A4;&#x30BA;&#x3059;&#x308B;&#x5E45;</p>
+      <td data-ice="description"><p>width to resize.</p>
 </td>
     </tr>
 <tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">height</td>
       <td data-ice="type" class="code"><span><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number">number</a></span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"><p>en: height to resize, ja:&#x30EA;&#x30B5;&#x30A4;&#x30BA;&#x3059;&#x308B;&#x9AD8;&#x3055;</p>
+      <td data-ice="description"><p>height to resize.</p>
 </td>
     </tr>
 </tbody>
@@ -3231,7 +3284,7 @@ ja: canvas&#x3068;&#x30D3;&#x30E5;&#x30FC;&#x30DD;&#x30FC;&#x30C8;&#x3092;&#x30E
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber347">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber344">source</a></span></span>
     </span>
   </h3>
 
@@ -3281,7 +3334,7 @@ ja: canvas&#x3068;&#x30D3;&#x30E5;&#x30FC;&#x30DD;&#x30FC;&#x30C8;&#x3092;&#x30E
   
   
   
-  <div data-ice="description"><p>en: update things of elements of the expression.<br> </p>
+  <div data-ice="description"><p>update things of elements of the expression. </p>
 </div>
 
   
@@ -3335,7 +3388,7 @@ ja: canvas&#x3068;&#x30D3;&#x30E5;&#x30FC;&#x30DD;&#x30FC;&#x30C8;&#x3092;&#x30E
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber473">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/middle_level/Renderer.js.html#lineNumber470">source</a></span></span>
     </span>
   </h3>
 

@@ -1,3 +1,5 @@
+// @flow
+
 import GLBoost from '../../globals';
 import DataUtil from '../../low_level/misc/DataUtil';
 import Vector3 from '../../low_level/math/Vector3';
@@ -20,9 +22,9 @@ export default class ModelConverter {
 
   /**
    * The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
-   * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
+   * @param enforcer a Symbol to forbid calling this constructor directly
    */
-  constructor(enforcer) {
+  constructor(enforcer: Symbol) {
     if (enforcer !== singletonEnforcer) {
       throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
     }
@@ -30,9 +32,9 @@ export default class ModelConverter {
 
   /**
    * The static method to get singleton instance of this class.
-   * @return {GLTFLoader} the singleton instance of GLTFLoader class
+   * @return The singleton instance of GLTFLoader class
    */
-  static getInstance() {
+  static getInstance(): GLTFLoader {
     if (!this[singleton]) {
       this[singleton] = new ModelConverter(singletonEnforcer);
     }
@@ -64,8 +66,9 @@ export default class ModelConverter {
     let glboostMeshes = this._setupMesh(glBoostContext, gltfModel);
 
     let groups = [];
-    for (let node_i in gltfModel.nodes) {
+    for (let node of gltfModel.nodes) {
       let group = glBoostContext.createGroup();
+      group.userFlavorName = node.name;
       groups.push(group);
     }
 
@@ -102,6 +105,9 @@ export default class ModelConverter {
     let options = gltfModel.asset.extras.glboostOptions;
     if (options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
       options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, gltfModel.asset);
+    }
+    if (options && options.loaderExtension && options.loaderExtension.loadExtensionInfoAndSetToRootGroup) {
+      options.loaderExtension.loadExtensionInfoAndSetToRootGroup(rootGroup, gltfModel, glBoostContext);
     }
 
     rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
@@ -193,7 +199,6 @@ export default class ModelConverter {
           let options = gltfModel.asset.extras.glboostOptions;
           let glboostJoint = glBoostContext.createJoint(options.isExistJointGizmo);
           glboostJoint._glTFJointIndex = joint_i;
-//          glboostJoint.userFlavorName = nodeJson.jointName;
           let group = groups[joint_i];
           group.addChild(glboostJoint, true);
         }
@@ -206,11 +211,15 @@ export default class ModelConverter {
     for (let mesh of gltfModel.meshes) {
       let geometry = null;
       let glboostMesh = null;
-      if (mesh.extras && mesh.extras._skin && mesh.extras._skin.inverseBindMatrices) {
+      if (mesh.extras && mesh.extras._skin && mesh.extras._skin.jointsIndices.length > 0) {
         geometry = glBoostContext.createSkeletalGeometry();
         glboostMesh = glBoostContext.createSkeletalMesh(geometry, null);
         glboostMesh.gltfJointIndices = mesh.extras._skin.jointsIndices;
-        glboostMesh.inverseBindMatrices = mesh.extras._skin.inverseBindMatrices.extras.vertexAttributeArray;
+        if (mesh.extras._skin.inverseBindMatrices) {
+          glboostMesh.inverseBindMatrices = mesh.extras._skin.inverseBindMatrices.extras.vertexAttributeArray;
+        } else {
+          glboostMesh.inverseBindMatrices = []; 
+        }
       } else {
         geometry = glBoostContext.createGeometry();
         glboostMesh = glBoostContext.createMesh(geometry);
@@ -219,7 +228,7 @@ export default class ModelConverter {
 
       let options = gltfModel.asset.extras.glboostOptions;
       if (options.isMeshTransparentAsDefault) {
-        glboostMeshes.isTransparentForce = true;
+        glboostMeshes.isTransparent = true;
       }
 
       let _indicesArray = [];
@@ -602,9 +611,15 @@ export default class ModelConverter {
             gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_EMISSIVE);
           }
 
+          const alphaMode = materialJson.alphaMode;
+          if (alphaMode === 'MASK') {
+            // doalpha test in fragment shader
+            gltfMaterial.isAlphaTest = true;
+            gltfMaterial.alphaCutoff = materialJson.alphaCutoff;
+          }
 
           let enables = [];
-          if (options.isBlend) {
+          if (options.isBlend || alphaMode === 'BLEND') {
             enables.push(3042);
           }
           if (options.isDepthTest) {

@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -219,7 +221,7 @@ export default class L_Element extends GLBoostObject {
     this._updateCountAsElement = 0;
     this._animationLine = {};
     this._currentAnimationInputValues = {};
-    this._activeAnimationLineName = null;
+    this._activeAnimationLineName = &quot;time&quot;;
 
     this._is_trs_matrix_updated = true;
     this._is_translate_updated = true;
@@ -247,7 +249,7 @@ export default class L_Element extends GLBoostObject {
     }
   }
 
-  _getCurrentAnimationInputValue(inputName: string): Vector3 | null{
+  _getCurrentAnimationInputValue(inputName: ?string): ?number {
     let value = this._currentAnimationInputValues[inputName];
     if (typeof(value) === &apos;number&apos;) {
       return value;
@@ -322,13 +324,14 @@ export default class L_Element extends GLBoostObject {
   }
 
   /**
-   * [en] Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).&lt;br&gt;
-   * [ja] &#x30A2;&#x30CB;&#x30E1;&#x30FC;&#x30B7;&#x30E7;&#x30F3;&#x306E;&#x305F;&#x3081;&#x306E;&#x5165;&#x529B;&#x5024;&#xFF08;&#x4F8B;&#x3048;&#x3070;&#x30D5;&#x30EC;&#x30FC;&#x30E0;&#x5024;&#xFF09;&#x3092;&#x30BB;&#x30C3;&#x30C8;&#x3057;&#x307E;&#x3059;&#x3002;&#x3053;&#x306E;&#x5024;&#x306F;&#x30B7;&#x30FC;&#x30F3;&#x30B0;&#x30E9;&#x30D5;&#x306B;&#x5C5E;&#x3059;&#x308B;&#x5168;&#x3066;&#x306E;&#x5B50;&#x5B6B;&#x306B;&#x5F71;&#x97FF;&#x3057;&#x307E;&#x3059;&#x3002;
-   * @param {string} inputName [en] inputName name of input value. [ja] &#x5165;&#x529B;&#x5024;&#x306E;&#x540D;&#x524D;
-   * @param {number|Vector2|Vector3|Vector4|*} inputValue [en] input value of animation. [ja] &#x30A2;&#x30CB;&#x30E1;&#x30FC;&#x30B7;&#x30E7;&#x30F3;&#x306E;&#x5165;&#x529B;&#x5024;
+   * Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).
+   * @param inputName inputName name of input value.
+   * @param inputValue input value of animation.
    */
-  setCurrentAnimationValue(inputName: string, inputValue: any) {
-    this._setDirtyToAnimatedElement(inputName);
+  setCurrentAnimationValue(inputName: string, inputValue: number|Vector2|Vector3|Vector4|Quaternion) {
+    if ((this: any)._setDirtyToAnimatedElement != null) {
+      (this: any)._setDirtyToAnimatedElement(inputName);
+    }
     this._currentAnimationInputValues[inputName] = inputValue;
   }
 
@@ -365,7 +368,7 @@ export default class L_Element extends GLBoostObject {
     return this.getTranslateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
   }
 
-  getTranslateAt(lineName: string, inputValue: number): Vector3 | null{
+  getTranslateAt(lineName: string, inputValue: ?number): ?Vector3 {
     let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], &apos;translate&apos;);
     if (value !== null) {
       this._translate = value;
@@ -374,7 +377,7 @@ export default class L_Element extends GLBoostObject {
     return value;
   }
 
-  getTranslateAtOrStatic(lineName: string, inputValue: number) {
+  getTranslateAtOrStatic(lineName: string, inputValue: ?number) {
     let value = this.getTranslateAt(lineName, inputValue);
     if (value === null) {
       return this.getTranslateNotAnimated();
@@ -398,7 +401,7 @@ export default class L_Element extends GLBoostObject {
     return this.getRotateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
   }
 
-  getRotateAt(lineName: string, inputValue: Vector3) {
+  getRotateAt(lineName: string, inputValue: number) {
     let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], &apos;rotate&apos;);
     if (value !== null) {
       this._rotate = value;
@@ -407,10 +410,10 @@ export default class L_Element extends GLBoostObject {
     return value;
   }
 
-  getRotateAtOrStatic(lineName: string, inputValue: Vector3) {
+  getRotateAtOrStatic(lineName: string, inputValue: ?number) {
     let value = null;
-    if (this._activeAnimationLineName) {
-      value = this.getRotateAt(this._activeAnimationLineName, inputValue);
+    if (lineName != null &amp;&amp; inputValue != null) {
+      value = this.getRotateAt(lineName, inputValue);
     }
     if (value === null) {
       return this.getRotateNotAnimated();
@@ -452,8 +455,11 @@ export default class L_Element extends GLBoostObject {
     return value;
   }
 
-  getScaleAtOrStatic(lineName: string, inputValue: number) {
-    let value = this.getScaleAt(lineName, inputValue);
+  getScaleAtOrStatic(lineName: string, inputValue: ?number) {
+    let value = null;
+    if (lineName != null &amp;&amp; inputValue != null) {
+      value = this.getScaleAt(lineName, inputValue);
+    }
     if (value === null) {
       return this.getScaleNotAnimated();
     }
@@ -489,7 +495,7 @@ export default class L_Element extends GLBoostObject {
 
   get matrix() {
     let input = void 0;
-    if (this._activeAnimationLineName !== null) {
+    if (this._activeAnimationLineName != null) {
       input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
     }
 
@@ -551,7 +557,7 @@ export default class L_Element extends GLBoostObject {
   }
 
 
-  getMatrixAtOrStatic(lineName: string, inputValue: number) {
+  getMatrixAtOrStatic(lineName: string, inputValue: ?number) {
     let input = inputValue;
 
     //console.log(this.userFlavorName + &quot;: &quot; + this.isTrsMatrixNeeded(lineName, inputValue));

@@ -1,9 +1,25 @@
+/* @flow */
+
 import L_AbstractCamera from './L_AbstractCamera';
 import Matrix44 from '../../math/Matrix44';
 
 export default class L_OrthoCamera extends L_AbstractCamera {
-  constructor(glBoostContext, toRegister, lookat, ortho) {
-    super(glBoostContext, toRegister, lookat);
+  _left: number;
+  _right: number;
+  _bottom: number;
+  _top: number;
+  _zNear: number;
+  _zFar: number;
+  _xmag: number;
+  _ymag: number;
+  _dirtyProjection: boolean;
+  _updateCountAsCameraProjection: number;
+  _dirtyProjection: boolean;
+  _updateCountAsCameraProjection: number;
+  _projectionMatrix: Matrix44;
+
+  constructor(glBoostSystem:GLBoostSystem, toRegister:boolean, lookat:Object, ortho:Object) {
+    super(glBoostSystem, toRegister, lookat);
 
     this._left = (typeof ortho.left === "undefined") ? -1:ortho.left;
     this._right = (typeof ortho.right === "undefined") ? 1:ortho.right;
@@ -37,7 +53,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     }
   }
 
-  static orthoRHMatrix(left, right, bottom, top, near, far, xmag, ymag) {
+  static orthoRHMatrix(left: number, right: number, bottom: number, top: number, near: number, far: number, xmag: number, ymag: number) {
 
     if (xmag && ymag) {
       return new Matrix44(
@@ -56,7 +72,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     }
   }
 
-  set left(value) {
+  set left(value: number) {
     if (this._left === value) {
       return;
     }
@@ -68,7 +84,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     return this._left;
   }
 
-  set right(value) {
+  set right(value: number) {
     if (this._right === value) {
       return;
     }
@@ -80,7 +96,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     return this._right;
   }
 
-  set bottom(value) {
+  set bottom(value: number) {
     if (this._bottom === value) {
       return;
     }
@@ -92,7 +108,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     return this._bottom;
   }
 
-  set top(value) {
+  set top(value: number) {
     if (this._top === value) {
       return;
     }
@@ -104,7 +120,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     return this._top;
   }
 
-  set zNear(value) {
+  set zNear(value: number) {
     if (this._zNear === value) {
       return;
     }
@@ -116,7 +132,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     return this._zNear;
   }
 
-  set zFar(value) {
+  set zFar(value: number) {
     if (this._zFar === value) {
       return;
     }
@@ -128,7 +144,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     return this._zFar;
   }
 
-  set xmag(value) {
+  set xmag(value: number) {
     if (this._xmag === value) {
       return;
     }
@@ -140,7 +156,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
     return this._xmag;
   }
 
-  set ymag(value) {
+  set ymag(value: number) {
     if (this._ymag === value) {
       return;
     }
@@ -204,7 +220,7 @@ export default class L_OrthoCamera extends L_AbstractCamera {
   }
 
   
-  set allInfo(info) {
+  set allInfo(info: Object) {
     super.allInfo = info;
   }
 }

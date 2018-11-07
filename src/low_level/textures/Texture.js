@@ -145,11 +145,13 @@ export default class Texture extends AbstractTexture {
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._getParamWithAlternative(GLBoost.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false));
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, imgCanvas);
 
-    if (glem.extTFA) {
-      gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+    if (this._isPowerOfTwoTexture()) {
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this._getParamWithAlternative(GLBoost.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR));
+      if (glem.extTFA) {
+        gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+      }
     }
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this._getParamWithAlternative(GLBoost.TEXTURE_MAG_FILTER, gl.LINEAR));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this._getParamWithAlternative(GLBoost.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR));
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, this._getParamWithAlternative(GLBoost.TEXTURE_WRAP_S, gl.REPEAT));
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this._getParamWithAlternative(GLBoost.TEXTURE_WRAP_T, gl.REPEAT));
     gl.generateMipmap(gl.TEXTURE_2D);
@@ -170,11 +172,13 @@ export default class Texture extends AbstractTexture {
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._getParamWithAlternative(GLBoost.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false));
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgCanvas);
 
-    if (glem.extTFA) {
-      gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+    if (this._isPowerOfTwoTexture()) {
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this._getParamWithAlternative(GLBoost.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR));
+      if (glem.extTFA) {
+        gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+      }
     }
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this._getParamWithAlternative(GLBoost.TEXTURE_MAG_FILTER, gl.LINEAR));
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this._getParamWithAlternative(GLBoost.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR));
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, this._getParamWithAlternative(GLBoost.TEXTURE_WRAP_S, gl.REPEAT));
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this._getParamWithAlternative(GLBoost.TEXTURE_WRAP_T, gl.REPEAT));
     gl.generateMipmap(gl.TEXTURE_2D);
@@ -200,3 +204,4 @@ export default class Texture extends AbstractTexture {
 
 
 }
+GLBoost['Texture'] = Texture;

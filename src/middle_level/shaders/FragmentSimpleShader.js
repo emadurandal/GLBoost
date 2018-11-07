@@ -26,21 +26,18 @@ export class FragmentSimpleShaderSource {
 
   FSShade_FragmentSimpleShaderSource(f, gl) {
     let shaderText =   "";
-    shaderText +=   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
-    shaderText += '  if (isNeededToMultiplyAlphaToColorOfPixelOutput) {\n';
-    shaderText += '    rt0.rgb *= rt0.a;\n';
-    shaderText += '  }\n';
+    shaderText +=   `rt0 = vec4(1.0, 1.0, 1.0, 1.0);\n`;
 
     return shaderText;
   }
 
   FSFinalize_FragmentSimpleShaderSource(f, gl, lights, material, extraData) {
     let shaderText = '';
-/*
-    shaderText += 'if (isNeededToMultiplyAlphaToColorOfPixelOutput && !isDataOutput) {\n';
-    shaderText += '  rt0.rgb *= rt0.a;\n';
-    shaderText += '}\n';
-*/
+    shaderText +=   `rt0.a *= opacity;\n`;
+    shaderText += '  if (isNeededToMultiplyAlphaToColorOfPixelOutput) {\n';
+    shaderText += '    rt0.rgb *= rt0.a;\n';
+    shaderText += '  }\n';
+
     return shaderText;
   }
 

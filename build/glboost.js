@@ -396,7 +396,8 @@
       c.define('QUERY_TYPE_INSTANCE_NAME');
       c.define('QUERY_TYPE_USER_FLAVOR_NAME');
       c.define('QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR');
-      c.define('QUERY_FORMAT_STRING');
+      c.define('QUERY_FORMAT_STRING_PARTIAL_MATCHING');
+      c.define('QUERY_FORMAT_STRING_PERFECT_MATCHING');
       c.define('QUERY_FORMAT_REGEXP');
 
       c.define('WORLD_MATRIX');
@@ -708,10 +709,16 @@
 
   }
 
+  /*       */
+
   let singleton = Symbol();
 
   class L_GLBoostMonitor {
-    constructor(enforcer) {
+                            
+                                    
+                                      
+
+    constructor(enforcer        ) {
       if (enforcer !== L_GLBoostMonitor._singletonEnforcer || !(this instanceof L_GLBoostMonitor)) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
@@ -722,24 +729,25 @@
     }
 
     static getInstance() {
-      if (!this[singleton]) {
-        this[singleton] = new L_GLBoostMonitor(L_GLBoostMonitor._singletonEnforcer);
+      const that      = this;
+      if (!(that    )[singleton]) {
+        that[singleton] = new L_GLBoostMonitor(L_GLBoostMonitor._singletonEnforcer);
       }
-      return this[singleton];
+      return that[singleton];
     }
 
-    registerGLBoostObject(glBoostObject) {
+    registerGLBoostObject(glBoostObject        ) {
       this._glBoostObjects[glBoostObject.instanceName] = glBoostObject;
       MiscUtil.consoleLog(GLBoost$1.LOG_GLBOOST_OBJECT_LIFECYCLE, 'GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was created.');
     }
 
-    deregisterGLBoostObject(glBoostObject) {
+    deregisterGLBoostObject(glBoostObject        ) {
       delete this._glBoostObjects[glBoostObject.instanceName];
       MiscUtil.consoleLog(GLBoost$1.LOG_GLBOOST_OBJECT_LIFECYCLE, 'GLBoost Resource: ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ') was ready for discard.');
     }
 
 
-    getGLBoostObjects(partOfGlBoostObjectInstanceName) {
+    getGLBoostObjects(partOfGlBoostObjectInstanceName        ) {
       let glBoostObjects = [];
       for (let instanceName in this._glBoostObjects) {
         if (instanceName.indexOf(partOfGlBoostObjectInstanceName)>0) {
@@ -750,7 +758,7 @@
       return glBoostObjects;
     }
 
-    getGLBoostObject(glBoostObjectInstanceName) {
+    getGLBoostObject(glBoostObjectInstanceName        ) {
       for (let instanceName in this._glBoostObjects) {
         if (instanceName === glBoostObjectInstanceName) {
           return this._glBoostObjects[instanceName];
@@ -759,7 +767,7 @@
       return null;
     }
 
-    getGLBoostObjectByUserFlavorName(glBoostObjectUserFlavorName) {
+    getGLBoostObjectByUserFlavorName(glBoostObjectUserFlavorName        ) {
       for (let instanceName in this._glBoostObjects) {
         if (this._glBoostObjects[instanceName].userFlavorName === glBoostObjectUserFlavorName) {
           return this._glBoostObjects[instanceName];
@@ -769,17 +777,17 @@
     }
 
 
-    getGLBoostObjectsByUserFlavorName(glBoostObjectUserFlavorName) {
+    getGLBoostObjectsByUserFlavorName(partOfGlBoostObjectUserFlavorName        ) {
       const results = [];
       for (let instanceName in this._glBoostObjects) {
-        if (this._glBoostObjects[instanceName].userFlavorName === glBoostObjectUserFlavorName) {
+        if (this._glBoostObjects[instanceName].userFlavorName.indexOf(partOfGlBoostObjectUserFlavorName) !== -1) {
           results.push(this._glBoostObjects[instanceName]);
         }
       }
       return results;
     }
 
-    getGLBoostObjectWhichHasThisObjectId(objectId) {
+    getGLBoostObjectWhichHasThisObjectId(objectId        ) {
       for (let instanceName in this._glBoostObjects) {
         if (this._glBoostObjects[instanceName].objectIndex === objectId) {
           return this._glBoostObjects[instanceName];
@@ -822,13 +830,13 @@
       MiscUtil.consoleLog(GLBoost$1.LOG_GLBOOST_OBJECT_LIFECYCLE, '========== GLBoost Object Lists [end] ==========');
     }
 
-    registerWebGLResource(glBoostObject, glResource) {
+    registerWebGLResource(glBoostObject        , glResource        ) {
       var glResourceName = glResource.constructor.name;
       this._glResources.push([glBoostObject, glResource]);
       MiscUtil.consoleLog(GLBoost$1.LOG_GL_RESOURCE_LIFECYCLE, 'WebGL Resource: ' + glResourceName + ' was created by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
     }
 
-    deregisterWebGLResource(glBoostObject, glResource) {
+    deregisterWebGLResource(glBoostObject        , glResource        ) {
       var glResourceName = glResource.constructor.name;
       this._glResources.forEach((glResource, i)=>{
         if (glResource[0] === glBoostObject && glResource[1].constructor.name === glResourceName) {
@@ -838,8 +846,8 @@
       MiscUtil.consoleLog(GLBoost$1.LOG_GL_RESOURCE_LIFECYCLE, 'WebGL Resource: ' + glResourceName + ' was deleted by ' + glBoostObject.toString() + ' (' + glBoostObject.belongingCanvasId + ').');
     }
 
-    getWebGLResources(webglResourceName) {
-      let webglResources = this._glResources.filter((glResourceArray)=>{
+    getWebGLResources(webglResourceName        ) {
+      let webglResources = this._glResources.filter((glResourceArray           )=>{
         if (glResourceArray[1].constructor.name === webglResourceName) {
           return true;
         } else {
@@ -1266,9 +1274,26 @@
   }
   GLContext._instances = new Object();
 
-  class GLBoostSystem {
+  /*       */
+                                                           
+                                                 
+                                                                  
 
-    constructor(canvas, initParameter, gl, width, height, glBoostContext) {
+                             
+
+  class GLBoostSystem {
+                                               
+                                        
+                          
+                                       
+                                      
+                               
+                                  
+                                      
+                             
+                                      
+
+    constructor(canvas        , initParameter       , gl                      , width        , height        , glBoostContext                   ) {
       if (gl) {
         this._glContext = GLContext.getInstance(null, initParameter, gl, width, height);
       } else {
@@ -1374,6 +1399,9 @@
   /*       */
 
   class GLBoostObject {
+                                
+                                         
+                                  
                                   
                           
                          
@@ -1419,15 +1447,16 @@
       this._objectIndex = -1;
 
       const seekSpaceOfArrayAndSetIndexThere = (typeName)=>{
+        const that     = this;
         let array = GLBoostObject['_' + typeName + 'ExistArray'];
         for (let i=0; i<array.length; i++) {
           if (array[i] === void 0) {
-            this['_' + typeName + 'Index'] = i;
+            that['_' + typeName + 'Index'] = i;
             array[i] = true;
             return;
           }
         }
-        this['_' + typeName + 'Index'] = array.length;
+        that['_' + typeName + 'Index'] = array.length;
         array[array.length] = true;
       };
 
@@ -1440,8 +1469,9 @@
     tearDownExistIndexAndArray() {
       const deleteIndex = (typeName)=>{
         let array = GLBoostObject['_' + typeName + 'ExistArray'];
-        delete array[this['_' + typeName + 'Index']];
-        this['_' + typeName + 'Index'] = -1;
+        const that      = this;
+        delete array[that['_' + typeName + 'Index']];
+        that['_' + typeName + 'Index'] = -1;
       };
 
       if (this.className.indexOf('Mesh') !== -1) {
@@ -1465,9 +1495,8 @@
     }
 
     /**
-     * [en] Return instance name.
-     * [ja] インスタンス名を返します。
-     * @returns {string} [en] the instance name. [ja] インスタンス名
+     * Return instance name.
+     * @returns the instance name.
      */
     toString()        {
       return this._instanceName;
@@ -1489,7 +1518,7 @@
     }
 
     get belongingCanvasId() {
-      return this._glBoostSystem.belongingCanvasId;
+      return this._glContext.belongingCanvasId;
     }
 
     set userFlavorName(name       ) {
@@ -1774,14 +1803,14 @@
     */
 
     /**
-     * 長さの2乗
+     * to square length
      */
     lengthSquared() {
       return this.x*this.x + this.y*this.y + this.z*this.z;
     }
 
     /**
-     * 長さの2乗（static版）
+     * to square length(static verison)
      */
     static lengthSquared(vec3        ) {
       return vec3.x*vec3.x + vec3.y*vec3.y + vec3.z*vec3.z;
@@ -1802,21 +1831,21 @@
     }
 
     /**
-     * 内積
+     * dot product
      */
     dotProduct(vec3        ) {
         return this.x * vec3.x + this.y * vec3.y + this.z * vec3.z;
     }
 
     /**
-     * 内積（static版）
+     * dot product(static version)
      */
     static dotProduct(lv        , rv        ) {
       return lv.x * rv.x + lv.y * rv.y + lv.z * rv.z;
     }
 
     /**
-     * 外積
+     * cross product
      */
     cross(v        ) {
       var x = this.y*v.z - this.z*v.y;
@@ -1831,7 +1860,7 @@
     }
 
     /**
-    * 外積(static版)
+    * cross product(static version)
     */
     static cross(lv        , rv        ) {
       var x = lv.y*rv.z - lv.z*rv.y;
@@ -1842,7 +1871,7 @@
     }
 
     /**
-     * 正規化
+     * normalize
      */
     normalize() {
       var length = this.length();
@@ -1852,7 +1881,7 @@
     }
 
     /**
-     * 正規化（static版）
+     * normalize(static version)
      */
     static normalize(vec3        ) {
       var length = vec3.length();
@@ -1881,7 +1910,7 @@
     }
 
     /**
-     * 減算
+     * subtract
      */
     subtract(v        ) {
       this.x -= v.x;
@@ -1892,14 +1921,14 @@
     }
 
     /**
-     * 減算（static版）
+     * subtract(subtract)
      */
     static subtract(lv        , rv        ) {
       return new Vector3(lv.x - rv.x, lv.y - rv.y, lv.z - rv.z);
     }
 
     /**
-     * 除算
+     * divide
      */
     divide(val       ) {
       if (val !== 0) {
@@ -1917,7 +1946,7 @@
     }
 
     /**
-     * 除算（static版）
+     * divide(static version)
      */
     static divide(vec3        , val       ) {
       if (val !== 0) {
@@ -1928,6 +1957,9 @@
       }
     }
 
+    /**
+     * multiply
+     */
     multiply(val       ) {
       this.x *= val;
       this.y *= val;
@@ -1936,6 +1968,9 @@
       return this;
     }
 
+    /**
+     * multiply vector
+     */
     multiplyVector(vec        ) {
       this.x *= vec.x;
       this.y *= vec.y;
@@ -1944,10 +1979,16 @@
       return this;
     }
 
+    /**
+     * multiply(static version)
+     */
     static multiply(vec3        , val       ) {
       return new Vector3(vec3.x * val, vec3.y * val, vec3.z * val);
     }
 
+    /**
+     * multiply vector(static version)
+     */
     static multiplyVector(vec3        , vec        ) {
       return new Vector3(vec3.x * vec.x, vec3.y * vec.y, vec3.z * vec.z);
     }
@@ -1964,6 +2005,9 @@
       return sita;
     }
 
+    /**
+     * divide vector
+     */
     divideVector(vec3        ) {
       this.x /= vec3.x;
       this.y /= vec3.y;
@@ -1972,10 +2016,16 @@
       return this;
     }
 
+    /**
+     * divide vector(static version)
+     */
     static divideVector(lvec3        , rvec3        ) {
       return new Vector3(lvec3.x / rvec3.x, lvec3.y / rvec3.y, lvec3.z / rvec3.z);
     }
 
+    /**
+     * change to string
+     */
     toString() {
       return '(' + this.x + ', ' + this.y + ', ' + this.z +')';
     }
@@ -2377,10 +2427,10 @@
 
     multiply(q) {
       let result = new Quaternion(0, 0, 0, 1);
-      result.w = this.w*q.w - this.x*q.x - this.y*q.y - this.z*q.z;
-      result.x = this.w*q.x + this.x*q.w + this.y*q.z - this.z*q.y;
-      result.y = this.w*q.y + this.y*q.w + this.x*q.z - this.z*q.x;
-      result.z = this.w*q.z + this.z*q.w + this.x*q.y - this.y*q.x;
+      result.x =   q.w*this.x + q.z*this.y + q.y*this.z - q.x*this.w;
+      result.y = - q.z*this.x + q.w*this.y + q.x*this.z - q.y*this.w;
+      result.z =   q.y*this.x + q.x*this.y + q.w*this.z - q.z*this.w;
+      result.w = - q.x*this.x - q.y*this.y - q.z*this.z - q.w*this.w;
       this.x = result.x;
       this.y = result.y;
       this.z = result.z;
@@ -2391,10 +2441,10 @@
 
     static multiply(q1, q2) {
       let result = new Quaternion(0, 0, 0, 1);
-      result.w = q1.w*q2.w - q1.x*q2.x - q1.y*q2.y - q1.z*q2.z;
-      result.x = q1.w*q2.x + q1.x*q2.w + q1.y*q2.z - q1.z*q2.y;
-      result.y = q1.w*q2.y + q1.y*q2.w + q1.x*q2.z - q1.z*q2.x;
-      result.z = q1.w*q2.z + q1.z*q2.w + q1.x*q2.y - q1.y*q2.x;
+      result.x =   q2.w*q1.x + q2.z*q1.y - q2.y*q1.z + q2.x*q1.w;
+      result.y = - q2.z*q1.x + q2.w*q1.y + q2.x*q1.z + q2.y*q1.w;
+      result.z =   q2.y*q1.x - q2.x*q1.y + q2.w*q1.z + q2.z*q1.w;
+      result.w = - q2.x*q1.x - q2.y*q1.y - q2.z*q1.z + q2.w*q1.w;
       return result;
     }
 
@@ -2761,13 +2811,16 @@
     }
 
     /**
-     * ゼロ行列
+     * zero matrix
      */
     zero() {
       this.setComponents(0, 0, 0, 0, 0, 0, 0, 0, 0);
       return this;
     }
 
+    /**
+     * zero matrix(static version)
+     */
     static zero() {
       return new Matrix33(0, 0, 0, 0, 0, 0, 0, 0, 0);
     }
@@ -2787,7 +2840,7 @@
     }
 
     /**
-     * 転置
+     * transpose
      */
     transpose() {
       this._swap(1, 3);
@@ -2798,7 +2851,7 @@
     }
 
     /**
-     * 転置（static版）
+     * transpose(static version)
      */
     static transpose(mat) {
 
@@ -2820,7 +2873,7 @@
     }
 
     /**
-     * 行列同士の乗算
+     * multiply zero matrix and zero matrix
      */
     multiply(mat) {
       var m00 = this.m00*mat.m00 + this.m01*mat.m10 + this.m02*mat.m20;
@@ -2844,7 +2897,7 @@
     }
 
     /**
-     * 行列同士の乗算（static版）
+     * multiply zero matrix and zero matrix(static version)
      */
     static multiply(l_m, r_m) {
       var m00 = l_m.m00*r_m.m00 + l_m.m01*r_m.m10 + l_m.m02*r_m.m20;
@@ -3139,7 +3192,7 @@
     }
 
     /**
-     * 単位行列にする
+     * to the identity matrix
      */
     identity() {
       this.setComponents(
@@ -3152,7 +3205,7 @@
     }
 
     /**
-     * 単位行列にする（static版）
+     * to the identity matrix（static版）
      */
     static identity() {
       return new Matrix44$1(
@@ -3397,7 +3450,7 @@
     }
 
     /**
-     * 転置
+     * transpose
      */
     transpose() {
       this._swap(1, 4);
@@ -3411,7 +3464,7 @@
     }
 
     /**
-     * 転置（static版）
+     * transpose(static version)
      */
     static transpose(mat) {
 
@@ -3435,7 +3488,7 @@
     }
 
     /**
-     * 行列同士の乗算
+     * multiply zero matrix and zero matrix
      */
     multiply(mat) {
       var m00 = this.m00*mat.m00 + this.m01*mat.m10 + this.m02*mat.m20 + this.m03*mat.m30;
@@ -3496,7 +3549,7 @@
     }
 
     /**
-     * 行列同士の乗算（static版）
+     * multiply zero matrix and zero matrix(static version)
      */
     static multiply(l_m, r_m) {
       var m00 = l_m.m00*r_m.m00 + l_m.m01*r_m.m10 + l_m.m02*r_m.m20 + l_m.m03*r_m.m30;
@@ -3775,6 +3828,8 @@
 
   GLBoost$1["Matrix44"] = Matrix44$1;
 
+  //      
+
   class MathClassUtil {
     constructor() {
 
@@ -3864,7 +3919,12 @@
       }
     }
 
-    static compomentNumberOfVector(element) {
+    /**
+     * discriminate which Vector instance 
+     * @param element any Vector instance  
+     * @return number of Vector instance
+     */
+    static compomentNumberOfVector(element                                                   )         {
       if(element instanceof Vector2) {
         return 2;
       } else if (element instanceof Vector3) {
@@ -4019,7 +4079,7 @@
       this._updateCountAsElement = 0;
       this._animationLine = {};
       this._currentAnimationInputValues = {};
-      this._activeAnimationLineName = null;
+      this._activeAnimationLineName = "time";
 
       this._is_trs_matrix_updated = true;
       this._is_translate_updated = true;
@@ -4047,7 +4107,7 @@
       }
     }
 
-    _getCurrentAnimationInputValue(inputName        )                {
+    _getCurrentAnimationInputValue(inputName         )          {
       let value = this._currentAnimationInputValues[inputName];
       if (typeof(value) === 'number') {
         return value;
@@ -4122,13 +4182,14 @@
     }
 
     /**
-     * [en] Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).<br>
-     * [ja] アニメーションのための入力値（例えばフレーム値）をセットします。この値はシーングラフに属する全ての子孫に影響します。
-     * @param inputName [en] inputName name of input value. [ja] 入力値の名前
-     * @param inputValue [en] input value of animation. [ja] アニメーションの入力値
+     * Set animation input value (for instance frame value), This value affect all child elements in this scene graph (recursively).
+     * @param inputName inputName name of input value.
+     * @param inputValue input value of animation.
      */
     setCurrentAnimationValue(inputName        , inputValue                                           ) {
-      this._setDirtyToAnimatedElement(inputName);
+      if ((this     )._setDirtyToAnimatedElement != null) {
+        (this     )._setDirtyToAnimatedElement(inputName);
+      }
       this._currentAnimationInputValues[inputName] = inputValue;
     }
 
@@ -4165,7 +4226,7 @@
       return this.getTranslateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
     }
 
-    getTranslateAt(lineName        , inputValue        )                {
+    getTranslateAt(lineName        , inputValue         )           {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'translate');
       if (value !== null) {
         this._translate = value;
@@ -4174,7 +4235,7 @@
       return value;
     }
 
-    getTranslateAtOrStatic(lineName        , inputValue        ) {
+    getTranslateAtOrStatic(lineName        , inputValue         ) {
       let value = this.getTranslateAt(lineName, inputValue);
       if (value === null) {
         return this.getTranslateNotAnimated();
@@ -4198,7 +4259,7 @@
       return this.getRotateAtOrStatic(this._activeAnimationLineName, this._getCurrentAnimationInputValue(this._activeAnimationLineName));
     }
 
-    getRotateAt(lineName        , inputValue         ) {
+    getRotateAt(lineName        , inputValue        ) {
       let value = this._getAnimatedTransformValue(inputValue, this._animationLine[lineName], 'rotate');
       if (value !== null) {
         this._rotate = value;
@@ -4209,8 +4270,8 @@
 
     getRotateAtOrStatic(lineName        , inputValue         ) {
       let value = null;
-      if (this._activeAnimationLineName) {
-        value = this.getRotateAt(this._activeAnimationLineName, inputValue);
+      if (lineName != null && inputValue != null) {
+        value = this.getRotateAt(lineName, inputValue);
       }
       if (value === null) {
         return this.getRotateNotAnimated();
@@ -4252,8 +4313,11 @@
       return value;
     }
 
-    getScaleAtOrStatic(lineName        , inputValue        ) {
-      let value = this.getScaleAt(lineName, inputValue);
+    getScaleAtOrStatic(lineName        , inputValue         ) {
+      let value = null;
+      if (lineName != null && inputValue != null) {
+        value = this.getScaleAt(lineName, inputValue);
+      }
       if (value === null) {
         return this.getScaleNotAnimated();
       }
@@ -4289,7 +4353,7 @@
 
     get matrix() {
       let input = void 0;
-      if (this._activeAnimationLineName !== null) {
+      if (this._activeAnimationLineName != null) {
         input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
       }
 
@@ -4351,7 +4415,7 @@
     }
 
 
-    getMatrixAtOrStatic(lineName        , inputValue        ) {
+    getMatrixAtOrStatic(lineName        , inputValue         ) {
       let input = inputValue;
 
       //console.log(this.userFlavorName + ": " + this.isTrsMatrixNeeded(lineName, inputValue));
@@ -4601,62 +4665,19 @@
     }
   }
 
-  /*       */
-                                              
-
   class M_Element extends L_Element {
-                        
-                                                      
-                                         
-                                                                
-                            
-                                                         
-                                                      
-                                                   
-                                                                
-                                                        
-                                                          
-                                                            
-                     
-                                  
-                            
-                         
-                                      
-                                                         
-                                     
-                                           
-                                            
-                                                
-                                                  
-                            
-                                     
-                                         
-                                  
-                                     
-                          
-                           
-                                                  
-                                                                                     
-                                                                                
-                                                                       
-                                                                          
-                                                                 
-                                                                      
-                                                                             
-                           
-                                        
-
-    constructor(glBoostContext                      ) {
+    constructor(glBoostContext) {
       super(glBoostContext);
 
       this._parent = null;
       this._invMatrix = Matrix44$1.identity();
-      this._accumulatedAncestryObjectUpdateNumber = -Number.MAX_VALUE;
-      this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = -Number.MAX_VALUE;    
-      this._accumulatedAncestryObjectUpdateNumberNormal = -Number.MAX_VALUE;
-      this._accumulatedAncestryObjectUpdateNumberInv = -Number.MAX_VALUE;
-      this._accumulatedAncestryObjectUpdateNumberJoint = -Number.MAX_VALUE;
-      this._isTransparentForce = null;
+      this._matrixGetMode = ''; // 'notanimated', 'animate_<input_value>'
+      this._accumulatedAncestryObjectUpdateNumber = -Math.MAX_VALUE;
+      this._accumulatedAncestryObjectUpdateNumberWithoutMySelf = -Math.MAX_VALUE;    
+      this._accumulatedAncestryObjectUpdateNumberNormal = -Math.MAX_VALUE;
+      this._accumulatedAncestryObjectUpdateNumberInv = -Math.MAX_VALUE;
+      this._accumulatedAncestryObjectUpdateNumberJoint = -Math.MAX_VALUE;
+      this._transparentByUser = false;
       this._opacity = 1.0;
       this._isAffectedByWorldMatrix = true;
       this._isAffectedByWorldMatrixAccumulatedAncestry = true;
@@ -4665,6 +4686,8 @@
 
       this._toInheritCurrentAnimationInputValue = true;
 
+      this._camera = null;
+      this._customFunction = null;
       this._isVisible = true;
 
       this._gizmos = [];
@@ -4681,7 +4704,7 @@
       }
     }
 
-    set toInheritCurrentAnimationInputValue(flg         ) {
+    set toInheritCurrentAnimationInputValue(flg) {
       this._toInheritCurrentAnimationInputValue = flg;
     }
 
@@ -4689,7 +4712,7 @@
       return this._toInheritCurrentAnimationInputValue;
     }
 
-    _getCurrentAnimationInputValue(inputName        )                {
+    _getCurrentAnimationInputValue(inputName) {
       let value = this._currentAnimationInputValues[inputName];
       if (typeof(value) === 'number') {
         return value;
@@ -4704,48 +4727,17 @@
       }
     }
 
-    _setDirtyToAnimatedElement(inputName        ) {
+    _setDirtyToAnimatedElement(inputName) {
       if (this.hasAnimation(inputName)) {
         this._needUpdate();
       }
-    }
-
-
-    _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf         , input        ) {
-      if (input === void 0 && this._activeAnimationLineName !== null) {
-        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-      }
-
-      let tempNumber = 0;
-      if (this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder !== input ||
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder === void 0)
-      {
-
-        let currentMatrix = null;
-        if (withMySelf) {
-          currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
-        } else {
-          currentMatrix = Matrix44$1.identity();
-        }
-    
-        if (this._parent === null) {
-          this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = currentMatrix;
-          return currentMatrix;
-        }
-
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44$1.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder = tempNumber;
-        this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
-      }
-      return this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder;
     }
 
     get worldMatrixWithoutMySelf() {
       return this.getWorldMatrixWithoutMySelfAt(void 0);
     }
 
-    getWorldMatrixWithoutMySelfAt(input         ) {
+    getWorldMatrixWithoutMySelfAt(input) {
 
       let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     
@@ -4770,15 +4762,8 @@
     }
 
 
-    get inverseWorldMatrixWithoutMySelf() {
-      if (this._parent === null) {
-        return Matrix44$1.identity();
-      }
 
-      return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).clone().invert();
-    }
-
-    _multiplyMyAndParentRotateMatrices(currentElem                  , withMySelf         ) {
+    _multiplyMyAndParentRotateMatrices(currentElem, withMySelf) {
       if (currentElem._parent === null) {
         if (withMySelf) {
           return currentElem.transformMatrixOnlyRotate;
@@ -4795,10 +4780,18 @@
     }
 
     get inverseWorldMatrix() {
-      return this._multiplyMyAndParentTransformMatrices(true, null).clone().invert();
+      return this.getInverseWorldMatrix(true, void 0)
     }
 
-    _accumulateMyAndParentOpacity(currentElem           ) {
+    get inverseWorldMatrixWithoutMySelf() {
+      return this.getInverseWorldMatrix(false, void 0);
+    }
+
+    getInverseWorldMatrix(withMyself, input) {
+      return Matrix44$1.invert(this._multiplyMyAndParentTransformMatrices(withMyself, input));
+    }
+
+    _accumulateMyAndParentOpacity(currentElem) {
       if (currentElem._parent === null) {
         return currentElem.opacity;
       } else {
@@ -4810,7 +4803,7 @@
       return this._accumulateMyAndParentOpacity(this);
     }
 
-    set opacity(opacity        ) {
+    set opacity(opacity) {
       this._opacity = opacity;
     }
 
@@ -4819,14 +4812,14 @@
     }
 
     get isTransparent() {
-      return this._isTransparentForce;
+      return this._transparentByUser;
     }
 
-    set isTransparentForce(flg         ) {
-      this._isTransparentForce = flg;
+    set isTransparent(flg) {
+      this._transparentByUser = flg;
     }
 
-    set dirty(flg        ) {
+    set dirty(flg) {
       if (flg) {
         this._needUpdate();
       }
@@ -4846,22 +4839,39 @@
       return this._instanceName + this._updateCountAsElement;                // faster
     }
 
+    set camera(camera) {
+      this._camera = camera;
+    }
+
+    get camera() {
+      return this._camera;
+    }
+
+    set customFunction(func) {
+      this._customFunction = func;
+    }
+
+    get customFunction() {
+      return this._customFunction;
+    }
+
     prepareToRender() {
 
     }
 
-    _copy(instance           ) {
+    _copy(instance) {
       super._copy(instance);
 
       instance._parent = this._parent;
       instance._invMatrix = this._invMatrix.clone();
+      instance._matrixGetMode = this._matrixGetMode;
       instance._is_inverse_trs_matrix_updated = this._is_inverse_trs_matrix_updated;
       instance._accumulatedAncestryObjectUpdateNumber = this._accumulatedAncestryObjectUpdateNumber;
       instance._accumulatedAncestryObjectUpdateNumberNormal = this._accumulatedAncestryObjectUpdateNumberNormal;
       instance._accumulatedAncestryObjectUpdateNumberInv = this._accumulatedAncestryObjectUpdateNumberInv;
 
 
-      instance._isTransparentForce = this._isTransparentForce;
+      instance._transparentByUser = this._transparentByUser;
       instance.opacity = this.opacity;
       instance._activeAnimationLineName = this._activeAnimationLineName;
 
@@ -4871,9 +4881,12 @@
       }
 
       instance._toInheritCurrentAnimationInputValue = this._toInheritCurrentAnimationInputValue;
+
+      instance._camera = this._camera;
+      instance._customFunction = this._customFunction;
     }
 
-    set isVisible(flg         ) {
+    set isVisible(flg) {
       this._isVisible = flg;
     }
 
@@ -4881,7 +4894,7 @@
       return this._isVisible;
     }
 
-    set isAffectedByWorldMatrix(flg         ) {
+    set isAffectedByWorldMatrix(flg) {
       this._isAffectedByWorldMatrix = flg;
     }
 
@@ -4889,7 +4902,7 @@
       return this._isAffectedByWorldMatrix;
     }
 
-    set isAffectedByWorldMatrixAccumulatedAncestry(flg         ) {
+    set isAffectedByWorldMatrixAccumulatedAncestry(flg) {
       this._isAffectedByWorldMatrixAccumulatedAncestry = flg;
     }
 
@@ -4897,7 +4910,7 @@
       return this._isAffectedByWorldMatrixAccumulatedAncestry;
     }
 
-    set isAffectedByViewMatrix(flg         ) {
+    set isAffectedByViewMatrix(flg) {
       this._isAffectedByViewMatrix = flg;
     }
 
@@ -4905,7 +4918,7 @@
       return this._isAffectedByViewMatrix;
     }
 
-    set isAffectedByProjectionMatrix(flg         ) {
+    set isAffectedByProjectionMatrix(flg) {
       this._isAffectedByProjectionMatrix = flg;
     }
 
@@ -4913,11 +4926,13 @@
       return this._isAffectedByProjectionMatrix;
     }
 
-    set gizmoScale(scale        ) {
+    set gizmoScale(scale) {
       for (let gizmo of this._gizmos) {
         gizmo.scale = new Vector3(scale, scale, scale);
       }
     }
+
+
 
     get gizmoScale() {
       if (this._gizmos.length === 0) {
@@ -4926,7 +4941,7 @@
       return this._gizmos[0].scale.x;
     }
 
-    set isGizmoVisible(flg         ) {
+    set isGizmoVisible(flg) {
       for (let gizmo of this._gizmos) {
         gizmo.isVisible = flg;
       }
@@ -4936,7 +4951,7 @@
       return this._gizmos[0].isVisible;
     }
 
-    set masterElement(element           ) {
+    set masterElement(element) {
       this._masterElement = element;
     }
 
@@ -4944,61 +4959,12 @@
       return this._masterElement;
     }
 
-    get worldMatrixForJoints() {
-      return this.getWorldMatrixForJointsAt(void 0);
-    }
-
-    getWorldMatrixForJointsAt(input         ) {
-
-      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-      
-      if (this._accumulatedAncestryObjectUpdateNumberForJoints !== tempNumber || this._matrixAccumulatedAncestryForJoints === void 0) {
-        this._matrixAccumulatedAncestryForJoints = this._multiplyMyAndParentTransformMatricesForJoints(true, input);
-        this._accumulatedAncestryObjectUpdateNumberForJoints = tempNumber;
-      }
-
-      return this._matrixAccumulatedAncestryForJoints.clone();
-      
-    }
-
-    _multiplyMyAndParentTransformMatricesForJoints(withMySelf, input) {
-      if (input === void 0 && this._activeAnimationLineName !== null) {
-        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-      }
-
-      let tempNumber = 0;
-      if (this.__cache_input_multiplyMyAndParentTransformMatricesForJoints !== input ||
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints === void 0)
-      {
-
-          let currentMatrix = null;
-          if (withMySelf) {
-            currentMatrix = this.getRotateTranslateAt(input);
-          } else {
-            currentMatrix = Matrix44$1.identity();
-          }
-      
-          if (this._parent === null) {
-            this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = currentMatrix;
-            return currentMatrix;
-          }
-
-          this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints = Matrix44$1.multiply(this._parent._multiplyMyAndParentTransformMatricesForJoints(true, input), currentMatrix);
-          this.__updateInfoString_multiplyMyAndParentTransformMatricesForJoints = tempNumber;
-          this.__cache_input_multiplyMyAndParentTransformMatricesForJoints = input;
-      }
-      return this.__cache_returnValue_multiplyMyAndParentTransformMatricesForJoints;
-    
-    }
-
-
     get worldMatrix() {
       return this.getWorldMatrixAt(void 0);
     }
 
 
-    getWorldMatrixAt(input        ) {
+    getWorldMatrixAt(input) {
 
       let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
     
@@ -5039,82 +5005,16 @@
     
     }
 
-    get inverseWorldMatrix() {
-      return this.getInverseWorldMatrixAt(void 0);
-    }
-
-    getInverseWorldMatrixAt(input         ) {
-      let tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    
-      if (this._accumulatedAncestryObjectUpdateNumberInverse !== tempNumber || this._inverseMatrixAccumulatedAncestry === void 0) {
-        this._inverseMatrixAccumulatedAncestry = this._multiplyMyAndParentTransformMatricesInInverseOrder(true, input);
-        this._accumulatedAncestryObjectUpdateNumberInverse = tempNumber;
-      }
-
-      return this._inverseMatrixAccumulatedAncestry.clone();
-    }
-
-    get inverseTransformMatrixAccumulatedAncestryWithoutMySelf() {
-      if (this._parent === null) {
-        return Matrix44$1.identity();
-      }
-
-      return this._multiplyMyAndParentTransformMatricesInInverseOrder(false, null).clone().invert();
-    }
-
-    _multiplyMyAndParentTransformMatricesInInverseOrder(withMySelf, input) {
-      if (input === null && this._activeAnimationLineName !== null) {
-        input = this._getCurrentAnimationInputValue(this._activeAnimationLineName);
-      }
-
-      let tempNumber = 0;
-      if (input === void 0 || this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder !== input ||
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder !== (tempNumber = this._accumulateMyAndParentNameWithUpdateInfo(this)) ||
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder === void 0)
-      {
-
-        let currentMatrix = null;
-        if (withMySelf) {
-          currentMatrix = this.getMatrixAtOrStatic(this._activeAnimationLineName, input);
-        } else {
-          currentMatrix = Matrix44$1.identity();
-        }
-    
-        if (this._parent === null) {
-          this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = currentMatrix;
-          return currentMatrix;
-        }
-
-        this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder = Matrix44$1.multiply(currentMatrix, this._parent._multiplyMyAndParentTransformMatricesInInverseOrder(true, input));
-        this.__updateInfoString_multiplyMyAndParentTransformMatricesInInverseOrder = tempNumber;
-        this.__cache_input_multiplyMyAndParentTransformMatricesInInverseOrder = input;
-      }
-      return this.__cache_returnValue_multiplyMyAndParentTransformMatricesInInverseOrder;
-    }
-
-    readyForDiscard() {
-      if (this.className.indexOf('Mesh') !== -1) {
-        const materials = this.getAppropriateMaterials();
-        for (let material of materials) {
-          if (material.userFlavorName !== 'GLBoostSystemDefaultMaterial') {
-            material.readyForDiscard();
-          }
-        }
-      }
-    }
-
-    addGizmo(gizmo         ) {
-      this._gizmos.push(gizmo);
-    }
-
     get gizmos() {
       return this._gizmos;
     }
 
-    _needUpdate() {
-      super._needUpdate();
+    addGizmo(gizmo) {
+      this._gizmos.push(gizmo);
     }
 
+    readyForDiscard() {
+    }
   }
 
   /**
@@ -6305,7 +6205,7 @@
           let needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
           material.shaderInstance.dirty = needTobeStillDirty ? true : false;
 
-          material.setUpStates();
+          material.setUpStates(mesh);
 
           this._setUpOrTearDownTextures(true, material);
         }
@@ -6401,6 +6301,8 @@
   //DrawKickerWorld._lastMaterialUpdateStateString = null;
   //DrawKickerWorld._lastGeometry = null;
   //DrawKickerWorld._lastRenderPassIndex = -1;
+
+  //      
 
   class SkeletalShaderSource {
 
@@ -6674,9 +6576,9 @@ return mat4(
     }
 
     /**
-     * @return {string}
+     * 
      */
-    VSPreProcess_SkeletalShaderSource(existCamera_f, f, lights, material, extraData) {
+    VSPreProcess_SkeletalShaderSource(existCamera_f, f, lights, material, extraData)         {
       let shaderText = '';
 
       shaderText += 'vec4 weightVec = aVertex_weight;\n'; // DO NOT normalize as vec4!
@@ -7300,7 +7202,7 @@ return mat4(
     }
 
     /**
-     * 全ての頂点属性のリストを返す
+     * return all vertex attribute name list
      */
     _allVertexAttribs(vertices) {
       var attribNameArray = [];
@@ -8443,7 +8345,23 @@ return mat4(
     }
   }
 
+  /*       */
+
   class BlendShapeGeometry extends Geometry {
+                           
+                           
+                           
+                           
+                           
+                           
+                           
+                           
+                           
+                            
+                                    
+                                     
+                       
+
     constructor(glBoostContext) {
       super(glBoostContext);
 
@@ -8463,7 +8381,7 @@ return mat4(
     }
 
 
-    draw(data) {
+    draw(data        ) {
       this._currentRenderPassIndex = data.renderPass_index;
       super.draw({
         expression: data.expression,
@@ -8499,7 +8417,7 @@ return mat4(
       super.prepareToRender(expression, existCamera_f, pointLight, meshMaterial, mesh);
     }
 
-    _setBlendWeightToGlslProgram(blendTargetNumber, weight) {
+    _setBlendWeightToGlslProgram(blendTargetNumber        , weight        ) {
       let blendTarget = GLBoost$1.getValueOfGLBoostConstant(blendTargetNumber);
       let materials = [this._materialForBlend];
       for (let i=0; i<materials.length;i++) {
@@ -8508,7 +8426,7 @@ return mat4(
       }
     }
 
-    set blendWeight_1(weight) {
+    set blendWeight_1(weight        ) {
       var gl = this._glContext.gl;
       var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -8520,7 +8438,7 @@ return mat4(
       return this._blendWeight_1;
     }
 
-    set blendWeight_2(weight) {
+    set blendWeight_2(weight        ) {
       var gl = this._glContext.gl;
       var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -8532,7 +8450,7 @@ return mat4(
       return this._blendWeight_2;
     }
 
-    set blendWeight_3(weight) {
+    set blendWeight_3(weight        ) {
       var gl = this._glContext.gl;
       var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -8544,7 +8462,7 @@ return mat4(
       return this._blendWeight_3;
     }
 
-    set blendWeight_4(weight) {
+    set blendWeight_4(weight        ) {
       var gl = this._glContext.gl;
       var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -8556,7 +8474,7 @@ return mat4(
       return this._blendWeight_4;
     }
 
-    set blendWeight_5(weight) {
+    set blendWeight_5(weight        ) {
       var gl = this._glContext.gl;
       var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -8568,7 +8486,7 @@ return mat4(
       return this._blendWeight_5;
     }
 
-    set blendWeight_6(weight) {
+    set blendWeight_6(weight        ) {
       var gl = this._glContext.gl;
       var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -8580,7 +8498,7 @@ return mat4(
       return this._blendWeight_6;
     }
 
-    set blendWeight_7(weight) {
+    set blendWeight_7(weight        ) {
       var gl = this._glContext.gl;
       var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -8592,7 +8510,7 @@ return mat4(
       return this._blendWeight_7;
     }
 
-    set blendWeight_8(weight) {
+    set blendWeight_8(weight        ) {
       var gl = this._glContext.gl;
       var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -8604,7 +8522,7 @@ return mat4(
       return this._blendWeight_8;
     }
 
-    set blendWeight_9(weight) {
+    set blendWeight_9(weight        ) {
       var gl = this._glContext.gl;
       var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -8616,7 +8534,7 @@ return mat4(
       return this._blendWeight_9;
     }
 
-    set blendWeight_10(weight) {
+    set blendWeight_10(weight        ) {
       var gl = this._glContext.gl;
       var currentProgram = gl.getParameter(gl.CURRENT_PROGRAM);
 
@@ -8632,17 +8550,17 @@ return mat4(
 
   GLBoost$1['BlendShapeGeometry'] = BlendShapeGeometry;
 
+  //      
+
   /**
-   * [en] This is the abstract class for all texture classes. Don't use this class directly.<br>
-   * [ja] 全てのテクスチャクラスのための抽象クラスです。直接このクラスは使わないでください。
+   * This is the abstract class for all texture classes. Don't use this class directly.
    */
   class AbstractTexture extends GLBoostObject {
 
     /**
-     * [en] The constructor of PointLight class. Do not construct this class directly.<br>
-     * [ja] PointLightクラスのコンストラクタ。直接このクラスを生成しようとしないでください。
+     * The constructor of PointLight class. Do not construct this class directly.
      *
-     * * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     * * @param {HTMLCanvas|string} canvas canvas or canvas' id string.
      */
     constructor(glBoostContext) {
       super(glBoostContext);
@@ -8660,18 +8578,16 @@ return mat4(
     }
 
     /**
-     * [en] get the WebGL texture resource within this class. <br />
-     * [ja] このクラス内部で管理しているWebGLテクスチャリソースを取得します。
+     * get the WebGL texture resource within this class.
      *
-     * @returns {null|*} [en] WebGL texture resouce. [ja] WebGLテクスチャリソース
+     * @returns WebGL texture resouce.
      */
-    get glTextureResource() {
+    get glTextureResource()           {
       return this._texture;
     }
 
     /**
-     * [en] bind the texture. It calls bindTexture on WebGL only if it has WebGL texture. Otherwise it returns false without doing anything.<br />
-     * [ja] テクスチャをバインドします。自身がWebGLテクスチャを持っている場合のみ、WebGLのbindTextureを呼びます。それ以外は何もせずにfalseを返します。
+     * bind the texture. It calls bindTexture on WebGL only if it has WebGL texture. Otherwise it returns false without doing anything.
      */
     setUp(textureUnitIndex) {
       var gl = this._glContext.gl;
@@ -8691,8 +8607,7 @@ return mat4(
     }
 
     /**
-     * [en] unbind the texture. <br />
-     * [ja] テクスチャをバインド解除します。
+     * unbind the texture.
      */
     tearDown(textureUnitIndex) {
       var gl = this._glContext.gl;
@@ -8743,12 +8658,12 @@ return mat4(
     /**
      * Origin is left bottom
      *
-     * @param {number} x horizontal pixel position (0 is left)
-     * @param {number} y virtical pixel position (0 is bottom)
-     * @param {Uint8Array} argByteArray Pixel Data as Uint8Array
-     * @returns {Vector4} Pixel Value in Vector4
+     * @param x horizontal pixel position (0 is left)
+     * @param y virtical pixel position (0 is bottom)
+     * @param argByteArray Pixel Data as Uint8Array
+     * @returns Pixel Value in Vector4
      */
-    getPixelValueAt(x, y, argByteArray) {
+    getPixelValueAt(x        , y        , argByteArray            )         {
       let byteArray = argByteArray;
       if (!byteArray) {
         byteArray = this.getTexturePixelData();
@@ -8774,24 +8689,26 @@ return mat4(
       return canvas;
     }
     /**
-     * [en] check whether or not this texture size is power of two. <br />
-     * [ja] テクスチャサイズが２の累乗かどうかを返します
+     * check whether or not this texture size is power of two.
      *
-     * @param {number} x [en] texture size. [ja] テクスチャサイズ
-     * @returns {boolean} [en] check whether or not the size x is power of two. [ja] xが２の累乗かどうか
+     * @param x texture size.
+     * @returns check whether or not the size x is power of two.
      */
-    _isPowerOfTwo(x) {
+    _isPowerOfTwo(x        )          {
       return (x & (x - 1)) == 0;
     }
 
+    _isPowerOfTwoTexture() {
+      return this._isPowerOfTwo(this.width) && this._isPowerOfTwo(this.height);
+    }
+
     /**
-     * [en] get a value nearest power of two. <br />
-     * [ja] 与えられた数から見て２の累乗に最も近い値を返します。
+     * get a value nearest power of two.
      *
-     * @param {number} x [en] texture size. [ja] テクスチャサイズ
-     * @returns {number} [en] a value nearest power of two. [ja] xに近い２の累乗の値
+     * @param x texture size.
+     * @returns a value nearest power of two.
      */
-    _getNearestPowerOfTwo(x) {
+    _getNearestPowerOfTwo(x        )         {
       return Math.pow( 2, Math.round( Math.log( x ) / Math.LN2 ) );
     }
 
@@ -8833,6 +8750,7 @@ return mat4(
       this._toMultiplyAlphaToColorPreviously = flag;
     }
   }
+  GLBoost$1['AbstractTexture'] = AbstractTexture;
 
   class FragmentSimpleShaderSource {
     // In the context within these member methods,
@@ -8858,21 +8776,18 @@ return mat4(
 
     FSShade_FragmentSimpleShaderSource(f, gl) {
       let shaderText =   "";
-      shaderText +=   `rt0 = vec4(1.0, 1.0, 1.0, opacity);\n`;
-      shaderText += '  if (isNeededToMultiplyAlphaToColorOfPixelOutput) {\n';
-      shaderText += '    rt0.rgb *= rt0.a;\n';
-      shaderText += '  }\n';
+      shaderText +=   `rt0 = vec4(1.0, 1.0, 1.0, 1.0);\n`;
 
       return shaderText;
     }
 
     FSFinalize_FragmentSimpleShaderSource(f, gl, lights, material, extraData) {
       let shaderText = '';
-  /*
-      shaderText += 'if (isNeededToMultiplyAlphaToColorOfPixelOutput && !isDataOutput) {\n';
-      shaderText += '  rt0.rgb *= rt0.a;\n';
-      shaderText += '}\n';
-  */
+      shaderText +=   `rt0.a *= opacity;\n`;
+      shaderText += '  if (isNeededToMultiplyAlphaToColorOfPixelOutput) {\n';
+      shaderText += '    rt0.rgb *= rt0.a;\n';
+      shaderText += '  }\n';
+
       return shaderText;
     }
 
@@ -9137,11 +9052,11 @@ return mat4(
 
       shaderText += 'if ( isWireframe ) {\n';
       shaderText += '  rt0 = wireframeResult;\n';
+      shaderText += '  if (rt0.a == 0.0) {\n';
+      shaderText += '    discard;\n';
+      shaderText += '  }\n';
       shaderText += '}\n';
 
-      shaderText += '    if (rt0.a < 0.05) {\n';
-      shaderText += '      discard;\n';
-      shaderText += '    }\n';
 
       /*
       //shaderText += '  rt0 = vec4((v_tangent+1.0)/2.0, 1.0);\n';
@@ -9311,7 +9226,8 @@ return mat4(
       }
       shaderText += 'uniform vec4 materialBaseColor;\n';
       shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
-
+      shaderText += 'uniform vec2 uAlphaTestParameters;\n';
+      
       return shaderText;
     }
 
@@ -9344,6 +9260,17 @@ return mat4(
       return shaderText;
     }
 
+    FSFinalize_DecalShaderSource(f, gl, lights, material, extraData) {
+      let shaderText = '';
+      shaderText += `
+                     if (uAlphaTestParameters.x > 0.5 && rt0.a < uAlphaTestParameters.y) {
+                       discard;
+                     }
+    `;
+
+      return shaderText;
+    }
+
     prepare_DecalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
       var vertexAttribsAsResult = [];
@@ -9368,11 +9295,12 @@ return mat4(
         let uIsTextureToMultiplyAlphaToColorPreviously = this._glContext.getUniformLocation(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously');
         material.setUniform(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously', uIsTextureToMultiplyAlphaToColorPreviously);
       }
+      material.setUniform(shaderProgram, 'uniform_alphaTestParameters', this._glContext.getUniformLocation(shaderProgram, 'uAlphaTestParameters'));
 
       material.registerTextureUnitToUniform(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE, shaderProgram, 'uTexture'); 
       
       material.registerTextureUnitToUniform(GLBoost$1.TEXTURE_PURPOSE_NORMAL, shaderProgram, 'uNormalTexture'); 
-
+      
       return vertexAttribsAsResult;
     }
   }
@@ -9405,7 +9333,10 @@ return mat4(
         material.updateTextureInfo(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE, 'uTexture'); 
         this._glContext.uniform1i(material.getUniform(glslProgram, 'uIsTextureToMultiplyAlphaToColorPreviously'), diffuseTexture.toMultiplyAlphaToColorPreviously, true);
       }
-
+      
+      const alphaCutoff = material.alphaCutoff;
+      const isAlphaTestEnable = material.isAlphaTest;
+      this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_alphaTestParameters'), isAlphaTestEnable ? 1.0 : 0.0, alphaCutoff, true);
 
       // For Shadow
       for (let i=0; i<lights.length; i++) {
@@ -9498,6 +9429,8 @@ return mat4(
         "lineWidth": [1.0],
         "polygonOffset": [0.0, 0.0]
       };
+      this._isAlphaTestEnable = true;
+      this._alphaCutoff = 0.1;
 
       this._countOfUpdate = 0;
     }
@@ -9621,6 +9554,10 @@ return mat4(
       return count;
     }
 
+    getTextures() {
+      return Object.values(this._textureDic);
+    }
+
     getTextureUserFlavorNames() {
       return Object.keys(this._textureDic);
     }
@@ -9701,8 +9638,7 @@ return mat4(
     }
 
     /**
-     * [en] bind the texture. For any value, it returns true if we call WebGL's bindTexture function, false otherwise.<br />
-     * [ja] テクスチャをバインドします。どんな値にせよ、WebGLのbindTexture関数を呼んだ場合はtrueを、そうでなければfalseを返します。
+     * bind the texture. For any value, it returns true if we call WebGL's bindTexture function, false otherwise.
      */
     setUpTexture(textureName, textureUnitIndex) {
       var gl = this._gl;
@@ -9745,7 +9681,7 @@ return mat4(
       }
     }
 
-    setUpStates() {
+    setUpStates(mesh) {
       let globalStatesUsage = this._glBoostSystem._glBoostContext.globalStatesUsage;
       if (this._globalStatesUsage) {
         globalStatesUsage = this._globalStatesUsage;
@@ -9765,6 +9701,12 @@ return mat4(
           break;
         default:
           break;
+      }
+
+      if (mesh.isTransparent || this.isTransparent) {
+        //this._gl.disable(2929);
+        this._gl.enable(3042);
+        //this._gl.colorMask(true, true, true, false);
       }
     }
 
@@ -9882,11 +9824,34 @@ return mat4(
       return Object.keys(this._textureSemanticsDic).length;
     }
 
+    set isAlphaTest(flg){
+      this._isAlphaTestEnable = flg;
+    }
+
+    get isAlphaTest() {
+      return this._isAlphaTestEnable;
+    }
+
+    set alphaCutoff(value) {
+      this._alphaCutoff = value;
+    }
+
+    get alphaCutoff() {
+      return this._alphaCutoff;
+    }
   }
 
   GLBoost$1['L_AbstractMaterial'] = L_AbstractMaterial;
 
+  /*       */
+
   class ClassicMaterial$1 extends L_AbstractMaterial {
+                                         
+                        
+                           
+                            
+                           
+
     constructor(glBoostContext) {
       super(glBoostContext);
 
@@ -9911,7 +9876,7 @@ return mat4(
     }
 
 
-    set baseColor(vec) {
+    set baseColor(vec         ) {
       if (!vec) {
         return;
       }
@@ -9924,7 +9889,7 @@ return mat4(
       return this._baseColor;
     }
 
-    set diffuseColor(vec) {
+    set diffuseColor(vec         ) {
       if (!vec) {
         return;
       }
@@ -9937,7 +9902,7 @@ return mat4(
       return this._diffuseColor;
     }
 
-    set specularColor(vec) {
+    set specularColor(vec         ) {
       if (!vec) {
         return;
       }
@@ -9950,7 +9915,7 @@ return mat4(
       return this._specularColor;
     }
 
-    set ambientColor(vec) {
+    set ambientColor(vec         ) {
       if (!vec) {
         return;
       }
@@ -9996,6 +9961,8 @@ return mat4(
       }
       
       shaderText += 'uniform vec4 ambient;\n'; // Ka * amount of ambient lights
+
+
       
 
       const sampler2D = this._sampler2DShadow_func();
@@ -10157,7 +10124,7 @@ return mat4(
 
       shaderText += `
 vec3 surfaceColor = rt0.rgb;
-rt0 = vec4(0.0, 0.0, 0.0, 0.0);
+rt0 = vec4(0.0, 0.0, 0.0, rt0.a);
 
 // BaseColor
 vec3 baseColor = srgbToLinear(surfaceColor) * uBaseColorFactor.rgb;
@@ -10261,8 +10228,7 @@ albedo.rgb *= (1.0 - metallic);
       shaderText += '  rt0.xyz += emissive;\n';
 
       shaderText += '  rt0.xyz = linearToSrgb(rt0.xyz);\n';
-       
-      shaderText += '  rt0.a = 1.0;\n';
+      
   //    shaderText += '  rt0.xyz = vec3(texture2D(uOcclusionTexture, texcoord).r);\n';
 
 
@@ -10317,6 +10283,7 @@ albedo.rgb *= (1.0 - metallic);
       this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_OcclusionFactors'), occlusion, occlusionRateForDirectionalLight, true);
       this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_EmissiveFactor'), emissive.x, emissive.y, emissive.z, true);
       this._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_IBLParameters'), IBLSpecularTextureMipmapCount, IBLDiffuseContribution, IBLSpecularContribution, true);
+      
 
       const ambient = Vector4$1.multiplyVector(new Vector4$1(1.0, 1.0, 1.0, 1.0), scene.getAmountOfAmbientLightsIntensity());
       this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_ambient'), ambient.x, ambient.y, ambient.z, ambient.w, true);    
@@ -10352,8 +10319,10 @@ albedo.rgb *= (1.0 - metallic);
       this._emissiveFactor = new Vector3(0.0, 0.0, 0.0);
       this._occlusionRateForDirectionalLight = 0.2;
       this._IBLSpecularTextureMipmapCount = 9;
-      this._IBLDiffuseContribution = 0.2;
-      this._IBLSpecularContribution = 0.55;
+      this._IBLDiffuseContribution = 1.0;
+      this._IBLSpecularContribution = 1.0;
+      this._isAlphaTestEnable = false;
+      this._alphaCutoff = 0.5;
 
       this._shaderClass = PBRPrincipledShader;
     }
@@ -10658,7 +10627,20 @@ albedo.rgb *= (1.0 - metallic);
 
   L_AbstractCamera._mainCamera = {};
 
+  /*       */
+
   class L_PerspectiveCamera extends L_AbstractCamera {
+                  
+                    
+                   
+                  
+                        
+                       
+                    
+                    
+                              
+                                           
+
     constructor(glBoostContext, toRegister, lookat, perspective) {
       super(glBoostContext, toRegister, lookat);
 
@@ -10693,7 +10675,7 @@ albedo.rgb *= (1.0 - metallic);
       }
     }
 
-    static perspectiveRHMatrix(fovy, aspect, zNear, zFar) {
+    static perspectiveRHMatrix(fovy        , aspect        , zNear        , zFar        ) {
 
       var yscale = 1.0 / Math.tan(0.5*fovy*Math.PI/180);
       var xscale = yscale / aspect;
@@ -10718,7 +10700,7 @@ albedo.rgb *= (1.0 - metallic);
       this._xscale = xscale;
     }
 
-    set fovy(value) {
+    set fovy(value        ) {
       if (this._fovy === value) {
         return;
       }
@@ -10730,7 +10712,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._fovy;
     }
 
-    set aspect(value) {
+    set aspect(value        ) {
       if (this._aspect === value) {
         return;
       }
@@ -10742,7 +10724,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._aspect;
     }
 
-    set zNear(value) {
+    set zNear(value        ) {
       if (this._zNear === value) {
         return;
       }
@@ -10754,7 +10736,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._zNear;
     }
 
-    set zFar(value) {
+    set zFar(value        ) {
       if (this._zFar === value) {
         return;
       }
@@ -10823,12 +10805,26 @@ albedo.rgb *= (1.0 - metallic);
       return info;
     }
 
-    set allInfo(info) {
+    set allInfo(info        ) {
       super.allInfo = info;
     }
   }
 
+  /*       */
+
   class L_FrustumCamera extends L_AbstractCamera {
+                  
+                   
+                 
+                    
+                   
+                  
+                        
+                       
+                              
+                                           
+                                
+    
     constructor(glBoostContext, toRegister, lookat, frustum) {
       super(glBoostContext, toRegister, lookat);
 
@@ -10865,7 +10861,7 @@ albedo.rgb *= (1.0 - metallic);
       }
     }
 
-    static frustumRHMatrix(left, right, top, bottom, zNear, zFar) {
+    static frustumRHMatrix(left        , right        , top        , bottom        , zNear        , zFar        ) {
       return new Matrix44$1(
         2*zNear/(right-left), 0.0, (right+left)/(right-left), 0.0,
         0.0, 2*zNear/(top-bottom), (top+bottom)/(top-bottom), 0.0,
@@ -10874,7 +10870,7 @@ albedo.rgb *= (1.0 - metallic);
       );
     }
 
-    set left(value) {
+    set left(value        ) {
       if (this._left === value) {
         return;
       }
@@ -10886,7 +10882,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._left;
     }
 
-    set right(value) {
+    set right(value        ) {
       if (this._right === value) {
         return;
       }
@@ -10898,7 +10894,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._right;
     }
 
-    set top(value) {
+    set top(value        ) {
       if (this._top === value) {
         return;
       }
@@ -10910,7 +10906,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._top;
     }
 
-    set bottom(value) {
+    set bottom(value        ) {
       if (this._bottom === value) {
         return;
       }
@@ -10922,7 +10918,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._bottom;
     }
 
-    set zNear(value) {
+    set zNear(value        ) {
       if (this._zNear === value) {
         return;
       }
@@ -10934,7 +10930,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._zNear;
     }
 
-    set zFar(value) {
+    set zFar(value        ) {
       if (this._zFar === value) {
         return;
       }
@@ -10948,6 +10944,10 @@ albedo.rgb *= (1.0 - metallic);
 
     get aspect() {
       return (this.right - this.left) / (this.top - this.bottom);
+    }
+
+    get fovy() {
+      return MathUtil.radianToDegree(2 * Math.atan(Math.abs(this.top - this.bottom) / (2 * this.zNear)));
     }
 
     get allInfo() {
@@ -10991,14 +10991,30 @@ albedo.rgb *= (1.0 - metallic);
       return info;
     }
 
-    set allInfo(info) {
+    set allInfo(info        ) {
       super.allInfo = info;
     }
   }
 
+  /*       */
+
   class L_OrthoCamera extends L_AbstractCamera {
-    constructor(glBoostContext, toRegister, lookat, ortho) {
-      super(glBoostContext, toRegister, lookat);
+                  
+                   
+                    
+                 
+                   
+                  
+                  
+                  
+                              
+                                           
+                              
+                                           
+                                
+
+    constructor(glBoostSystem              , toRegister        , lookat       , ortho       ) {
+      super(glBoostSystem, toRegister, lookat);
 
       this._left = (typeof ortho.left === "undefined") ? -1:ortho.left;
       this._right = (typeof ortho.right === "undefined") ? 1:ortho.right;
@@ -11032,7 +11048,7 @@ albedo.rgb *= (1.0 - metallic);
       }
     }
 
-    static orthoRHMatrix(left, right, bottom, top, near, far, xmag, ymag) {
+    static orthoRHMatrix(left        , right        , bottom        , top        , near        , far        , xmag        , ymag        ) {
 
       if (xmag && ymag) {
         return new Matrix44$1(
@@ -11051,7 +11067,7 @@ albedo.rgb *= (1.0 - metallic);
       }
     }
 
-    set left(value) {
+    set left(value        ) {
       if (this._left === value) {
         return;
       }
@@ -11063,7 +11079,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._left;
     }
 
-    set right(value) {
+    set right(value        ) {
       if (this._right === value) {
         return;
       }
@@ -11075,7 +11091,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._right;
     }
 
-    set bottom(value) {
+    set bottom(value        ) {
       if (this._bottom === value) {
         return;
       }
@@ -11087,7 +11103,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._bottom;
     }
 
-    set top(value) {
+    set top(value        ) {
       if (this._top === value) {
         return;
       }
@@ -11099,7 +11115,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._top;
     }
 
-    set zNear(value) {
+    set zNear(value        ) {
       if (this._zNear === value) {
         return;
       }
@@ -11111,7 +11127,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._zNear;
     }
 
-    set zFar(value) {
+    set zFar(value        ) {
       if (this._zFar === value) {
         return;
       }
@@ -11123,7 +11139,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._zFar;
     }
 
-    set xmag(value) {
+    set xmag(value        ) {
       if (this._xmag === value) {
         return;
       }
@@ -11135,7 +11151,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._xmag;
     }
 
-    set ymag(value) {
+    set ymag(value        ) {
       if (this._ymag === value) {
         return;
       }
@@ -11199,7 +11215,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     
-    set allInfo(info) {
+    set allInfo(info        ) {
       super.allInfo = info;
     }
   }
@@ -11672,11 +11688,11 @@ albedo.rgb *= (1.0 - metallic);
 
     _getTargetAABB() {
       let targetAABB = null;
-      if (typeof this._target.updateAABB !== 'undefined') {
-        targetAABB = this._target.updateAABB();
-      } else {
-        targetAABB = this._target.AABB;
-      }
+  //    if (typeof this._target.updateAABB !== 'undefined') {
+  //      targetAABB = this._target.updateAABB();
+  //    } else {
+      targetAABB = this._target.AABB;
+  //    }
       return targetAABB;
     }
 
@@ -11912,16 +11928,16 @@ albedo.rgb *= (1.0 - metallic);
 
         if ('ontouchend' in document) {
           eventTargetDom.addEventListener('touchstart', this._mouseDown.bind(this));
-          eventTargetDom.addEventListener('touchend', this._mouseUp.bind(this));
+          document.addEventListener('touchend', this._mouseUp.bind(this));
           eventTargetDom.addEventListener('touchmove', this._mouseMove.bind(this));          
         }
         if ('onmouseup' in document) {
           eventTargetDom.addEventListener('mousedown', this._mouseDown.bind(this));
-          eventTargetDom.addEventListener('mouseup', this._mouseUp.bind(this));
+          document.addEventListener('mouseup', this._mouseUp.bind(this));
           eventTargetDom.addEventListener('mousemove', this._mouseMove.bind(this));          
         }
-        if ('onmousewheel' in document) {
-          document.addEventListener('mousewheel', this._mouseWheel.bind(this));
+        if (window.WheelEvent) {
+          eventTargetDom.addEventListener('wheel', this._mouseWheel.bind(this));
         }
       }
     }
@@ -11933,16 +11949,16 @@ albedo.rgb *= (1.0 - metallic);
         
         if ('ontouchend' in document) {
           eventTargetDom.removeEventListener('touchstart', this._mouseDown.bind(this));
-          eventTargetDom.removeEventListener('touchend', this._mouseUp.bind(this));
+          document.removeEventListener('touchend', this._mouseUp.bind(this));
           eventTargetDom.removeEventListener('touchmove', this._mouseMove).bind(this);          
         }
         if ('onmouseup' in document) {
           eventTargetDom.removeEventListener('mousedown', this._mouseDown.bind(this));
-          eventTargetDom.removeEventListener('mouseup', this._mouseUp.bind(this));
+          document.removeEventListener('mouseup', this._mouseUp.bind(this));
           eventTargetDom.removeEventListener('mousemove', this._mouseMove.bind(this));          
         }
-        if ('onmousewheel' in document) {
-          document.removeEventListener('mousewheel', this._mouseWheel.bind(this));
+        if (window.WheelEvent) {
+          eventTargetDom.removeEventListener('wheel', this._mouseWheel.bind(this));
         }
       }
     }
@@ -12580,11 +12596,13 @@ albedo.rgb *= (1.0 - metallic);
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._getParamWithAlternative(GLBoost$1.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false));
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, width, height, 0, gl.RGBA, gl.UNSIGNED_BYTE, imgCanvas);
 
-      if (glem.extTFA) {
-        gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+      if (this._isPowerOfTwoTexture()) {
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this._getParamWithAlternative(GLBoost$1.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR));
+        if (glem.extTFA) {
+          gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+        }
       }
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this._getParamWithAlternative(GLBoost$1.TEXTURE_MAG_FILTER, gl.LINEAR));
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this._getParamWithAlternative(GLBoost$1.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR));
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, this._getParamWithAlternative(GLBoost$1.TEXTURE_WRAP_S, gl.REPEAT));
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this._getParamWithAlternative(GLBoost$1.TEXTURE_WRAP_T, gl.REPEAT));
       gl.generateMipmap(gl.TEXTURE_2D);
@@ -12605,11 +12623,13 @@ albedo.rgb *= (1.0 - metallic);
       gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._getParamWithAlternative(GLBoost$1.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false));
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imgCanvas);
 
-      if (glem.extTFA) {
-        gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+      if (this._isPowerOfTwoTexture()) {
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this._getParamWithAlternative(GLBoost$1.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR));
+        if (glem.extTFA) {
+          gl.texParameteri(gl.TEXTURE_2D, glem.extTFA.TEXTURE_MAX_ANISOTROPY_EXT, 4);
+        }
       }
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, this._getParamWithAlternative(GLBoost$1.TEXTURE_MAG_FILTER, gl.LINEAR));
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, this._getParamWithAlternative(GLBoost$1.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR));
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, this._getParamWithAlternative(GLBoost$1.TEXTURE_WRAP_S, gl.REPEAT));
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, this._getParamWithAlternative(GLBoost$1.TEXTURE_WRAP_T, gl.REPEAT));
       gl.generateMipmap(gl.TEXTURE_2D);
@@ -12635,6 +12655,7 @@ albedo.rgb *= (1.0 - metallic);
 
 
   }
+  GLBoost$1['Texture'] = Texture;
 
   class PhinaTexture extends Texture {
     constructor(glBoostContext, width, height, fillStyle, parameters = null) {
@@ -12753,36 +12774,22 @@ albedo.rgb *= (1.0 - metallic);
         gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
 
-        for (let i=0; i<posXimages.length; i++) {
-          const image = new Image();
-          image.src = posXimages[i];
-          image.onload = ()=>{ gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);};
-        }
-        for (let i=0; i<negXimages.length; i++) {
-          const image = new Image();
-          image.src = negXimages[i];
-          image.onload = ()=>{ gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);};
-        }
-        for (let i=0; i<posYimages.length; i++) {
-          const image = new Image();
-          image.src = posYimages[i];
-          image.onload = ()=>{ gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);};
-        }
-        for (let i=0; i<negYimages.length; i++) {
-          const image = new Image();
-          image.src = negYimages[i];
-          image.onload = ()=>{ gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);};
-        }
-        for (let i=0; i<posZimages.length; i++) {
-          const image = new Image();
-          image.src = posZimages[i];
-          image.onload = ()=> { gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);};
-        }
-        for (let i=0; i<negZimages.length; i++) {
-          const image = new Image();
-          image.src = negZimages[i];
-          image.onload = ()=> { gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);};
-        }
+        const loadImageToGPU = (images, cubemapSide) => {
+          for (let i=0; i<images.length; i++) {
+            const image = new Image();
+            image.crossOrigin = "Anonymous";
+            image.src = images[i];
+            image.onload = ()=>{ gl.texImage2D(cubemapSide, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);};
+          }
+        };
+
+        loadImageToGPU(posXimages, gl.TEXTURE_CUBE_MAP_POSITIVE_X);
+        loadImageToGPU(negXimages, gl.TEXTURE_CUBE_MAP_NEGATIVE_X);
+        loadImageToGPU(posYimages, gl.TEXTURE_CUBE_MAP_POSITIVE_Y);
+        loadImageToGPU(negYimages, gl.TEXTURE_CUBE_MAP_NEGATIVE_Y);
+        loadImageToGPU(posZimages, gl.TEXTURE_CUBE_MAP_POSITIVE_Z);
+        loadImageToGPU(negZimages, gl.TEXTURE_CUBE_MAP_NEGATIVE_Z);
+        
     }
 
     async generateTextureFromBaseUri(baseUri, mipLevelNum) {
@@ -12827,8 +12834,9 @@ albedo.rgb *= (1.0 - metallic);
             [baseUri + "_back_" + i + ".jpg", gl.TEXTURE_CUBE_MAP_NEGATIVE_Z]
           ];
           for (var j = 0; j < faces.length; j++) {
-            var face = faces[j][1];
-            var image = new Image();
+            const face = faces[j][1];
+            const image = new Image();
+            image.crossOrigin = "Anonymous";
             image.onload = onLoadEachCubeImage(texture, face, image, i);
             image.src = faces[j][0];
           }
@@ -12842,8 +12850,10 @@ albedo.rgb *= (1.0 - metallic);
 
   }
 
+  /*       */
+
   class Cube extends Geometry {
-    constructor(glBoostContext, widthVector, vertexColor) {
+    constructor(glBoostContext        , widthVector         , vertexColor         ) {
       super(glBoostContext);
 
       // if array, convert to vector[2/3/4]
@@ -13191,8 +13201,10 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1["Sphere"] = Sphere;
 
+  /*       */
+
   class Axis extends Geometry {
-    constructor(glBoostContext, length) {
+    constructor(glBoostContext        , length        ) {
       super(glBoostContext);
 
       this._setupVertexData(length);
@@ -13643,10 +13655,16 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1["Screen"] = Screen;
 
-  //import GLContext from './GLContext';
+  //      
+                                             
+                                             
 
   class GLBoostLowContext {
-    constructor(canvas, initParameter, gl, width, height) {
+                            
+                                  
+                          
+
+    constructor(canvas                   , initParameter        , gl                      , width       , height       ) {
       this._setName();
 
       this.__system = new GLBoostSystem(canvas, initParameter, gl, width, height, this);
@@ -13708,23 +13726,23 @@ albedo.rgb *= (1.0 - metallic);
       return new BlendShapeGeometry(this.__system);
     }
 
-    createCube(widthVector, vertexColor) {
+    createCube(widthVector         , vertexColor         ) {
       return new Cube(this.__system, widthVector, vertexColor);
     }
 
-    createPlane(width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat) {
+    createPlane(width        , height        , uSpan        , vSpan        , customVertexAttributes       , isUVRepeat         ) {
       return new Plane(this.__system, width, height, uSpan, vSpan, customVertexAttributes, isUVRepeat);
     }
 
-    createSphere(radius, widthSegments, heightSegments, vertexColor) {
+    createSphere(radius        , widthSegments        , heightSegments        , vertexColor        ) {
       return new Sphere(this.__system, radius, widthSegments, heightSegments, vertexColor);
     }
 
-    createAxis(length) {
+    createAxis(length        ) {
       return new Axis(this.__system, length);
     }
 
-    createParticle(centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint) {
+    createParticle(centerPointData        , particleWidth        , particleHeight        , customVertexAttributes        , performanceHint        ) {
       return new Particle(this.__system, centerPointData, particleWidth, particleHeight, customVertexAttributes, performanceHint);
     }
 
@@ -13736,50 +13754,50 @@ albedo.rgb *= (1.0 - metallic);
       return new PBRMetallicRoughnessMaterial(this.__system);
     }
 
-    createPerspectiveCamera(lookat, perspective) {
+    createPerspectiveCamera(lookat       , perspective       ) {
       return new L_PerspectiveCamera(this.__system, true, lookat, perspective);
     }
 
-    createFrustumCamera(lookat, perspective) {
+    createFrustumCamera(lookat       , perspective       ) {
       return new L_FrustumCamera(this.__system, true, lookat, perspective);
     }
 
-    createOrthoCamera(lookat, ortho) {
+    createOrthoCamera(lookat       , ortho       ) {
       return new L_OrthoCamera(this.__system, true, lookat, ortho);
     }
 
-    createCameraController(options) {
+    createCameraController(options       ) {
       return new L_CameraController(this.__system, options);
     }
 
-    createWalkThroughCameraController(options) {
+    createWalkThroughCameraController(options       ) {
       return new L_WalkThroughCameraController(this.__system, options);
     }
 
-    createTexture(src, userFlavorName, parameters = null) {
+    createTexture(src       , userFlavorName       , parameters         = null) {
       return new Texture(this.__system, src, userFlavorName, parameters);
     }
 
-    createPhinaTexture(width, height, fillStyle, parameters = null) {
+    createPhinaTexture(width       , height       , fillStyle        , parameters         = null) {
       return new PhinaTexture(this.__system, width, height, fillStyle, parameters);
     }
 
-    createCubeTexture(userFlavorName, parameters) {
+    createCubeTexture(userFlavorName        , parameters        ) {
       return new CubeTexture(this.__system, userFlavorName, parameters);
     }
 
-    createScreen(screen, customVertexAttributes) {
+    createScreen(screen       , customVertexAttributes       ) {
       return new Screen(this.__system, screen, customVertexAttributes);
     }
 
     /**
      * create textures as render target. (and attach it to framebuffer object internally.)<br>
-     * @param {number} width - width of texture
-     * @param {number} height - height of texture
-     * @param {number} textureNum - the number of creation.
-     * @returns {Array} an array of created textures.
+     * @param  width - width of texture
+     * @param  height - height of texture
+     * @param  textureNum - the number of creation.
+     * @returns  an array of created textures.
      */
-    createTexturesForRenderTarget(width, height, textureNum) {
+    createTexturesForRenderTarget(width        , height       , textureNum       )        {
       var glContext = this.__system._glContext;
       var gl = glContext.gl;
 
@@ -13819,7 +13837,7 @@ albedo.rgb *= (1.0 - metallic);
       return fbo._glboostTextures.concat();
     }
 
-    createDepthTexturesForRenderTarget(width, height) {
+    createDepthTexturesForRenderTarget(width       , height       ) {
       var glContext = this.__system._glContext;
 
       var gl = glContext.gl;
@@ -13886,7 +13904,7 @@ albedo.rgb *= (1.0 - metallic);
       return this.__system._glContext.belongingCanvasId;
     }
 
-    set globalStatesUsage(usageMode) {
+    set globalStatesUsage(usageMode        ) {
       this.__system._globalStatesUsage = usageMode;
     }
 
@@ -13897,9 +13915,11 @@ albedo.rgb *= (1.0 - metallic);
     reflectGlobalGLState() {
       let gl = this.__system._glContext.gl;
 
-      this.currentGlobalStates.forEach((state)=>{
-        gl.enable(state);
-      });
+      if (this.currentGlobalStates != null) {
+        this.currentGlobalStates.forEach((state)=>{
+          gl.enable(state);
+        });
+      }
 
       gl.depthFunc( gl.LEQUAL );
 
@@ -13927,7 +13947,7 @@ albedo.rgb *= (1.0 - metallic);
       });
     }
 
-    set currentGlobalStates(states) {
+    set currentGlobalStates(states               ) {
       this.__system._currentGlobalStates = states.concat();
     }
 
@@ -13943,8 +13963,8 @@ albedo.rgb *= (1.0 - metallic);
       return this.__system._glBoostMonitor;
     }
 
-    setPropertiesFromJson(arg, queryType = GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
-      let json = arg;
+    setPropertiesFromJson(arg              , queryType        = GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
+      let json     = arg;
       if (typeof arg === "string") {
         json = JSON.parse(arg);
       }
@@ -13954,9 +13974,10 @@ albedo.rgb *= (1.0 - metallic);
       }
       let objects = null;
       if (queryType === GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
-        objects = this.__system._glBoostMonitor.getGLBoostObjectsByUserFlavorName(json.targetUserFlavorName);
+        objects = this.__system._glBoostMonitor.getGLBoostObjectsByUserFlavorName((json.targetUserFlavorName     ));
       } else if (queryType === GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
-        const found = this.__system._glBoostMonitor.getGLBoostObject(json.targetInstanceName);
+        const targetInstanceName      = (json        ).targetInstanceName;
+        const found = this.__system._glBoostMonitor.getGLBoostObject(targetInstanceName);
         if (found != null && found.userFlavorName === json.targetUserFlavorName) {
           objects = [found];
         } else {
@@ -13967,7 +13988,7 @@ albedo.rgb *= (1.0 - metallic);
         objects = [found];
       }
 
-      objects.forEach((obj)=>{obj.setPropertiesFromJson(json);});
+      objects.forEach((obj    )=>{obj.setPropertiesFromJson(json);});
      
       return objects;
     }
@@ -13979,7 +14000,17 @@ albedo.rgb *= (1.0 - metallic);
   //      
 
   class M_Mesh extends M_Element {
-    constructor(glBoostContext, geometry, material) {
+                         
+                              
+                     
+                           
+                   
+                       
+                      
+                                  
+                              
+
+    constructor(glBoostContext                , geometry     , material     ) {
       super(glBoostContext);
 
       if (geometry) {
@@ -13993,7 +14024,7 @@ albedo.rgb *= (1.0 - metallic);
       this._isPickable = true;
     }
 
-    prepareToRender(expression, existCamera_f, lights) {
+    prepareToRender(expression     , existCamera_f     , lights     ) {
       this._geometry.prepareToRender(expression, existCamera_f, lights, this._material, this);
       /*
       if (this._geometry._materials.length === 0 && this._material) {
@@ -14006,7 +14037,7 @@ albedo.rgb *= (1.0 - metallic);
       */
     }
 
-    draw(data) {
+    draw(data     ) {
       this._geometry.draw(
         {
           expression: data.expression,
@@ -14023,7 +14054,7 @@ albedo.rgb *= (1.0 - metallic);
       );
     }
 
-    set geometry(geometry) {
+    set geometry(geometry     ) {
       this._geometry = geometry;
       geometry._parent = this;
       M_Mesh._geometries[geometry.toString()] = geometry;
@@ -14033,7 +14064,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._geometry;
     }
 
-    set material(material) {
+    set material(material     ) {
       this._material = material;
     }
 
@@ -14116,7 +14147,7 @@ albedo.rgb *= (1.0 - metallic);
       }
     }
 
-    merge(meshOrMeshes) {
+    merge(meshOrMeshes                        ) {
       if (Array.isArray(meshOrMeshes)) {
         this.bakeTransformToGeometry();
 
@@ -14149,7 +14180,7 @@ albedo.rgb *= (1.0 - metallic);
       }
     }
 
-    mergeHarder(meshOrMeshes) {
+    mergeHarder(meshOrMeshes                        ) {
 
       if (Array.isArray(meshOrMeshes)) {
 
@@ -14180,7 +14211,7 @@ albedo.rgb *= (1.0 - metallic);
       }
     }
 
-    calcTransformedDepth(camera) {
+    calcTransformedDepth(camera     ) {
       var viewMatrix = camera.lookAtRHMatrix();
       var m_m = null;
       if (this.bindShapeMatrix) {
@@ -14203,16 +14234,13 @@ albedo.rgb *= (1.0 - metallic);
 
     get isTransparent() {
       let isTransparent = (this._opacity < 1.0) ? true : false;
-      isTransparent |= this.geometry.isTransparent(this);
+      isTransparent = isTransparent || this._isTransparentForce;
+      isTransparent = isTransparent || this._isTransparentForce;
       return isTransparent;
     }
 
-    set isTransparentForce(flg) {
+    set isTransparent(flg         ) {
       this._isTransparentForce = flg;
-    }
-
-    get isTransparentForce() {
-      return this._isTransparentForce;
     }
 
     get AABBInWorld() {
@@ -14233,7 +14261,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
 
-    rayCast(arg1         , arg2         , camera, viewport) {
+    rayCast(arg1         , arg2        , camera     , viewport     ) {
       let origVecInLocal = null;
       let dirVecInLocal = null;
       if (arg1 instanceof Vector3 && arg2 instanceof Vector3) {
@@ -14287,7 +14315,7 @@ albedo.rgb *= (1.0 - metallic);
       }
     }
 
-    set isOutlineVisible(flg) {
+    set isOutlineVisible(flg         ) {
       if (flg && this._outlineGizmo === null && this.className === 'M_Mesh') {
         this._outlineGizmo = this._glBoostSystem._glBoostContext.createOutlineGizmo(this);
       }
@@ -14304,7 +14332,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._outlineGizmo.isVisible;
     }
 
-    set isVisible(flg) {
+    set isVisible(flg         ) {
       super.isVisible = flg;
       if (this._outlineGizmo) {
         this._outlineGizmo.isVisible = flg;
@@ -14331,19 +14359,31 @@ albedo.rgb *= (1.0 - metallic);
       super._needUpdate();
     }
 
-    set isPickable(flag) {
+    set isPickable(flag         ) {
       this._isPickable = flag;
     }
 
     get isPickable() {
       return this._isPickable;
     }
+
+    readyForDiscard() {
+      const materials = this.getAppropriateMaterials();
+      for (let material of materials) {
+        material.readyForDiscard();
+      }
+    }
   }
   M_Mesh._geometries = {};
 
   GLBoost$1['M_Mesh'] = M_Mesh;
 
+  /*       */
+
   class CubeAbsolute extends Geometry {
+                            
+                        
+
     constructor(glBoostContext) {
       super(glBoostContext);
 
@@ -14356,7 +14396,7 @@ albedo.rgb *= (1.0 - metallic);
       this.setVerticesData(this._vertexData, [this._indices]);
     }
 
-    _setupVertexData(minPosition, maxPosition, vertexColor) {
+    _setupVertexData(minPosition        , maxPosition        , vertexColor) {
       this._indices = [
         3, 1, 0, 2, 1, 3,
         4, 5, 7, 7, 5, 6,
@@ -14507,7 +14547,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._vertexData;
     }
 
-    update(minPosition, maxPosition) {
+    update(minPosition        , maxPosition        ) {
       this._vertexData = this._setupVertexData(minPosition, maxPosition);
       this.updateVerticesData(this._vertexData, [this._indices]);
     }
@@ -14521,12 +14561,14 @@ albedo.rgb *= (1.0 - metallic);
                                                   
 
   class M_Group extends M_Element {
-                               
+                         
                         
                   
                                
+                                  
+                    
 
-    constructor(glBoostContext) {
+    constructor(glBoostContext                ) {
       super(glBoostContext);
       this._elements = [];
       this._AABB = new AABB();
@@ -14539,10 +14581,10 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * Add the element to this group as a child.
-     * @param {Element} element - a instance of Element class
-     * @param {boolean} isDuplicateOk - allow duplicating if need
+     * @param element - a instance of Element class
+     * @param isDuplicateOk - allow duplicating if need
      */
-    addChild(element, isDuplicateOk = false) {
+    addChild(element         , isDuplicateOk          = false) {
 
       if (isDuplicateOk){
         // if forgive duplicated register by copy
@@ -14563,11 +14605,10 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     /**
-     * [en] remove the element from this group.
-     * [ja] このグループから指定した要素を削除します。
-     * @param {Element} element [en] the element to remove [ja] 削除したい要素
+     * remove the element from this group.
+     * @param element the element to remove
      */
-    removeChild(element) {
+    removeChild(element           ) {
       this._elements = this._elements.filter(function(elem) {
         if (elem === element) {
           element._parent = null;
@@ -14577,8 +14618,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     /**
-     * [en] remove all elements from this group.
-     * [ja] このグループから全ての要素を削除します。
+     * remove all elements from this group.
      */
     removeAll() {
       this._elements = this._elements.filter(function(elem) {
@@ -14587,11 +14627,11 @@ albedo.rgb *= (1.0 - metallic);
       this._elements.length = 0;
     }
 
-    getChildren()                  {
+    getChildren()                {
       return this._elements;
     }
 
-    getAnyJointAsChild()           {
+    getAnyJointAsChild()               {
       for (let element of this._elements) {
         if (element.className === 'M_Joint') {
           return element;
@@ -14641,7 +14681,7 @@ albedo.rgb *= (1.0 - metallic);
 
     }
 
-    searchElement(query        , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchElement(query        , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
       /*
       if (element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) {
         return element;
@@ -14664,7 +14704,7 @@ albedo.rgb *= (1.0 - metallic);
       return null;
     }
 
-    searchElementByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchElementByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
       if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
         return element;
       }
@@ -14682,7 +14722,7 @@ albedo.rgb *= (1.0 - metallic);
       return null;
     }
 
-    searchElementsByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchElementsByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
       let resultElements = [];
 
       if (element instanceof M_Group) {
@@ -14706,10 +14746,7 @@ albedo.rgb *= (1.0 - metallic);
       return resultElements;
     }
 
-    searchElementsByType(type               , element           = this) {
-      if (element instanceof type) {
-        return element;
-      }
+    searchElementsByType(type     , element           = this) {
 
       if (type['name'].indexOf('Gizmo') !== -1 && element instanceof M_Element) {
         let gizmos = element._gizmos;
@@ -14731,12 +14768,21 @@ albedo.rgb *= (1.0 - metallic);
             results.push(hitChildOrChildren);
           }
         }
+
+        if (type === M_Group) {
+          results.push(element);
+        }
         return results;
       }
+      
+      if (element instanceof type) {
+        return element;
+      }
+      
       return null;
     }
 
-    searchGLBoostObjectByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
+    searchGLBoostObjectByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element                               = this) {
       if (element instanceof M_Group) {
         let children = element.getChildren();
         for (let i = 0; i < children.length; i++) {
@@ -14755,21 +14801,42 @@ albedo.rgb *= (1.0 - metallic);
           }
         }
       }
-
-      if (type === L_AbstractMaterial && element instanceof M_Mesh) {
+      
+      if (type.name.indexOf('Material') !== -1 && element instanceof M_Mesh) {
         let materials = element.getAppropriateMaterials();
         for (let material of materials) {
-          if (this._validateByQuery(material, query, queryMeta)) {
-            return material;
+          if (material instanceof type) {
+            if (this._validateByQuery(material, query, queryMeta)) {
+              return material;
+            }
           }
         }
         return null;
-      } else if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+      }
+      
+      if (type.name.indexOf('Texture') !== -1 && element instanceof M_Mesh) {
+        let materials = element.getAppropriateMaterials();
+        for (let material of materials) {
+          const textures = material.getTextures();
+          for (let texture of textures) {
+            if (texture instanceof type) {
+              if (this._validateByQuery(texture, query, queryMeta)) {
+                return texture;
+              }
+            }
+          }
+        }
+        return null;
+      }
+      
+      if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
         return element;
       }
+
+      return null;
     }
 
-    searchGLBoostObjectsByNameAndType(query, type               , queryMeta           = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element = this) {
+    searchGLBoostObjectsByNameAndType(query     , type               , queryMeta           = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
       let objects = [];
       if (element instanceof M_Group) {
         let children = element.getChildren();
@@ -14791,22 +14858,91 @@ albedo.rgb *= (1.0 - metallic);
         }
         return objects;
       }
-
-      if (type === L_AbstractMaterial && element instanceof M_Mesh) {
+      
+      if (type.name.indexOf('Material') !== -1 && element instanceof M_Mesh) {
         let materials = element.getAppropriateMaterials();
         for (let material of materials) {
-          if (this._validateByQuery(material, query, queryMeta)) {
-            objects.push(material);
+          if (material instanceof type) {
+            if (this._validateByQuery(material, query, queryMeta)) {
+              objects.push(material);
+            }
           }
         }
         return objects;
-      } else if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+      }
+      
+      if (type.name.indexOf('Texture') !== -1 && element instanceof M_Mesh) {
+        let materials = element.getAppropriateMaterials();
+        for (let material of materials) {
+          const textures = material.getTextures();
+          for (let texture of textures) {
+            if (texture instanceof type) {
+              if (this._validateByQuery(texture, query, queryMeta)) {
+                objects.push(texture);
+              }
+            }
+          }
+        }
+        return objects;
+      }
+      
+      if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
         return [element];
       }
       return objects;
     }
 
-    getStartAnimationInputValue(inputLineName, element = this) {
+    searchGLBoostObjectsByType(type               , element          = this) {
+      let objects = [];
+      if (element instanceof M_Group) {
+        let children = element.getChildren();
+        for (let i = 0; i < children.length; i++) {
+          let hitChildren = this.searchGLBoostObjectsByType(type, children[i]);
+          if (hitChildren.length > 0) {
+            objects = objects.concat(hitChildren);
+          }
+        }
+        return objects;
+      }
+
+      if (type.name.indexOf('Gizmo') !== -1 && element instanceof M_Element) {
+        let gizmos = element._gizmos;
+        for (let gizmo of gizmos) {
+          objects.push(gizmo);
+        }
+        return objects;
+      }
+
+      if (type.name.indexOf('Material') !== -1 && element instanceof M_Mesh) {
+        let materials = element.getAppropriateMaterials();
+        for (let material of materials) {
+          if (material instanceof type) {
+            objects.push(material);
+          }
+        }
+        return objects;
+      }
+      
+      if (type.name.indexOf('Texture') !== -1 && element instanceof M_Mesh) {
+        let materials = element.getAppropriateMaterials();
+        for (let material of materials) {
+          const textures = material.getTextures();
+          for (let texture of textures) {
+            if (texture instanceof type) {
+              objects.push(texture);
+            }
+          }
+        }
+        return objects;
+      }
+
+      if (element instanceof type) {
+        return [element];
+      }
+      return objects;
+    }
+
+    getStartAnimationInputValue(inputLineName        , element          = this) {
 
       if (element instanceof M_Group) {
         let latestInputValue = element.getStartInputValueOfAnimation(inputLineName);
@@ -14834,7 +14970,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
 
-    getEndAnimationInputValue(inputLineName, element          = this) {
+    getEndAnimationInputValue(inputLineName        , element          = this) {
 
       if (element instanceof M_Group) {
         let latestInputValue = element.getEndInputValueOfAnimation(inputLineName);
@@ -14903,7 +15039,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._AABB;
     }
 
-    clone(clonedOriginalRootElement = this, clonedRootElement = null, onCompleteFuncs = []) {
+    clone(clonedOriginalRootElement      = this, clonedRootElement      = null, onCompleteFuncs      = []) {
       let instance = new M_Group(this._glBoostSystem);
       if (clonedRootElement === null) {
         clonedRootElement = instance;
@@ -14931,8 +15067,8 @@ albedo.rgb *= (1.0 - metallic);
       instance._isRootJointGroup = this._isRootJointGroup;
     }
 
-    set isVisible(flg        ) {
-      let collectVisibility = function(elem        ) {
+    set isVisible(flg         ) {
+      let collectVisibility = function(elem           ) {
         elem._isVisible = flg;
         if (elem instanceof M_Group) {
           let children = elem.getChildren();
@@ -14946,6 +15082,35 @@ albedo.rgb *= (1.0 - metallic);
 
     get isVisible() {
       return this._isVisible;
+    }
+
+    setSpecifiedPropertyRecursively(propertyName         , value     ) {
+      let setValueRecursively = function(elem           ) {
+        elem[propertyName] = value;
+        if (elem instanceof M_Group) {
+          let children = elem.getChildren();
+          children.forEach(function(child) {
+            setValueRecursively(child);
+          });
+        }
+      };
+      setValueRecursively(this);
+    }
+
+    executeSpecifiedFunctionRecursively(func          , thisObj     , args            , childIndexToInsertToArgs = null) {
+      let execRecursively = function(elem           ) {
+        if (childIndexToInsertToArgs != null) {
+          args[childIndexToInsertToArgs] = elem;
+        }
+        func.apply(thisObj, args);
+        if (elem instanceof M_Group) {
+          let children = elem.getChildren();
+          children.forEach(function(child) {
+            execRecursively(child);
+          });
+        }
+      };
+      execRecursively(this);
     }
 
     _updateAABBGizmo() {
@@ -14982,7 +15147,7 @@ albedo.rgb *= (1.0 - metallic);
       this.removeAll();
     }
 
-    rayCast(arg1         , arg2         , camera, viewport) {
+    rayCast(arg1        , arg2        , camera     , viewport     , ignoreInstanceNameList           ) {
       const meshes = this.searchElementsByType(M_Mesh);
       let currentShortestT = Number.MAX_VALUE;
       let currentShortestIntersectedPosVec3 = null;
@@ -14992,6 +15157,9 @@ albedo.rgb *= (1.0 - metallic);
           continue;
         }
         if (!mesh.isPickable) {
+          continue;
+        }
+        if (ignoreInstanceNameList && ignoreInstanceNameList.indexOf(mesh.instanceName) !== -1) {
           continue;
         }
         let result = null;
@@ -15182,6 +15350,145 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1['Expression'] = Expression;
 
+  class M_FrustumCamera extends M_AbstractCamera {
+    constructor(glBoostContext, toRegister, lookat, perspective) {
+      super(glBoostContext, toRegister);
+
+      this._lowLevelCamera = new L_FrustumCamera(this, false, lookat, perspective);
+      this._lowLevelCamera._middleLevelCamera = this;
+    }
+
+    // ===================== delegate to low level class ========================
+
+    _needUpdateProjection() {
+      this._lowLevelCamera._needUpdateProjection();
+    }
+
+    get updateCountAsCameraProjection() {
+      return this._lowLevelCamera.updateCountAsCameraProjection;
+    }
+
+    projectionRHMatrix() {
+      return this._lowLevelCamera.projectionRHMatrix();
+    }
+
+    set left(value) {
+      this._lowLevelCamera.left = value;
+    }
+
+    get left() {
+      return this._lowLevelCamera.left;
+    }
+
+    set right(value) {
+      this._lowLevelCamera.right = value;
+    }
+
+    get right() {
+      return this._lowLevelCamera.right;
+    }
+
+    set top(value) {
+      this._lowLevelCamera.top = value;
+    }
+
+    get top() {
+      return this._lowLevelCamera.top;
+    }
+
+    set bottom(value) {
+      this._lowLevelCamera.bottom = value;
+    }
+
+    get bottom() {
+      return this._lowLevelCamera.bottom;
+    }
+
+    set zNear(value) {
+      this._lowLevelCamera.zNear = value;
+    }
+
+    get zNear() {
+      return this._lowLevelCamera.zNear;
+    }
+
+    set zFar(value) {
+      this._lowLevelCamera.zFar = value;
+    }
+
+    get zFar() {
+      return this._lowLevelCamera.zFar;
+    }
+
+    get aspect() {
+      return this._lowLevelCamera.aspect;
+    }
+
+    get fovy() {
+      return this._lowLevelCamera.fovy;
+    }
+  }
+
+  GLBoost$1['M_FrustumCamera'] = M_FrustumCamera;
+
+  class M_PerspectiveCamera extends M_AbstractCamera {
+    constructor(glBoostContext, toRegister, lookat, perspective) {
+      super(glBoostContext, toRegister);
+
+      this._lowLevelCamera = new L_PerspectiveCamera(this, false, lookat, perspective);
+      this._lowLevelCamera._middleLevelCamera = this;
+    }
+
+    // ===================== delegate to low level class ========================
+
+    _needUpdateProjection() {
+      this._lowLevelCamera._needUpdateProjection();
+    }
+
+    get updateCountAsCameraProjection() {
+      return this._lowLevelCamera.updateCountAsCameraProjection;
+    }
+
+    projectionRHMatrix() {
+      return this._lowLevelCamera.projectionRHMatrix();
+    }
+
+    set fovy(value) {
+      this._lowLevelCamera.fovy = value;
+    }
+
+    get fovy() {
+      return this._lowLevelCamera.fovy;
+    }
+
+    set aspect(value) {
+      this._lowLevelCamera.aspect = value;
+    }
+
+    get aspect() {
+      return this._lowLevelCamera.aspect;
+    }
+
+    set zNear(value) {
+      this._lowLevelCamera.zNear = value;
+    }
+
+    get zNear() {
+      return this._lowLevelCamera.zNear;
+    }
+
+    set zFar(value) {
+      this._lowLevelCamera.zFar = value;
+    }
+
+    get zFar() {
+      return this._lowLevelCamera.zFar;
+    }
+
+  }
+
+  GLBoost$1['M_PerspectiveCamera'] = M_PerspectiveCamera;
+
   class EffekseerElement$1 extends M_Element {
     constructor(glBoostContext) {
       super(glBoostContext);
@@ -15214,6 +15521,7 @@ albedo.rgb *= (1.0 - metallic);
       const __play = ()=>{
         // Play the loaded effect
         this.__handle = effekseer.play(this.__effect);
+        this.update();
       };
 
       if (isLoop) {
@@ -15224,14 +15532,9 @@ albedo.rgb *= (1.0 - metallic);
       
     }
 
-    update() {
+    update(camera) {
       if (this.__handle != null) {
-        const m = this.worldMatrix;
-        this.__handle.setLocation(m.m03, m.m13, m.m23);
-        const eular = m.toEulerAngles();
-        this.__handle.setRotation(eular.x, eular.y, eular.z);
-        const scale = m.getScale();
-        this.__handle.setScale(scale.x, scale.y, scale.z);
+        this.__handle.setMatrix(this.worldMatrix.m);
         this.__handle.setSpeed(this.__speed);
       }
     }
@@ -15755,17 +16058,10 @@ albedo.rgb *= (1.0 - metallic);
       this._opacityMeshes = [];
       this._transparentMeshes = [];
       this._meshes.forEach((mesh)=>{
-        if (mesh.isTransparentForce === false) {
-          this._opacityMeshes.push(mesh);
-        } else if (mesh.isTransparentForce === true) {
+        if (mesh.isTransparent) {
           this._transparentMeshes.push(mesh);
         } else {
-          if (!mesh.isTransparent) {
-            this._opacityMeshes.push(mesh);
-          } else {
-            this._transparentMeshes.push(mesh);
-          }
-
+          this._opacityMeshes.push(mesh);
         }
       });
 
@@ -15869,9 +16165,10 @@ albedo.rgb *= (1.0 - metallic);
 
   }
 
+  //      
+
   /**
-   * en: This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.<br>
-   * ja: このクラスはレンダリングプロセスの制御を司ります。Canvasにイメージをレンダリングするために、このRendererクラスは他の要素のデータを集め、描画プロセスの計画を決定し、実行します。
+   * This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.
    */
   class Renderer extends GLBoostObject {
     constructor(glBoostContext, parameters) {
@@ -15896,23 +16193,30 @@ albedo.rgb *= (1.0 - metallic);
       this.__requestedToEnterWebVR = false;
       this.__isReadyForWebVR = false;
       this.__animationFrameObject = window;
+      this.__effekseerElements = [];
     }
 
 
     /**
-     * en: update things of elements of the expression.<br>
-     * @param {Expression} expression a instance of Expression class
+     * update things of elements of the expression.
+     * @param expression a instance of Expression class
      */
-    update(expression) {
+    update(expression            ) {
       
       let skeletalMeshes = [];
       let effekseerElements = [];
       // gather scenes as unique
       for (let renderPass of expression.renderPasses) {
         skeletalMeshes = skeletalMeshes.concat(renderPass._skeletalMeshes);
-        effekseerElements = effekseerElements.concat(renderPass._effekseerElements);
+  //      effekseerElements = effekseerElements.concat(renderPass._effekseerElements);
+        effekseerElements = effekseerElements.concat(renderPass.scene.searchElementsByType(EffekseerElement$1));
         renderPass.scene.updateAmountOfAmbientLightsIntensity();
+        let camera = renderPass.scene.getMainCamera();
+        for (let effekseerElement of effekseerElements) {
+          effekseerElement.update(camera);
+        }
       }
+      this.__effekseerElements = effekseerElements;
 
       let unique = function(array) {
         return array.reduce(function(a, b) {
@@ -15928,22 +16232,17 @@ albedo.rgb *= (1.0 - metallic);
         mesh.geometry.update(mesh);
       }
 
-      for (let effekseerElement of effekseerElements) {
-        effekseerElement.update();
-      }
-
-      if (typeof effekseer !== "undefined") {
+      if (typeof effekseer !== "undefined" && this.__effekseerElements.length > 0) {
         effekseer.update();
       }
 
     }
 
     /**
-     * en: draw elements of the expression.<br>
-     * ja: sceneが持つオブジェクトを描画します
-     * @param {Expression} expression a instance of Expression class
+     * draw elements of the expression.
+     * @param expression a instance of Expression class
      */
-    draw(expression) {
+    draw(expression            ) {
       let renderPassTag = '';
       expression.renderPasses.forEach((renderPass, index)=>{
         if (!renderPass.isEnableToDraw || !renderPass.scene) {
@@ -16038,7 +16337,7 @@ albedo.rgb *= (1.0 - metallic);
 
         transparentMeshes.forEach((mesh)=> {
           //console.log(mesh.userFlavorName);
-          if (mesh.isVisible) {
+          if (mesh.isVisible && mesh.isTransparent) {
             mesh.draw({
               expression: expression,
               lights: lights,
@@ -16058,11 +16357,11 @@ albedo.rgb *= (1.0 - metallic);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
   //      glem.drawBuffers(gl, [gl.BACK]);
 
-        if (typeof effekseer !== "undefined") {
-          const projection = (camera === null) ? Matrix44$1.identity().m : camera.projectionRHMatrix().m;
-          const inverseWorld = (camera === null) ? Matrix44$1.identity().m : camera.inverseWorldMatrix.m; 
+        if (typeof effekseer !== "undefined" && this.__effekseerElements.length > 0 && camera != null) {
+          const projection = camera.projectionRHMatrix().m;
+          const viewing = camera.lookAtRHMatrix().multiply(camera.inverseWorldMatrixWithoutMySelf).m; 
           effekseer.setProjectionMatrix(projection);
-          effekseer.setCameraMatrix(inverseWorld);
+          effekseer.setCameraMatrix(viewing);
           effekseer.draw();
         }
 
@@ -16129,13 +16428,12 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     /**
-     * en: clear color/depth/stencil of canvas.<br>
-     * ja: canvasのカラー、デプス、ステンシルのいずれか又は全てをクリアします。
-     * @param {boolean} color_flg true: clear color, false: don't clear color
-     * @param {boolean} depth_flg true: clear depth, false: don't clear depth
-     * @param {boolean} stencil_flg  true: clear stencil, false: don't clear stencil
+     * clear color/depth/stencil of canvas.
+     * @param color_flg true: clear color, false: don't clear color
+     * @param depth_flg true: clear depth, false: don't clear depth
+     * @param stencil_flg  true: clear stencil, false: don't clear stencil
      */
-    clearCanvas( color_flg, depth_flg, stencil_flg ) {
+    clearCanvas( color_flg         , depth_flg         , stencil_flg          ) {
       const gl = this._glContext.gl;
 
       var bufferBits = 0;
@@ -16149,22 +16447,20 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     /**
-     * en: Get WebGL context.<br>
-     * ja: WebGLコンテキストを取得します。
-     * @returns {webglcontext} a context of WebGL
+     * Get WebGL context.
+     * @returns a context of WebGL
      */
-    get glContext() {
+    get glContext()               {
       return this._glContext.gl;
     }
 
 
     /**
-     * en: resize canvas and viewport.<br>
-     * ja: canvasとビューポートをリサイズします。
-     * @param {number} width en: width to resize, ja: リサイズする幅
-     * @param {number} height en: height to resize, ja:リサイズする高さ
+     * resize canvas and viewport.
+     * @param width width to resize.
+     * @param height height to resize.
      */
-    resize(width, height) {
+    resize(width        , height        ) {
       this._glContext.canvasWidth = width;
       this._glContext.canvasHeight = height;
     }
@@ -16347,15 +16643,13 @@ albedo.rgb *= (1.0 - metallic);
 
 
   /**
-   * [en] This M_Scene class is the top level element of scene graph hierarchy.
-   *       To render scene, pass this scene element to Renderer.draw method.<br>
-   * [ja] このSceneクラスはシーングラフ階層のトップレベルに位置する要素です。
-   *       シーンをレンダリングするには、このscene要素をRenderer.drawメソッドに渡します。
+   * This M_Scene class is the top level element of scene graph hierarchy.
+   *  To render scene, pass this scene element to Renderer.draw method.
    */
   class M_Scene extends M_Group {
                                
                            
-                                
+                              
                                           
                              
                                           
@@ -16365,9 +16659,8 @@ albedo.rgb *= (1.0 - metallic);
                           
     
     /**
-     * [en] constructor
-     * [ja] コンストラクタ
-     * @param {HTMLCanvas|string} canvas [en] canvas or canvas' id string. [ja] canvasまたはcanvasのid文字列
+     * constructor
+     * @param {HTMLCanvas|string} canvas canvas or canvas' id string.
      */
     constructor(glBoostContext    ) {
       super(glBoostContext);
@@ -16394,8 +16687,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     /**
-     * [en] Prepare for Rendering. You have to call this method before Renderer.draw method.
-     * [ja] レンダリングのための前処理を行います。Renderer.drawメソッドの前にこのメソッドを呼ぶ必要があります。
+     * Prepare for Rendering. You have to call this method before Renderer.draw method.
      */
     prepareToRender(expression    ) {
       this._reset();
@@ -16567,38 +16859,34 @@ albedo.rgb *= (1.0 - metallic);
     }    
 
     /**
-     * [en] Get child elements which belong to this scene.<br>
-     * [ja] このシーンに属していた子供の要素の配列を返します。
-     * @return {Array<Element>} [en] child elements of this scene. [ja] このシーンの子供の要素
+     * Get child elements which belong to this scene.
+     * @return child elements of this scene.
      */
-    getChildren() {
+    getChildren()                {
       return this._elements;
     }
 
     /**
-     * [en] Get child elements which belong to this scene.<br>
-     * [ja] このシーンに属していた子供の要素の配列を返します。
-     * @return {Array<Element>} [en] child elements of this scene. [ja] このシーンの子供の要素
+     * Get child elements which belong to this scene.
+     * @return child elements of this scene.
      */
-    get elements()            {
+    get elements()                {
       return this._elements;
     }
 
     /**
-     * [en] Get child meshes which belong to this scene.<br>
-     * [ja] このシーンに属していた子供のMesh要素の配列を返します。
-     * @return {Array<M_Mesh>} [en] child meshes of this scene. [ja] このシーンの子供のMesh要素
+     * Get child meshes which belong to this scene.
+     * @return child meshes of this scene.
      */
-    get meshes() {
+    get meshes()               {
       return this._meshes;
     }
 
     /**
-     * [en] Get child lights which belong to this scene.<br>
-     * [ja] このシーンに属していた子供のLight要素の配列を返します。
-     * @return {Array<M_AbstractLight>} [en] child lights of this scene. [ja] このシーンの子供のLight要素
+     * Get child lights which belong to this scene.
+     * @return child lights of this scene.
      */
-    get lights() {
+    get lights()                        {
       return this._lights;
     }
 
@@ -16607,11 +16895,10 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     /**
-     * [en] Get child cameras which belong to this scene.<br>
-     * [ja] このシーンに属していた子供のCamera要素の配列を返します。
-     * @return {Array<PerspectiveCamera>} [en] child cameras of this scene. [ja] このシーンの子供のCamera要素
+     * Get child cameras which belong to this scene.
+     * @return child cameras of this scene.
      */
-    get cameras() {
+    get cameras()                           {
       return this._cameras;
     }
 
@@ -17541,142 +17828,6 @@ albedo.rgb *= (1.0 - metallic);
       }
   }
 
-  class M_PerspectiveCamera extends M_AbstractCamera {
-    constructor(glBoostContext, toRegister, lookat, perspective) {
-      super(glBoostContext, toRegister);
-
-      this._lowLevelCamera = new L_PerspectiveCamera(this, false, lookat, perspective);
-      this._lowLevelCamera._middleLevelCamera = this;
-    }
-
-    // ===================== delegate to low level class ========================
-
-    _needUpdateProjection() {
-      this._lowLevelCamera._needUpdateProjection();
-    }
-
-    get updateCountAsCameraProjection() {
-      return this._lowLevelCamera.updateCountAsCameraProjection;
-    }
-
-    projectionRHMatrix() {
-      return this._lowLevelCamera.projectionRHMatrix();
-    }
-
-    set fovy(value) {
-      this._lowLevelCamera.fovy = value;
-    }
-
-    get fovy() {
-      return this._lowLevelCamera.fovy;
-    }
-
-    set aspect(value) {
-      this._lowLevelCamera.aspect = value;
-    }
-
-    get aspect() {
-      return this._lowLevelCamera.aspect;
-    }
-
-    set zNear(value) {
-      this._lowLevelCamera.zNear = value;
-    }
-
-    get zNear() {
-      return this._lowLevelCamera.zNear;
-    }
-
-    set zFar(value) {
-      this._lowLevelCamera.zFar = value;
-    }
-
-    get zFar() {
-      return this._lowLevelCamera.zFar;
-    }
-
-  }
-
-  GLBoost$1['M_PerspectiveCamera'] = M_PerspectiveCamera;
-
-  class M_FrustumCamera extends M_AbstractCamera {
-    constructor(glBoostContext, toRegister, lookat, perspective) {
-      super(glBoostContext, toRegister);
-
-      this._lowLevelCamera = new L_FrustumCamera(this, false, lookat, perspective);
-      this._lowLevelCamera._middleLevelCamera = this;
-    }
-
-    // ===================== delegate to low level class ========================
-
-    _needUpdateProjection() {
-      this._lowLevelCamera._needUpdateProjection();
-    }
-
-    get updateCountAsCameraProjection() {
-      return this._lowLevelCamera.updateCountAsCameraProjection;
-    }
-
-    projectionRHMatrix() {
-      return this._lowLevelCamera.projectionRHMatrix();
-    }
-
-    set left(value) {
-      this._lowLevelCamera.left = value;
-    }
-
-    get left() {
-      return this._lowLevelCamera.left;
-    }
-
-    set right(value) {
-      this._lowLevelCamera.right = value;
-    }
-
-    get right() {
-      return this._lowLevelCamera.right;
-    }
-
-    set top(value) {
-      this._lowLevelCamera.top = value;
-    }
-
-    get top() {
-      return this._lowLevelCamera.top;
-    }
-
-    set bottom(value) {
-      this._lowLevelCamera.bottom = value;
-    }
-
-    get bottom() {
-      return this._lowLevelCamera.bottom;
-    }
-
-    set zNear(value) {
-      this._lowLevelCamera.zNear = value;
-    }
-
-    get zNear() {
-      return this._lowLevelCamera.zNear;
-    }
-
-    set zFar(value) {
-      this._lowLevelCamera.zFar = value;
-    }
-
-    get zFar() {
-      return this._lowLevelCamera.zFar;
-    }
-
-    get aspect() {
-      return (this._lowLevelCamera.right - this._lowLevelCamera.left) / (this._lowLevelCamera.top - this._lowLevelCamera.bottom);
-    }
-
-  }
-
-  GLBoost$1['M_FrustumCamera'] = M_FrustumCamera;
-
   class M_OrthoCamera extends M_AbstractCamera {
     constructor(glBoostContext, toRegister, lookat, ortho) {
       super(glBoostContext, toRegister);
@@ -17771,8 +17922,10 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1['M_OrthoCamera'] = M_OrthoCamera;
 
+  /*       */
+
   class Arrow extends Geometry {
-    constructor(glBoostSystem, length, lineCount = 1) {
+    constructor(glBoostSystem        , length        , lineCount         = 1) {
       super(glBoostSystem);
 
       this._setupVertexData(length, lineCount);
@@ -17855,21 +18008,23 @@ albedo.rgb *= (1.0 - metallic);
     }
   }
 
+  //      
+
+
   /**
-   * [en] This is a Directional Light class.<br>
-   * [ja] 平行光源クラスです。
+   * This is a Directional Light class.
    */
   class M_DirectionalLight extends M_AbstractLight {
 
     /**
      * The constructor of DirectionalLight class. 
      * 
-     * @param {glBoostSystem} glBoostSystem - glBoostSystem Instance
-     * @param {Vector4} intensity intensity as Vector4 Color
-     * @param {Vector3} rotate - initial rotation vector
-     * @param {number} length - length for DirectionalLightGizmo
+     * @param glBoostSystem - glBoostSystem Instance
+     * @param intensity intensity as Vector4 Color
+     * @param rotate - initial rotation vector
+     * @param length - length for DirectionalLightGizmo
      */
-    constructor(glBoostSystem, intensity, rotate = new Vector3(0, 0, 0), length = 1.0) {
+    constructor(glBoostSystem               , intensity         , rotate          = new Vector3(0, 0, 0), length         = 1.0) {
       super(glBoostSystem);
 
       this._intensity = intensity;
@@ -18760,32 +18915,31 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost['PhongShader'] = PhongShader;
 
+  //      
+
   let singleton$4 = Symbol();
   let singletonEnforcer$1 = Symbol();
 
   /**
-   * [en] This is a loader class of Obj file format.<br>
-   * [ja] Objファイルを読み込むためのローダークラスです。
+   * This is a loader class of Obj file format.
    */
   class ObjLoader {
 
     /**
-     * [en] The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.<br>
-     * [ja] ObjLoaderクラスのコンストラクタです。しかし本クラスはシングルトンであるため、このコンストラクタは直接呼び出せません。getInstance()静的メソッドを使ってください。
-     * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] このコンストラクタの直接呼び出しを禁止するためのシンボル
+     * The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+     * @param enforcer a Symbol to forbid calling this constructor directly
      */
-    constructor(enforcer) {
+    constructor(enforcer        ) {
       if (enforcer !== singletonEnforcer$1) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
     }
 
     /**
-     * [en] The static method to get singleton instance of this class.<br>
-     * [ja] このクラスのシングルトンインスタンスを取得するための静的メソッド。
-     * @return {ObjLoader} [en] the singleton instance of ObjLoader class [ja] ObjLoaderクラスのシングルトンインスタンス
+     * The static method to get singleton instance of this class.
+     * @return The singleton instance of ObjLoader class
      */
-    static getInstance() {
+    static getInstance()            {
       if (!this[singleton$4]) {
         this[singleton$4] = new ObjLoader(singletonEnforcer$1);
       }
@@ -18794,13 +18948,13 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * the method to load Obj file.
-     * @param {glBoostContext} glBoostContext - glBoostContext instance
-     * @param {string} url - url of glTF file
-     * @param {Shader} defaultShader - a shader to assign to loaded geometries
-     * @param {string} mtlString - string of mtl file (optional)
-     * @return {Promise} a promise object
+     * @param glBoostContext - glBoostContext instance
+     * @param url - url of glTF file
+     * @param defaultShader - a shader to assign to loaded geometries
+     * @param mtlString - string of mtl file (optional)
+     * @return a promise object
      */
-    loadObj(glBoostContext, url, defaultShader = null, mtlString = null) {
+    loadObj(glBoostContext                , url        , defaultShader         = null, mtlString         = null)          {
       return DataUtil.loadResourceAsync(url, false, (resolve, responseText)=>{
         let gotText = responseText;
         let partsOfPath = url.split('/');
@@ -19507,32 +19661,32 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost['LambertShader'] = LambertShader;
 
+  //      
+
+
   let singleton$5 = Symbol();
   let singletonEnforcer$2 = Symbol();
 
   /**
-   * [en] This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .<br>
-   * [ja] glTFファイルを読み込むためのローダークラスです。glTFファイルフォーマットについての詳細は https://github.com/KhronosGroup/glTF をご覧ください。
+   * This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .
    */
   class GLTFLoader {
 
     /**
-     * [en] The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.<br>
-     * [ja] GLTFLoaderクラスのコンストラクタです。しかし本クラスはシングルトンであるため、このコンストラクタは直接呼び出せません。getInstance()静的メソッドを使ってください。
-     * @param {Symbol} enforcer [en] a Symbol to forbid calling this constructor directly [ja] このコンストラクタの直接呼び出しを禁止するためのシンボル
+     * The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+     * @param enforcer a Symbol to forbid calling this constructor directly
      */
-    constructor(enforcer) {
+    constructor(enforcer        ) {
       if (enforcer !== singletonEnforcer$2) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
     }
 
     /**
-     * [en] The static method to get singleton instance of this class.<br>
-     * [ja] このクラスのシングルトンインスタンスを取得するための静的メソッド。
-     * @return {GLTFLoader} [en] the singleton instance of GLTFLoader class [ja] GLTFLoaderクラスのシングルトンインスタンス
+     * The static method to get singleton instance of this class.<br>
+     * @return The singleton instance of GLTFLoader class
      */
-    static getInstance() {
+    static getInstance()             {
       if (!this[singleton$5]) {
         this[singleton$5] = new GLTFLoader(singletonEnforcer$2);
       }
@@ -19599,12 +19753,12 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * the method to load glTF file.
-     * @param {glBoostContext} glBoostContext - glBoostContext instance
-     * @param {string} url - url of glTF file
-     * @param {Object} options - option data for loading
-     * @return {Promise} a promise object
+     * @param glBoostContext - glBoostContext instance
+     * @param url - url of glTF file
+     * @param options - option data for loading
+     * @return a promise object
      */
-    loadGLTF(glBoostContext, url, options) {
+    loadGLTF(glBoostContext                , url        , options        )          {
       let defaultOptions = {
         files: { 
           //        "foo.gltf": content of file as ArrayBuffer, 
@@ -19620,6 +19774,7 @@ albedo.rgb *= (1.0 - metallic);
         defaultMaterial: ClassicMaterial$1,
         defaultShaderClass: null,
         isMeshTransparentAsDefault: false,
+        ignoreMeshList: [],
         defaultStates: {
           states: {
             enable: [
@@ -19898,6 +20053,8 @@ albedo.rgb *= (1.0 - metallic);
         this._IterateNodeOfScene(glBoostContext, buffers, json, defaultShader, shaders, textures, glTFVer, resolve, options);
       }
 
+      
+
     }
 
     _IterateNodeOfScene(glBoostContext, buffers, json, defaultShader, shaders, textures, glTFVer, resolve, options) {
@@ -19935,15 +20092,18 @@ albedo.rgb *= (1.0 - metallic);
         // Animation
         this._loadAnimation(group, buffers, json, glTFVer, options);
 
-        if (options && options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
-          options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
-        }
-
         rootGroup.addChild(group);
 
       }
 
       rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
+
+      if (options && options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
+        options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, json.asset);
+      }
+      if (options && options.loaderExtension && options.loaderExtension.loadExtensionInfoAndSetToRootGroup) {
+        options.loaderExtension.loadExtensionInfoAndSetToRootGroup(rootGroup, json, glBoostContext);
+      }
 
       resolve(rootGroup);
     }
@@ -19992,12 +20152,18 @@ albedo.rgb *= (1.0 - metallic);
         let cameraStr = nodeJson.camera;
         let cameraJson = json.cameras[cameraStr];
         let camera = null;
+
+        let centerVec = new Vector3(0.0, 0.0, -1.0);
+        if (json.asset && json.asset.LastSaved_ApplicationVendor) {
+          // For backwards compatibility
+          centerVec = new Vector3(1.0, 0.0, 0.0);
+        }
         if (cameraJson.type === 'perspective') {
           let perspective = cameraJson.perspective;
           camera = glBoostContext.createPerspectiveCamera(
             {
               eye: new Vector3(0.0, 0.0, 0),
-              center: new Vector3(1.0, 0.0, 0.0),
+              center: centerVec,
               up: new Vector3(0.0, 1.0, 0.0)
             },
             {
@@ -20012,7 +20178,7 @@ albedo.rgb *= (1.0 - metallic);
           camera = glBoostContext.createOrthoCamera(
             {
               eye: new Vector3(0.0, 0.0, 0),
-              center: new Vector3(1.0, 0.0, 0.0),
+              center: centerVec,
               up: new Vector3(0.0, 1.0, 0.0)
             },
             {
@@ -20089,10 +20255,14 @@ albedo.rgb *= (1.0 - metallic);
         mesh = glBoostContext.createMesh(geometry);
       }
       mesh.userFlavorName = meshStr;
-      group.addChild(mesh);
 
-      if (options && options.isMeshTransparentAsDefault) {
-        mesh.isTransparentForce = true;
+      if (!(options.ignoreMeshList != null) || options.ignoreMeshList.indexOf(mesh.userFlavorName) === -1) {
+        // if the mesh name is not in ignore list, add it to the group.
+        group.addChild(mesh);
+      }
+
+      if (options && options.isMeshTransparentAsDefault || options && options.defaultStates && options.defaultStates.isTransparent) {
+        mesh.isTransparent = true;
       }
 
       let _indicesArray = [];
@@ -20234,7 +20404,7 @@ albedo.rgb *= (1.0 - metallic);
                   group.getChildren().forEach((elem)=>{
                     let isMatch = this.isTargetMatch(statesInfo, elem, target);
                     if (isMatch) {
-                      elem.isTransparentForce = statesInfo.isTransparent !== void 0 ? statesInfo.isTransparent : false;
+                      elem.isTransparent = statesInfo.isTransparent !== void 0 ? statesInfo.isTransparent : false;
                       if (statesInfo.states) {
                         material.states = statesInfo.states;
                       }
@@ -20540,6 +20710,17 @@ albedo.rgb *= (1.0 - metallic);
         if (typeof value !== 'string') {
           material[valueName + 'Color'] = MathClassUtil.arrayToVectorOrMatrix(value);
         }
+        if (valueName === 'transparent') {
+          material.isTransparent = value;
+          let enables = [3042];
+          material.states.enable = material.states.enable.concat(enables);
+        }
+        if (valueName === 'transparency') {
+          material.baseColor.w = 1.0 - value;
+          material.diffuseColor.w = 1.0 - value;
+          material.specularColor.w = 1.0 - value;
+          material.ambientColor.w = 1.0 - value;
+        }
       }
 
       if (indices !== null) {
@@ -20794,7 +20975,7 @@ albedo.rgb *= (1.0 - metallic);
 
     _sliceBufferViewToArrayBuffer(json, bufferViewStr, arrayBuffer) {
       let bufferViewJson = json.bufferViews[bufferViewStr];
-      let byteOffset = bufferViewJson.byteOffset;
+      let byteOffset = (bufferViewJson.byteOffset != null) ? bufferViewJson.byteOffset : 0;
       let byteLength = bufferViewJson.byteLength;
       let arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
       return arrayBufferSliced;
@@ -21075,6 +21256,8 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1["GLTFLoader"] = GLTFLoader;
 
+  //      
+
   let singleton$6 = Symbol();
   let singletonEnforcer$3 = Symbol();
 
@@ -21085,9 +21268,9 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
-     * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
+     * @param enforcer a Symbol to forbid calling this constructor directly
      */
-    constructor(enforcer) {
+    constructor(enforcer        ) {
       if (enforcer !== singletonEnforcer$3) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
@@ -21121,9 +21304,9 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * The static method to get singleton instance of this class.
-     * @return {GLTFLoader} the singleton instance of GLTFLoader class
+     * @return The singleton instance of GLTFLoader class
      */
-    static getInstance() {
+    static getInstance()             {
       if (!this[singleton$6]) {
         this[singleton$6] = new GLTF2Loader(singletonEnforcer$3);
       }
@@ -21132,11 +21315,11 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * the method to load glTF2 file.
-     * @param {string} uri uri of glTF file
-     * @param {Object} options - opition data for loading
-     * @return {Promise}
+     * @param uri uri of glTF file
+     * @param options - opition data for loading
+     * @return
      */
-    loadGLTF(uri, options) {
+    loadGLTF(uri        , options         = {})          {
       let defaultOptions = {
         files: { 
           //        "foo.gltf": content of file as ArrayBuffer, 
@@ -21169,7 +21352,8 @@ albedo.rgb *= (1.0 - metallic);
             isTextureImageToLoadPreMultipliedAlpha: false,
             globalStatesUsage: GLBoost$1.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
           }
-        ]
+        ],
+        extendedJson: null //   URI string / JSON Object / ArrayBuffer
       };
 
       (function() {
@@ -21210,7 +21394,21 @@ albedo.rgb *= (1.0 - metallic);
       return DataUtil.loadResourceAsync(uri, true,
         (resolve, response)=>{
           var arrayBuffer = response;
-          this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+
+          if (options.extendedJson) {
+            fetch(options.extendedJson).then((_response)=> {
+              _response.json().then((json)=>{
+                options.extendedJson = json;
+                this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+              });
+            }).then((json)=> {
+              //this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+              console.log("Result of ladding extended JSON");
+            });
+          } else {
+            this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+          }
+        
         }, (reject, error)=>{}
       );
     }
@@ -21256,6 +21454,12 @@ albedo.rgb *= (1.0 - metallic);
         basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
       }
 
+      if (gltfJson.asset.extras === undefined) {
+        gltfJson.asset.extras = {};
+      }
+      this._mergeExtendedJson(gltfJson, options.extendedJson);
+      gltfJson.asset.extras.basePath = basePath;
+
       let promise = this._loadInner(arrayBufferBinary, basePath, gltfJson, options);
       promise.then((gltfJson) => {
         console.log('Resoureces loading done!');
@@ -21271,12 +21475,35 @@ albedo.rgb *= (1.0 - metallic);
         basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
       }
       let gltfJson = JSON.parse(gotText);
+      if (gltfJson.asset.extras === undefined) {
+        gltfJson.asset.extras = {};
+      } 
+
       options = this._getOptions(defaultOptions, gltfJson, options);
+      
+      this._mergeExtendedJson(gltfJson, options.extendedJson);
+      gltfJson.asset.extras.basePath = basePath;
+
       let promise = this._loadInner(null, basePath, gltfJson, options);
       promise.then((gltfJson) => {
         console.log('Resoureces loading done!');
         resolve(gltfJson[0][0]);
       });
+    }
+
+    _mergeExtendedJson(gltfJson, extendedData) {
+      let extendedJson = null;
+      if (extendedData instanceof ArrayBuffer) {
+        const extendedJsonStr = DataUtil.arrayBufferToString(extendedData);
+        extendedJson = JSON.parse(extendedJsonStr);
+      } else if (typeof extendedData === 'string') {
+        extendedJson = JSON.parse(extendedData);
+        extendedJson = extendedJson;
+      } else if (typeof extendedData === 'object') {
+        extendedJson = extendedData;
+      }
+
+      Object.assign(gltfJson, extendedJson);
     }
 
     _loadInner(arrayBufferBinary, basePath, gltfJson, options) {
@@ -21688,9 +21915,9 @@ albedo.rgb *= (1.0 - metallic);
         
         promisesToLoadResources.push(new Promise((resolve, reject)=> {
           let img = new Image();
+          img.crossOrigin = 'Anonymous';
           img.src = imageUri;
           imageJson.image = img;
-          img.crossOrigin = 'Anonymous';
           if (imageUri.match(/^data:/)) {
             resolve(gltfJson);
           } else {
@@ -21774,7 +22001,7 @@ albedo.rgb *= (1.0 - metallic);
 
     _sliceBufferViewToArrayBuffer(json, bufferViewStr, arrayBuffer) {
       let bufferViewJson = json.bufferViews[bufferViewStr];
-      let byteOffset = bufferViewJson.byteOffset;
+      let byteOffset = (bufferViewJson.byteOffset != null) ? bufferViewJson.byteOffset : 0;
       let byteLength = bufferViewJson.byteLength;
       let arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
       return arrayBufferSliced;
@@ -21821,6 +22048,8 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1["GLTF2Loader"] = GLTF2Loader;
 
+  //      
+
   let singleton$7 = Symbol();
   let singletonEnforcer$4 = Symbol();
 
@@ -21831,9 +22060,9 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
-     * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
+     * @param enforcer a Symbol to forbid calling this constructor directly
      */
-    constructor(enforcer) {
+    constructor(enforcer        ) {
       if (enforcer !== singletonEnforcer$4) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
@@ -21841,9 +22070,9 @@ albedo.rgb *= (1.0 - metallic);
 
     /**
      * The static method to get singleton instance of this class.
-     * @return {GLTFLoader} the singleton instance of GLTFLoader class
+     * @return The singleton instance of GLTFLoader class
      */
-    static getInstance() {
+    static getInstance()             {
       if (!this[singleton$7]) {
         this[singleton$7] = new ModelConverter(singletonEnforcer$4);
       }
@@ -21875,8 +22104,9 @@ albedo.rgb *= (1.0 - metallic);
       let glboostMeshes = this._setupMesh(glBoostContext, gltfModel);
 
       let groups = [];
-      for (let node_i in gltfModel.nodes) {
+      for (let node of gltfModel.nodes) {
         let group = glBoostContext.createGroup();
+        group.userFlavorName = node.name;
         groups.push(group);
       }
 
@@ -21913,6 +22143,9 @@ albedo.rgb *= (1.0 - metallic);
       let options = gltfModel.asset.extras.glboostOptions;
       if (options.loaderExtension && options.loaderExtension.setAssetPropertiesToRootGroup) {
         options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, gltfModel.asset);
+      }
+      if (options && options.loaderExtension && options.loaderExtension.loadExtensionInfoAndSetToRootGroup) {
+        options.loaderExtension.loadExtensionInfoAndSetToRootGroup(rootGroup, gltfModel, glBoostContext);
       }
 
       rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
@@ -22003,7 +22236,6 @@ albedo.rgb *= (1.0 - metallic);
             let options = gltfModel.asset.extras.glboostOptions;
             let glboostJoint = glBoostContext.createJoint(options.isExistJointGizmo);
             glboostJoint._glTFJointIndex = joint_i;
-  //          glboostJoint.userFlavorName = nodeJson.jointName;
             let group = groups[joint_i];
             group.addChild(glboostJoint, true);
           }
@@ -22016,11 +22248,15 @@ albedo.rgb *= (1.0 - metallic);
       for (let mesh of gltfModel.meshes) {
         let geometry = null;
         let glboostMesh = null;
-        if (mesh.extras && mesh.extras._skin && mesh.extras._skin.inverseBindMatrices) {
+        if (mesh.extras && mesh.extras._skin && mesh.extras._skin.jointsIndices.length > 0) {
           geometry = glBoostContext.createSkeletalGeometry();
           glboostMesh = glBoostContext.createSkeletalMesh(geometry, null);
           glboostMesh.gltfJointIndices = mesh.extras._skin.jointsIndices;
-          glboostMesh.inverseBindMatrices = mesh.extras._skin.inverseBindMatrices.extras.vertexAttributeArray;
+          if (mesh.extras._skin.inverseBindMatrices) {
+            glboostMesh.inverseBindMatrices = mesh.extras._skin.inverseBindMatrices.extras.vertexAttributeArray;
+          } else {
+            glboostMesh.inverseBindMatrices = []; 
+          }
         } else {
           geometry = glBoostContext.createGeometry();
           glboostMesh = glBoostContext.createMesh(geometry);
@@ -22029,7 +22265,7 @@ albedo.rgb *= (1.0 - metallic);
 
         let options = gltfModel.asset.extras.glboostOptions;
         if (options.isMeshTransparentAsDefault) {
-          glboostMeshes.isTransparentForce = true;
+          glboostMeshes.isTransparent = true;
         }
 
         let _indicesArray = [];
@@ -22400,9 +22636,15 @@ albedo.rgb *= (1.0 - metallic);
               gltfMaterial.setTexture(texture, GLBoost$1.TEXTURE_PURPOSE_EMISSIVE);
             }
 
+            const alphaMode = materialJson.alphaMode;
+            if (alphaMode === 'MASK') {
+              // doalpha test in fragment shader
+              gltfMaterial.isAlphaTest = true;
+              gltfMaterial.alphaCutoff = materialJson.alphaCutoff;
+            }
 
             let enables = [];
-            if (options.isBlend) {
+            if (options.isBlend || alphaMode === 'BLEND') {
               enables.push(3042);
             }
             if (options.isDepthTest) {
@@ -22721,7 +22963,7 @@ albedo.rgb *= (1.0 - metallic);
       renderer: null,
       canvas: null,
 
-      /** 子供を 自分のCanvasRenderer で描画するか */
+      /** rendering child by self CanvasRenderer or not */
       renderChildBySelf: true,
 
       init: function(params) {
@@ -22738,7 +22980,7 @@ albedo.rgb *= (1.0 - metallic);
         this.canvas.style.display = "none";
 
         this.glBoostContext = new GLBoostMiddleContext(this.canvas);
-        // レンダラーを生成
+        // create renderer
         this.renderer = this.glBoostContext.createRenderer({clearColor: {red:1, green:1, blue:1, alpha:1}});
         this.scene = this.glBoostContext.createScene();
         this.expression = this.glBoostContext.createExpressionAndRenderPasses(1);
@@ -22759,13 +23001,13 @@ albedo.rgb *= (1.0 - metallic);
       superClass: 'phina.display.Layer',
 
       /**
-       * 子孫要素の描画の面倒を自分で見る
+       * rendering child by self CanvasRenderer or not
        */
       renderChildBySelf: true,
 
-      /** 子孫要素を普通に描画するためのキャンバス */
+      /** For drawing child attribute canvas */
       canvas2d: null,
-      /** canvas2dに描画するレンダラー */
+      /** To drawing canvas2d renderer */
       renderer2d: null,
 
       width: 0,
@@ -23326,6 +23568,150 @@ albedo.rgb *= (1.0 - metallic);
     GLBoost['JointGizmoUpdater'] = JointGizmoUpdater;
   }
 
+  //      
+
+  let singleton$8 = Symbol();
+  let singletonEnforcer$5 = Symbol();
+
+  /**
+   * This is a loader class of glTF VRize extension Data.
+   */
+  class GLBoostGLTFLoaderExtension {
+
+    /**
+     * The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+     * @param enforcer a Symbol to forbid calling this constructor directly
+     */
+    constructor(enforcer        ) {
+      if (enforcer !== singletonEnforcer$5) {
+        throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
+      }
+    }
+
+    /**
+     * The static method to get singleton instance of this class.
+     * @return the singleton instance of ObjLoader class
+     */
+    static getInstance()           {
+      if (!this[singleton$8]) {
+        this[singleton$8] = new GLBoostGLTFLoaderExtension(singletonEnforcer$5);
+      }
+      return this[singleton$8];
+    }
+
+    setUVTransformToTexture(texture, samplerJson) {
+      let uvTransform = new Vector4$1(1, 1, 0, 0);
+      if (samplerJson.extras && samplerJson.extras.scale) {
+        let scale = samplerJson.extras.scale;
+        uvTransform.x = scale[0];
+        uvTransform.y = scale[1];
+      }
+      if (samplerJson.extras && samplerJson.extras.translation) {
+        let translation = samplerJson.extras.translation;
+        uvTransform.z = translation[0];
+        uvTransform.w = translation[1];
+      }
+      texture.uvTransform = uvTransform;
+    }
+
+    setAssetPropertiesToRootGroup(rootGroup, asset) {
+      // Animation FPS
+      if (asset && asset.animationFps) {
+        rootGroup.animationFps = asset.animationFps;
+      }
+
+      // other information
+      if (asset && asset.version) {
+        rootGroup.version = asset.version;
+      }
+      if (asset && asset.LastSaved_ApplicationVendor) {
+        rootGroup.LastSaved_ApplicationVendor = asset.LastSaved_ApplicationVendor;
+      }
+      if (asset && asset.LastSaved_ApplicationName) {
+        rootGroup.LastSaved_ApplicationName = asset.LastSaved_ApplicationName;
+      }
+      if (asset && asset.LastSaved_ApplicationVersion) {
+        rootGroup.LastSaved_ApplicationVersion = asset.LastSaved_ApplicationVersion;
+      }
+
+      // Animation Tracks
+      if (asset && asset.extras && asset.extras.animation_tracks) {
+        rootGroup.animationTracks = asset.extras.animation_tracks;
+      }
+
+      // Transparent Meshes Draw Order
+      if (asset && asset.extras) {
+        const transparentMeshesAsManualOrder = (asset.extras.transparent_meshes_draw_order != null) ? asset.extras.transparent_meshes_draw_order : [];
+        let meshParents = rootGroup.searchElementsByType(M_Group);
+        const transparentMeshes = [];
+        for (let name of transparentMeshesAsManualOrder) {
+          for (let parent of meshParents) {
+            if (parent.userFlavorName === name) {
+              const mesh = parent.getChildren()[0];
+              if (mesh.isTransparent) {
+                transparentMeshes.push(mesh);
+              }
+              break;
+            }
+          }
+        }
+        rootGroup.transparentMeshesAsManualOrder = transparentMeshes;
+      }
+
+    }
+
+    loadExtensionInfoAndSetToRootGroup(rootGroup, json, glBoostContext) {
+      rootGroup['extensions'] = json.extensions;
+      if (json.extensions && json.extensions.GLBoost) {
+        const ext = json.extensions.GLBoost;
+
+        // Assignment for Backward Compatibility
+        if (ext.animation) {
+          if (ext.animation.fps != null) {
+            rootGroup.animationFps = ext.animation.fps; 
+          }
+          if (ext.animation.tracks != null) {
+            rootGroup.animationTracks = ext.animation.tracks;
+          }
+        }
+        
+        const transparentMeshesDrawOrder = ext.transparentMeshesDrawOrder;
+        if (transparentMeshesDrawOrder) {
+          let meshParents = rootGroup.searchElementsByType(M_Group);
+          const transparentMeshes = [];
+          for (let name of transparentMeshesDrawOrder) {
+            for (let parent of meshParents) {
+              if (parent.userFlavorName === name) {
+                const mesh = parent.getChildren()[0];
+                if (mesh.isTransparent) {
+                  transparentMeshes.push(mesh);
+                }
+                break;
+              }
+            }
+          }
+          rootGroup.transparentMeshesAsManualOrder = transparentMeshes;
+        }
+      }
+
+      if (json.extensions && json.extensions.Effekseer) {
+        const ext = json.extensions.Effekseer;
+        for (let effect of ext.effects) {
+          const group = rootGroup.searchElement(effect.nodeName, {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PERFECT_MATCHING});
+          const effekseerElm = glBoostContext.createEffekseerElement();
+          const promise = effekseerElm.load(asset.extras.basePath + effect.efkName + '.efk', true, true);
+          promise.then((effect)=>{
+            group.addChild(effect);
+          });
+        }
+      }
+    }
+
+  }
+
+
+  GLBoost$1["GLBoostGLTFLoaderExtension"] = GLBoostGLTFLoaderExtension;
+
   /*       */
 
   class AnimationPlayer {
@@ -23340,8 +23726,7 @@ albedo.rgb *= (1.0 - metallic);
                                         
                          
                             
-
-                           
+                                   
 
     constructor() {
     }
@@ -23441,7 +23826,7 @@ albedo.rgb *= (1.0 - metallic);
       return this.__animationMotions;
     }
 
-    set animationMotions(motions    ) {
+    set animationMotions(motions            ) {
       this.__animationMotions = motions;
     }
   }
@@ -23521,4 +23906,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-272-g1d588-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-353-g8686d-mod branch: develop';

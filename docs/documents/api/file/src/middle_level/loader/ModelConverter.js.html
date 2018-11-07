@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -190,9 +192,9 @@ export default class ModelConverter {
 
   /**
    * The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
-   * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
+   * @param enforcer a Symbol to forbid calling this constructor directly
    */
-  constructor(enforcer) {
+  constructor(enforcer: Symbol) {
     if (enforcer !== singletonEnforcer) {
       throw new Error(&quot;This is a Singleton class. get the instance using &apos;getInstance&apos; static method.&quot;);
     }
@@ -200,9 +202,9 @@ export default class ModelConverter {
 
   /**
    * The static method to get singleton instance of this class.
-   * @return {GLTFLoader} the singleton instance of GLTFLoader class
+   * @return The singleton instance of GLTFLoader class
    */
-  static getInstance() {
+  static getInstance(): GLTFLoader {
     if (!this[singleton]) {
       this[singleton] = new ModelConverter(singletonEnforcer);
     }
@@ -234,8 +236,9 @@ export default class ModelConverter {
     let glboostMeshes = this._setupMesh(glBoostContext, gltfModel);
 
     let groups = [];
-    for (let node_i in gltfModel.nodes) {
+    for (let node of gltfModel.nodes) {
       let group = glBoostContext.createGroup();
+      group.userFlavorName = node.name;
       groups.push(group);
     }
 
@@ -272,6 +275,9 @@ export default class ModelConverter {
     let options = gltfModel.asset.extras.glboostOptions;
     if (options.loaderExtension &amp;&amp; options.loaderExtension.setAssetPropertiesToRootGroup) {
       options.loaderExtension.setAssetPropertiesToRootGroup(rootGroup, gltfModel.asset);
+    }
+    if (options &amp;&amp; options.loaderExtension &amp;&amp; options.loaderExtension.loadExtensionInfoAndSetToRootGroup) {
+      options.loaderExtension.loadExtensionInfoAndSetToRootGroup(rootGroup, json, glBoostContext);
     }
 
     rootGroup.allMeshes = rootGroup.searchElementsByType(M_Mesh);
@@ -363,7 +369,6 @@ export default class ModelConverter {
           let options = gltfModel.asset.extras.glboostOptions;
           let glboostJoint = glBoostContext.createJoint(options.isExistJointGizmo);
           glboostJoint._glTFJointIndex = joint_i;
-//          glboostJoint.userFlavorName = nodeJson.jointName;
           let group = groups[joint_i];
           group.addChild(glboostJoint, true);
         }
@@ -389,7 +394,7 @@ export default class ModelConverter {
 
       let options = gltfModel.asset.extras.glboostOptions;
       if (options.isMeshTransparentAsDefault) {
-        glboostMeshes.isTransparentForce = true;
+        glboostMeshes.isTransparent = true;
       }
 
       let _indicesArray = [];
@@ -772,9 +777,15 @@ export default class ModelConverter {
             gltfMaterial.setTexture(texture, GLBoost.TEXTURE_PURPOSE_EMISSIVE);
           }
 
+          const alphaMode = materialJson.alphaMode;
+          if (alphaMode === &apos;MASK&apos;) {
+            // doalpha test in fragment shader
+            gltfMaterial.isAlphaTest = true;
+            gltfMaterial.alphaCutoff = materialJson.alphaCutoff;
+          }
 
           let enables = [];
-          if (options.isBlend) {
+          if (options.isBlend || alphaMode === &apos;BLEND&apos;) {
             enables.push(3042);
           }
           if (options.isDepthTest) {

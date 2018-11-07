@@ -61,36 +61,22 @@ export default class CubeTexture extends AbstractTexture {
       gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
 
-      for (let i=0; i<posXimages.length; i++) {
-        const image = new Image();
-        image.src = posXimages[i];
-        image.onload = ()=>{ gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
+      const loadImageToGPU = (images, cubemapSide) => {
+        for (let i=0; i<images.length; i++) {
+          const image = new Image();
+          image.crossOrigin = "Anonymous";
+          image.src = images[i];
+          image.onload = ()=>{ gl.texImage2D(cubemapSide, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
+        }
       }
-      for (let i=0; i<negXimages.length; i++) {
-        const image = new Image();
-        image.src = negXimages[i];
-        image.onload = ()=>{ gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
-      }
-      for (let i=0; i<posYimages.length; i++) {
-        const image = new Image();
-        image.src = posYimages[i];
-        image.onload = ()=>{ gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
-      }
-      for (let i=0; i<negYimages.length; i++) {
-        const image = new Image();
-        image.src = negYimages[i];
-        image.onload = ()=>{ gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
-      }
-      for (let i=0; i<posZimages.length; i++) {
-        const image = new Image();
-        image.src = posZimages[i];
-        image.onload = ()=> { gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
-      }
-      for (let i=0; i<negZimages.length; i++) {
-        const image = new Image();
-        image.src = negZimages[i];
-        image.onload = ()=> { gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
-      }
+
+      loadImageToGPU(posXimages, gl.TEXTURE_CUBE_MAP_POSITIVE_X);
+      loadImageToGPU(negXimages, gl.TEXTURE_CUBE_MAP_NEGATIVE_X);
+      loadImageToGPU(posYimages, gl.TEXTURE_CUBE_MAP_POSITIVE_Y);
+      loadImageToGPU(negYimages, gl.TEXTURE_CUBE_MAP_NEGATIVE_Y);
+      loadImageToGPU(posZimages, gl.TEXTURE_CUBE_MAP_POSITIVE_Z);
+      loadImageToGPU(negZimages, gl.TEXTURE_CUBE_MAP_NEGATIVE_Z);
+      
   }
 
   async generateTextureFromBaseUri(baseUri, mipLevelNum) {
@@ -135,8 +121,9 @@ export default class CubeTexture extends AbstractTexture {
           [baseUri + "_back_" + i + ".jpg", gl.TEXTURE_CUBE_MAP_NEGATIVE_Z]
         ];
         for (var j = 0; j < faces.length; j++) {
-          var face = faces[j][1];
-          var image = new Image();
+          const face = faces[j][1];
+          const image = new Image();
+          image.crossOrigin = "Anonymous";
           image.onload = onLoadEachCubeImage(texture, face, image, i);
           image.src = faces[j][0];
         }

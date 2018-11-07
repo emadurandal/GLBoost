@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -177,24 +179,24 @@ export class PBRPrincipledShaderSource {
 
   FSDefine_PBRPrincipledShaderSource(in_, f, lights, material, extraData) {
     
-    var shaderText = &apos;&apos;;
+    let shaderText = &apos;&apos;;
     shaderText += &apos;uniform vec2 uMetallicRoughnessFactors;\n&apos;;
     shaderText += &apos;uniform vec3 uBaseColorFactor;\n&apos;;
     shaderText += &apos;uniform vec2 uOcclusionFactors;&apos;
     shaderText += &apos;uniform vec3 uEmissiveFactor;&apos;
     shaderText += &apos;uniform sampler2D uMetallicRoughnessTexture;\n&apos;;
 
-    let occlusionTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_OCCLUSION);
+    const occlusionTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_OCCLUSION);
     if (occlusionTexture) {
       shaderText += &apos;uniform sampler2D uOcclusionTexture;\n&apos;;
     }
     
-    let emissiveTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_EMISSIVE);
+    const emissiveTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_EMISSIVE);
     if (emissiveTexture) {
       shaderText += &apos;uniform sampler2D uEmissiveTexture;\n&apos;;
     }
 
-    let diffuseEnvCubeTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_IBL_DIFFUSE_ENV_CUBE);
+    const diffuseEnvCubeTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_IBL_DIFFUSE_ENV_CUBE);
     if (diffuseEnvCubeTexture) {
       shaderText += &apos;uniform sampler2D uBrdfLUTTexture;\n&apos;;
       shaderText += &apos;uniform samplerCube uDiffuseEnvTexture;\n&apos;;
@@ -203,10 +205,12 @@ export class PBRPrincipledShaderSource {
     }
     
     shaderText += &apos;uniform vec4 ambient;\n&apos;; // Ka * amount of ambient lights
+
+
     
 
-    var sampler2D = this._sampler2DShadow_func();
-    let lightNumExceptAmbient = lights.filter((light)=&gt;{return !light.isTypeAmbient();}).length;    
+    const sampler2D = this._sampler2DShadow_func();
+    const lightNumExceptAmbient = lights.filter((light)=&gt;!light.isTypeAmbient()).length;    
     if (lightNumExceptAmbient &gt; 0) {
       shaderText += `uniform highp ${sampler2D} uDepthTexture[${lightNumExceptAmbient}];\n`;
       shaderText += `${in_} vec4 v_shadowCoord[${lightNumExceptAmbient}];\n`;
@@ -325,7 +329,7 @@ export class PBRPrincipledShaderSource {
     }
   `;
 
-    let diffuseEnvCubeTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_IBL_DIFFUSE_ENV_CUBE);
+    const diffuseEnvCubeTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_IBL_DIFFUSE_ENV_CUBE);
     if (diffuseEnvCubeTexture) {
       shaderText += `
       vec3 IBLContribution(vec3 n, float NV, vec3 reflection, vec3 albedo, vec3 F0, float userRoughness)
@@ -360,11 +364,11 @@ export class PBRPrincipledShaderSource {
   }
 
   FSShade_PBRPrincipledShaderSource(f, gl, lights, material, extraData) {
-    var shaderText = &apos;&apos;;
+    let shaderText = &apos;&apos;;
 
     shaderText += `
 vec3 surfaceColor = rt0.rgb;
-rt0 = vec4(0.0, 0.0, 0.0, 0.0);
+rt0 = vec4(0.0, 0.0, 0.0, rt0.a);
 
 // BaseColor
 vec3 baseColor = srgbToLinear(surfaceColor) * uBaseColorFactor.rgb;
@@ -374,7 +378,7 @@ float userRoughness = uMetallicRoughnessFactors.y;
 float metallic = uMetallicRoughnessFactors.x;
 `;
 
-    let metallicRoughnessTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS);
+    const metallicRoughnessTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS);
     if (metallicRoughnessTexture) {
     shaderText += `
 vec4 ormTexel = texture2D(uMetallicRoughnessTexture, texcoord);
@@ -400,8 +404,8 @@ albedo.rgb *= (1.0 - metallic);
     shaderText += &apos;    float NV = clamp(dot(normal, viewDirection), 0.001, 1.0);\n&apos;;
 
     for (let i=0; i&lt;lights.length; i++) {
-      let light = lights[i];
-      let isShadowEnabledAsTexture = (light.camera &amp;&amp; light.camera.texture) ? true:false;
+      const light = lights[i];
+      const isShadowEnabledAsTexture = !!((light.camera &amp;&amp; light.camera.texture));
       shaderText += `  {\n`;
       shaderText +=      Shader._generateLightStr(i);
       // Light
@@ -434,9 +438,9 @@ albedo.rgb *= (1.0 - metallic);
 
 
     // Indirect
-    /// IBL
+    // / IBL
     
-    let diffuseEnvCubeTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_IBL_DIFFUSE_ENV_CUBE);
+    const diffuseEnvCubeTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_IBL_DIFFUSE_ENV_CUBE);
     if (diffuseEnvCubeTexture) {
       shaderText += `vec3 reflection = reflect(-viewDirection, normal);\n`;
       shaderText += &apos;vec3 ibl = IBLContribution(normal, NV, reflection, albedo, F0, userRoughness);\n&apos;;
@@ -444,15 +448,15 @@ albedo.rgb *= (1.0 - metallic);
       shaderText += &apos;vec3 ibl = vec3(0.0, 0.0, 0.0);\n&apos;;
     }
     
-//shaderText += &apos;ibl = vec3(0.0, 0.0, 0.0);\n&apos;;
+// shaderText += &apos;ibl = vec3(0.0, 0.0, 0.0);\n&apos;;
     // calc occlusion
     shaderText += &apos;float occlusion = 1.0;\n&apos;;
-    let occlusionTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_OCCLUSION);
+    const occlusionTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_OCCLUSION);
     if (occlusionTexture) {
       shaderText += &apos;occlusion = mix(1.0, texture2D(uOcclusionTexture, texcoord).r, uOcclusionFactors.x);\n&apos;;
     }
 
-    /// Enforce Occlution to Directional Lights by occlusionRateForDirectionalLight (Fake effect)
+    // / Enforce Occlution to Directional Lights by occlusionRateForDirectionalLight (Fake effect)
     shaderText += &apos;  float occlusionRateForDirectionalLight = uOcclusionFactors.y;\n&apos;;
     shaderText += &apos;  rt0.xyz = mix(rt0.xyz, rt0.xyz * occlusion, occlusionRateForDirectionalLight);\n&apos;;
     
@@ -461,15 +465,14 @@ albedo.rgb *= (1.0 - metallic);
 
     // Emissive
     shaderText += &apos;  vec3 emissive = uEmissiveFactor;\n&apos;;
-    let emissiveTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_EMISSIVE);
+    const emissiveTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_EMISSIVE);
     if (emissiveTexture) {
       shaderText += &apos;emissive *= srgbToLinear(texture2D(uEmissiveTexture, texcoord).xyz);&apos;;
     }
     shaderText += &apos;  rt0.xyz += emissive;\n&apos;;
 
     shaderText += &apos;  rt0.xyz = linearToSrgb(rt0.xyz);\n&apos;;
-     
-    shaderText += &apos;  rt0.a = 1.0;\n&apos;;
+    
 //    shaderText += &apos;  rt0.xyz = vec3(texture2D(uOcclusionTexture, texcoord).r);\n&apos;;
 
 
@@ -478,7 +481,7 @@ albedo.rgb *= (1.0 - metallic);
 
   prepare_PBRPrincipledShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
 
-    var vertexAttribsAsResult = [];
+    const vertexAttribsAsResult = [];
 
     material.setUniform(shaderProgram, &apos;uniform_BaseColorFactor&apos;, this._glContext.getUniformLocation(shaderProgram, &apos;uBaseColorFactor&apos;));
     material.setUniform(shaderProgram, &apos;uniform_MetallicRoughnessFactors&apos;, this._glContext.getUniformLocation(shaderProgram, &apos;uMetallicRoughnessFactors&apos;));
@@ -491,7 +494,7 @@ albedo.rgb *= (1.0 - metallic);
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_METALLIC_ROUGHNESS, shaderProgram, &apos;uMetallicRoughnessTexture&apos;); 
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_OCCLUSION, shaderProgram, &apos;uOcclusionTexture&apos;);
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_EMISSIVE, shaderProgram, &apos;uEmissiveTexture&apos;);
-    material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_BRDF_LUT, shaderProgram, &apos;uBrdfLutTexture&apos;);
+    material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_BRDF_LUT, shaderProgram, &apos;uBrdfLUTTexture&apos;);
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_IBL_DIFFUSE_ENV_CUBE, shaderProgram, &apos;uDiffuseEnvTexture&apos;);
     material.registerTextureUnitToUniform(GLBoost.TEXTURE_PURPOSE_IBL_SPECULAR_ENV_CUBE, shaderProgram, &apos;uSpecularEnvTexture&apos;);
 
@@ -510,9 +513,9 @@ export default class PBRPrincipledShader extends DecalShader {
   setUniforms(gl, glslProgram, scene, material, camera, mesh, lights) {
     super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
-    var baseColor = material.baseColor;
-    var metallic = (material.metallic !== void 0) ? material.metallic : 1.0;
-    let roughness = (material.roughness !== void 0) ? material.roughness : 0.5;
+    const baseColor = material.baseColor;
+    const metallic = (material.metallic !== void 0) ? material.metallic : 1.0;
+    const roughness = (material.roughness !== void 0) ? material.roughness : 0.5;
     const occlusion = (material.occlusion !== void 0) ? material.occlusion : 1.0;
     const occlusionRateForDirectionalLight = (material.occlusionRateForDirectionalLight !== void 0) ? material.occlusionRateForDirectionalLight : 0.2;
     const emissive = (material.emissive !== void 0) ? material.emissive : Vector3.zero();
@@ -524,15 +527,16 @@ export default class PBRPrincipledShader extends DecalShader {
     this._glContext.uniform2f(material.getUniform(glslProgram, &apos;uniform_OcclusionFactors&apos;), occlusion, occlusionRateForDirectionalLight, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, &apos;uniform_EmissiveFactor&apos;), emissive.x, emissive.y, emissive.z, true);
     this._glContext.uniform3f(material.getUniform(glslProgram, &apos;uniform_IBLParameters&apos;), IBLSpecularTextureMipmapCount, IBLDiffuseContribution, IBLSpecularContribution, true);
+    
 
-    let ambient = Vector4.multiplyVector(new Vector4(1.0, 1.0, 1.0, 1.0), scene.getAmountOfAmbientLightsIntensity());
+    const ambient = Vector4.multiplyVector(new Vector4(1.0, 1.0, 1.0, 1.0), scene.getAmountOfAmbientLightsIntensity());
     this._glContext.uniform4f(material.getUniform(glslProgram, &apos;uniform_ambient&apos;), ambient.x, ambient.y, ambient.z, ambient.w, true);    
 
   }
 
 }
 
-GLBoost[&apos;PBRPrincipledShader&apos;] = PBRPrincipledShader;
+GLBoost.PBRPrincipledShader = PBRPrincipledShader;
 </code></pre>
 
 </div>

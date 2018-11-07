@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -178,20 +180,19 @@ import Matrix44 from &apos;../../../low_level/math/Matrix44&apos;;
 
 
 /**
- * [en] This is a Directional Light class.&lt;br&gt;
- * [ja] &#x5E73;&#x884C;&#x5149;&#x6E90;&#x30AF;&#x30E9;&#x30B9;&#x3067;&#x3059;&#x3002;
+ * This is a Directional Light class.
  */
 export default class M_DirectionalLight extends M_AbstractLight {
 
   /**
    * The constructor of DirectionalLight class. 
    * 
-   * @param {glBoostSystem} glBoostSystem - glBoostSystem Instance
-   * @param {Vector4} intensity intensity as Vector4 Color
-   * @param {Vector3} rotate - initial rotation vector
-   * @param {number} length - length for DirectionalLightGizmo
+   * @param glBoostSystem - glBoostSystem Instance
+   * @param intensity intensity as Vector4 Color
+   * @param rotate - initial rotation vector
+   * @param length - length for DirectionalLightGizmo
    */
-  constructor(glBoostSystem, intensity, rotate = new Vector3(0, 0, 0), length = 1.0) {
+  constructor(glBoostSystem: glBoostSystem, intensity: Vector4, rotate: Vector3 = new Vector3(0, 0, 0), length: number = 1.0) {
     super(glBoostSystem);
 
     this._intensity = intensity;

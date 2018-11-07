@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -168,14 +170,31 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/low_level/core/GLBoostSystem.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import GLContext from &apos;./GLContext&apos;;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/* @flow */
+
+import GLContext from &apos;./GLContext&apos;;
 import L_GLBoostMonitor from &apos;./L_GLBoostMonitor&apos;;
 import GLExtensionsManager from &apos;./GLExtensionsManager&apos;;
 import GLBoost from &apos;../../globals&apos;;
+import type GLBoostLowContext from &apos;./GLBoostLowContext&apos;;
+import type Texture from &apos;../textures/Texture&apos;;
+import type ClassicMaterial from &apos;../materials/ClassicMaterial&apos;;
+
+declare var effekseer: any;
 
 export default class GLBoostSystem {
+  _currentGlobalStates: Array&lt;number&gt; | null;
+  _defaultGlobalStates: Array&lt;number&gt;;
+  _glContext: GLContext;
+  _glBoostContext: GLBoostLowContext;
+  _glBoostMonitor: L_GLBoostMonitor;
+  _globalStatesUsage: string;
+  _defaultDummyTexture: Texture;
+  _defaultDummyTextureCube: Texture;
+  _brdfLutTexture: Texture;
+  _defaultMaterial: ClassicMaterial;
 
-  constructor(canvas, initParameter, gl, width, height, glBoostContext) {
+  constructor(canvas: Object, initParameter:Object, gl:WebGLRenderingContext, width: number, height: number, glBoostContext: GLBoostLowContext) {
     if (gl) {
       this._glContext = GLContext.getInstance(null, initParameter, gl, width, height);
     } else {

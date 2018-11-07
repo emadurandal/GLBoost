@@ -1,3 +1,5 @@
+// @flow
+
 import GLBoost from '../../globals';
 import DataUtil from '../../low_level/misc/DataUtil';
 import DecalShader from '../shaders/DecalShader';
@@ -14,9 +16,9 @@ export default class GLTF2Loader {
 
   /**
    * The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
-   * @param {Symbol} enforcer a Symbol to forbid calling this constructor directly
+   * @param enforcer a Symbol to forbid calling this constructor directly
    */
-  constructor(enforcer) {
+  constructor(enforcer: Symbol) {
     if (enforcer !== singletonEnforcer) {
       throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
     }
@@ -50,9 +52,9 @@ export default class GLTF2Loader {
 
   /**
    * The static method to get singleton instance of this class.
-   * @return {GLTFLoader} the singleton instance of GLTFLoader class
+   * @return The singleton instance of GLTFLoader class
    */
-  static getInstance() {
+  static getInstance(): GLTFLoader {
     if (!this[singleton]) {
       this[singleton] = new GLTF2Loader(singletonEnforcer);
     }
@@ -61,11 +63,11 @@ export default class GLTF2Loader {
 
   /**
    * the method to load glTF2 file.
-   * @param {string} uri uri of glTF file
-   * @param {Object} options - opition data for loading
-   * @return {Promise}
+   * @param uri uri of glTF file
+   * @param options - opition data for loading
+   * @return
    */
-  loadGLTF(uri, options) {
+  loadGLTF(uri: string, options: Object = {}): Promise {
     let defaultOptions = {
       files: { 
         //        "foo.gltf": content of file as ArrayBuffer, 
@@ -98,7 +100,8 @@ export default class GLTF2Loader {
           isTextureImageToLoadPreMultipliedAlpha: false,
           globalStatesUsage: GLBoost.GLOBAL_STATES_USAGE_IGNORE // GLBoost.GLOBAL_STATES_USAGE_DO_NOTHING // GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE // GLBoost.GLOBAL_STATES_USAGE_EXCLUSIVE
         }
-      ]
+      ],
+      extendedJson: null //   URI string / JSON Object / ArrayBuffer
     };
 
     (function() {
@@ -139,7 +142,21 @@ export default class GLTF2Loader {
     return DataUtil.loadResourceAsync(uri, true,
       (resolve, response)=>{
         var arrayBuffer = response;
-        this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+
+        if (options.extendedJson) {
+          fetch(options.extendedJson).then((_response)=> {
+            _response.json().then((json)=>{
+              options.extendedJson = json;
+              this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+            });
+          }).then((json)=> {
+            //this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+            console.log("Result of ladding extended JSON");
+          });
+        } else {
+          this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+        }
+      
       }, (reject, error)=>{}
     );
   }
@@ -185,6 +202,12 @@ export default class GLTF2Loader {
       basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
     }
 
+    if (gltfJson.asset.extras === undefined) {
+      gltfJson.asset.extras = {};
+    }
+    this._mergeExtendedJson(gltfJson, options.extendedJson);
+    gltfJson.asset.extras.basePath = basePath;
+
     let promise = this._loadInner(arrayBufferBinary, basePath, gltfJson, options);
     promise.then((gltfJson) => {
       console.log('Resoureces loading done!');
@@ -200,12 +223,36 @@ export default class GLTF2Loader {
       basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
     }
     let gltfJson = JSON.parse(gotText);
+    if (gltfJson.asset.extras === undefined) {
+      gltfJson.asset.extras = {};
+    } 
+
     options = this._getOptions(defaultOptions, gltfJson, options);
+    
+    this._mergeExtendedJson(gltfJson, options.extendedJson);
+    gltfJson.asset.extras.basePath = basePath;
+
     let promise = this._loadInner(null, basePath, gltfJson, options);
     promise.then((gltfJson) => {
       console.log('Resoureces loading done!');
       resolve(gltfJson[0][0]);
     });
+  }
+
+  _mergeExtendedJson(gltfJson, extendedData) {
+    let extendedJson = null;
+    if (extendedData instanceof ArrayBuffer) {
+      const extendedJsonStr = DataUtil.arrayBufferToString(extendedData);
+      extendedJson = JSON.parse(extendedJsonStr);
+    } else if (typeof extendedData === 'string') {
+      extendedJson = JSON.parse(extendedData);
+      extendedJson = extendedJson;
+    } else if (typeof extendedData === 'object') {
+      extendedJson = extendedData;
+    } else {
+    }
+
+    Object.assign(gltfJson, extendedJson);
   }
 
   _loadInner(arrayBufferBinary, basePath, gltfJson, options) {
@@ -627,9 +674,9 @@ export default class GLTF2Loader {
       
       promisesToLoadResources.push(new Promise((resolve, reject)=> {
         let img = new Image();
+        img.crossOrigin = 'Anonymous';
         img.src = imageUri;
         imageJson.image = img;
-        img.crossOrigin = 'Anonymous';
         if (imageUri.match(/^data:/)) {
           resolve(gltfJson);
         } else {
@@ -713,7 +760,7 @@ export default class GLTF2Loader {
 
   _sliceBufferViewToArrayBuffer(json, bufferViewStr, arrayBuffer) {
     let bufferViewJson = json.bufferViews[bufferViewStr];
-    let byteOffset = bufferViewJson.byteOffset;
+    let byteOffset = (bufferViewJson.byteOffset != null) ? bufferViewJson.byteOffset : 0;
     let byteLength = bufferViewJson.byteLength;
     let arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
     return arrayBufferSliced;

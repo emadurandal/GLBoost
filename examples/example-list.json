@@ -1,9 +1,19 @@
 {
   "test": [
     "basic",
+    "index_buffer",
+    "texture",
+    "triangle_strip",
     "custom_shader",
     "custom_shader_2",
     "free_shader",
+    "primitives",
+    "primitives_2",
+    "primitives_3",
+    "primitives_4_geometry_merged",
+    "obj_mesh",
+    "obj_mesh_two_objects",
+    "obj_mesh_with_mtl_string",
     "loading_gltf",
     "loading_gltf_head",
     "loading_gltf_anim",
@@ -25,5 +35,9 @@
     "update_particles",
     "effekseer",
     "raycast"
+  ],
+  "test2": [
+    "multiple_render_passes",
+    "multiple_render_targets"
   ]
 }

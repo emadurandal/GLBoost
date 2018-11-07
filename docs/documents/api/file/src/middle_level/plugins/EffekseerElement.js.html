@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -172,6 +174,9 @@
 import M_Element from &apos;../elements/M_Element&apos;;
 import Vector3 from &apos;../../low_level/math/Vector3&apos;;
 import Vector4 from &apos;../../low_level/math/Vector4&apos;;
+import Matrix44 from &apos;../../low_level/math/Matrix44&apos;;
+import M_FrustumCamera from &apos;../elements/cameras/M_FrustumCamera&apos;;
+import M_PerspectiveCamera from &apos;../elements/cameras/M_PerspectiveCamera&apos;;
 
 export default class EffekseerElement extends M_Element {
   constructor(glBoostContext) {
@@ -205,6 +210,7 @@ export default class EffekseerElement extends M_Element {
     const __play = ()=&gt;{
       // Play the loaded effect
       this.__handle = effekseer.play(this.__effect);
+      this.update();
     };
 
     if (isLoop) {
@@ -215,14 +221,9 @@ export default class EffekseerElement extends M_Element {
     
   }
 
-  update() {
+  update(camera) {
     if (this.__handle != null) {
-      const m = this.worldMatrix;
-      this.__handle.setLocation(m.m03, m.m13, m.m23);
-      const eular = m.toEulerAngles();
-      this.__handle.setRotation(eular.x, eular.y, eular.z);
-      const scale = m.getScale();
-      this.__handle.setScale(scale.x, scale.y, scale.z);
+      this.__handle.setMatrix(this.worldMatrix.m);
       this.__handle.setSpeed(this.__speed);
     }
   }

@@ -8,6 +8,9 @@ import type GLBoostSystem from './GLBoostSystem';
 import GLContext from './GLContext';
 
 export default class GLBoostObject {
+  static classInfoDic: Object;
+  static _objectExistArray: Array<any>;
+  static __entities: Array<any>;
   _glBoostSystem: GLBoostSystem;
   _glContext: GLContext;
   _toRegister: boolean;
@@ -53,15 +56,16 @@ export default class GLBoostObject {
     this._objectIndex = -1;
 
     const seekSpaceOfArrayAndSetIndexThere = (typeName)=>{
+      const that:any = this;
       let array = GLBoostObject['_' + typeName + 'ExistArray'];
       for (let i=0; i<array.length; i++) {
         if (array[i] === void 0) {
-          this['_' + typeName + 'Index'] = i;
+          that['_' + typeName + 'Index'] = i;
           array[i] = true;
           return;
         }
       }
-      this['_' + typeName + 'Index'] = array.length;
+      that['_' + typeName + 'Index'] = array.length;
       array[array.length] = true;
     };
 
@@ -74,8 +78,9 @@ export default class GLBoostObject {
   tearDownExistIndexAndArray() {
     const deleteIndex = (typeName)=>{
       let array = GLBoostObject['_' + typeName + 'ExistArray'];
-      delete array[this['_' + typeName + 'Index']];
-      this['_' + typeName + 'Index'] = -1;
+      const that: any = this;
+      delete array[that['_' + typeName + 'Index']];
+      that['_' + typeName + 'Index'] = -1;
     };
 
     if (this.className.indexOf('Mesh') !== -1) {
@@ -99,9 +104,8 @@ export default class GLBoostObject {
   }
 
   /**
-   * [en] Return instance name.
-   * [ja] インスタンス名を返します。
-   * @returns {string} [en] the instance name. [ja] インスタンス名
+   * Return instance name.
+   * @returns the instance name.
    */
   toString():string {
     return this._instanceName;
@@ -123,7 +127,7 @@ export default class GLBoostObject {
   }
 
   get belongingCanvasId() {
-    return this._glBoostSystem.belongingCanvasId;
+    return this._glContext.belongingCanvasId;
   }
 
   set userFlavorName(name:string) {

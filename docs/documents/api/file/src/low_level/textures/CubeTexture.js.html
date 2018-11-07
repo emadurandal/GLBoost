@@ -127,7 +127,9 @@
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-expressions">middle_level/expressions</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/Expression.js~Expression.html">Expression</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/expressions/RenderPass.js~RenderPass.html">RenderPass</a></span></span></li>
 <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-geometries">middle_level/geometries</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/geometries/M_SkeletalGeometry.js~M_SkeletalGeometry.html">M_SkeletalGeometry</a></span></span></li>
-<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#middle-level-loader">middle_level/loader</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLBoostGLTFLoaderExtension.js~GLBoostGLTFLoaderExtension.html">GLBoostGLTFLoaderExtension</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Exporter.js~GLTF2Exporter.html">GLTF2Exporter</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTF2Loader.js~GLTF2Loader.html">GLTF2Loader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/GLTFLoader.js~GLTFLoader.html">GLTFLoader</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ModelConverter.js~ModelConverter.html">ModelConverter</a></span></span></li>
 <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/middle_level/loader/ObjLoader.js~ObjLoader.html">ObjLoader</a></span></span></li>
@@ -231,36 +233,22 @@ export default class CubeTexture extends AbstractTexture {
       gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
 
-      for (let i=0; i&lt;posXimages.length; i++) {
-        const image = new Image();
-        image.src = posXimages[i];
-        image.onload = ()=&gt;{ gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
+      const loadImageToGPU = (images, cubemapSide) =&gt; {
+        for (let i=0; i&lt;images.length; i++) {
+          const image = new Image();
+          image.crossOrigin = &quot;Anonymous&quot;;
+          image.src = images[i];
+          image.onload = ()=&gt;{ gl.texImage2D(cubemapSide, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
+        }
       }
-      for (let i=0; i&lt;negXimages.length; i++) {
-        const image = new Image();
-        image.src = negXimages[i];
-        image.onload = ()=&gt;{ gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_X, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
-      }
-      for (let i=0; i&lt;posYimages.length; i++) {
-        const image = new Image();
-        image.src = posYimages[i];
-        image.onload = ()=&gt;{ gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Y, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
-      }
-      for (let i=0; i&lt;negYimages.length; i++) {
-        const image = new Image();
-        image.src = negYimages[i];
-        image.onload = ()=&gt;{ gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Y, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
-      }
-      for (let i=0; i&lt;posZimages.length; i++) {
-        const image = new Image();
-        image.src = posZimages[i];
-        image.onload = ()=&gt; { gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_Z, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
-      }
-      for (let i=0; i&lt;negZimages.length; i++) {
-        const image = new Image();
-        image.src = negZimages[i];
-        image.onload = ()=&gt; { gl.texImage2D(gl.TEXTURE_CUBE_MAP_NEGATIVE_Z, i, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image)};
-      }
+
+      loadImageToGPU(posXimages, gl.TEXTURE_CUBE_MAP_POSITIVE_X);
+      loadImageToGPU(negXimages, gl.TEXTURE_CUBE_MAP_NEGATIVE_X);
+      loadImageToGPU(posYimages, gl.TEXTURE_CUBE_MAP_POSITIVE_Y);
+      loadImageToGPU(negYimages, gl.TEXTURE_CUBE_MAP_NEGATIVE_Y);
+      loadImageToGPU(posZimages, gl.TEXTURE_CUBE_MAP_POSITIVE_Z);
+      loadImageToGPU(negZimages, gl.TEXTURE_CUBE_MAP_NEGATIVE_Z);
+      
   }
 
   async generateTextureFromBaseUri(baseUri, mipLevelNum) {
@@ -305,8 +293,9 @@ export default class CubeTexture extends AbstractTexture {
           [baseUri + &quot;_back_&quot; + i + &quot;.jpg&quot;, gl.TEXTURE_CUBE_MAP_NEGATIVE_Z]
         ];
         for (var j = 0; j &lt; faces.length; j++) {
-          var face = faces[j][1];
-          var image = new Image();
+          const face = faces[j][1];
+          const image = new Image();
+          image.crossOrigin = &quot;Anonymous&quot;;
           image.onload = onLoadEachCubeImage(texture, face, image, i);
           image.src = faces[j][0];
         }
