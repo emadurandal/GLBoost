@@ -53,14 +53,11 @@ $ npm start
 * Safari
 * iOS Safari
 * Android Chrome
+* Microsoft Edge (Xbox One included)
 
 ## Unsupported Browsers
 
-* Microsoft Edge (Xbox One included)
 * Internet Explorer
-
-Microsoft Edge was previously supported but support temporarily suspended at this time.
-Support will resume in the near future.
 
 ## How to use
 
