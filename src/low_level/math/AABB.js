@@ -9,7 +9,9 @@ export default class AABB {
     this._AABB_max = new Vector3(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
     this._centerPoint = null;
     this._lengthCenterToCorner = null;
-
+    this._threshold_AABB_min = null;
+    this._threshold_AABB_max = null;
+    this._threshold_AABB_lengthCenterToCorner = null;
   }
 
   clone() {
@@ -58,6 +60,16 @@ export default class AABB {
     const lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
     this._lengthCenterToCorner = (lengthCenterToCorner !== lengthCenterToCorner) ? 0 : lengthCenterToCorner;
 
+    if (this._threshold_AABB_min != null && this._AABB_min < this._threshold_AABB_min) {
+
+    }
+    if (this._threshold_AABB_max != null && this._threshold_AABB_max < this._AABB_max) {
+
+    }
+    if (this._threshold_AABB_lengthCenterToCorner != null && this._threshold_AABB_lengthCenterToCorner < this._lengthCenterToCorner) {
+
+    }
+  
     return this;
   }
 

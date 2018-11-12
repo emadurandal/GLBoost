@@ -434,7 +434,14 @@
       c.define('LOG_GLBOOST_OBJECT_LIFECYCLE');
       c.define('LOG_GL_RESOURCE_LIFECYCLE');
       c.define('LOG_GL_ERROR');
+      c.define('LOG_LEVEL_ERROR', void 0, 'error');
+      c.define('LOG_LEVEL_WARN', void 0, 'warn');
+      c.define('LOG_LEVEL_LOG', void 0, 'log');
+      c.define('LOG_LEVEL_INFO', void 0, 'info');
+      c.define('LOG_LEVEL_DEBUG', void 0, 'debug');
       c.define('LOG_OMISSION_PROCESSING');
+
+      c.define('LOG_TYPE_NUMERICAL', void 0, 'numerical');
 
     })();
 
@@ -3830,6 +3837,112 @@
 
   //      
 
+  let singleton$2 = Symbol();
+  let singletonEnforcer = Symbol();
+
+                           
+                          
+                            
+                     
+                          
+                    
+    
+
+  class Logger {
+                                     
+    // Formatter
+    // logFormatter:any;
+
+    // Log Data Output Target
+                                         
+                                           
+    /**
+     * The constructor of Logger class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+     * @param enforcer a Symbol to forbid calling this constructor directly
+     */
+    constructor(enforcer        ) {
+      if (enforcer !== singletonEnforcer) {
+        throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
+      }
+      //this.logFormatter = null;
+      this.realtimeTargets = new Map();
+      this.aggregateTargets = new Map();
+      this.logData = [];
+      this.registerRealtimeOutputTarget('default', this.defaultConsoleFunction);
+    }
+
+    /**
+     * The static method to get singleton instance of this class.
+     * @return The singleton instance of GLTFLoader class
+     */
+    static getInstance()         {
+      if (!this[singleton$2]) {
+        this[singleton$2] = new Logger(singletonEnforcer);
+      }
+      return this[singleton$2];
+    }
+
+    registerRealtimeOutputTarget(targetName, target) {
+      this.realtimeTargets.set(targetName, target);
+    }
+
+    registerAggregateOutputTarget(targetName, target) {
+      this.aggregateTargets.set(targetName, target);
+    }
+
+    unregisterRealtimeOutputTarget(targetName) {
+      this.realtimeTargets.delete(targetName);
+    }
+
+    unregisterAggregateOutputTarget(targetName) {
+      this.aggregateTargets.delete(targetName);
+    }
+
+    aggregate(targetName = null) {
+      if (targetName != null) {
+        const targetFunc = this.realtimeTargets[targetName];
+        for (const log of this.logData) {
+          targetFunc(logLevelId, logTypeId, log);
+        }
+    } else {
+        for (var [targetName, targetFunc] of this.realtimeTargets) {
+          for (const log of this.logData) {
+            targetFunc(logLevelId, logTypeId, log);
+          }
+        }
+      }
+    }
+
+    out(logLevelId, logTypeId, ...args) {
+      const unixtime = Date.now();
+      this.logData.push({
+        unixtime: unixtime,
+        logLevelId: logLevelId,
+        args: args
+      });
+
+      for (var [targetName, targetFunc] of this.realtimeTargets) {
+        targetFunc(logLevelId, logTypeId, unixtime, ...args);
+      }
+    }
+
+    defaultConsoleFunction(logLevelId, logTypeId, unixtime, ...args) {
+      //console[GLBoost.getValueOfGLBoostConstant(logLevelId)](`[${GLBoost.getValueOfGLBoostConstant(logTypeId)}] ${args}`);
+
+      const d = new Date(unixtime);
+      const year  = d.getFullYear();
+      const month = d.getMonth() + 1;
+      const day   = d.getDate();
+      const hour  = ( d.getHours()   < 10 ) ? '0' + d.getHours()   : d.getHours();
+      const min   = ( d.getMinutes() < 10 ) ? '0' + d.getMinutes() : d.getMinutes();
+      const sec   = ( d.getSeconds() < 10 ) ? '0' + d.getSeconds() : d.getSeconds();
+      const datestr = year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec;
+      console[GLBoost$1.getValueOfGLBoostConstant(logLevelId)](`[${datestr}][${GLBoost$1.getValueOfGLBoostConstant(logTypeId)}] ${args}`);
+    }
+  }
+
+  //      
+
   class MathClassUtil {
     constructor() {
 
@@ -3977,7 +4090,9 @@
   //    const a = input.x * PVMat44.m30 + input.y * PVMat44.m31 + input.z * PVMat44.m32 + PVMat44.m33;
 
       if (out.w === 0) {
-        console.warn("Zero division!");
+        //console.warn("Zero division!");
+        const logger = Logger.getInstance();
+        logger.out(GLBoost$1.LOG_LEVEL_WARN, GLBoost$1.LOG_TYPE_NUMERICAL, "Zero Division");
       }
 
       const output = new Vector3(out.multiply(1/out.w));
@@ -5989,22 +6104,22 @@
   Shader._shaderHashTable = {};
   Shader._defaultLight = null;
 
-  let singleton$2 = Symbol();
-  let singletonEnforcer = Symbol();
+  let singleton$3 = Symbol();
+  let singletonEnforcer$1 = Symbol();
 
   class DrawKickerWorld {
     constructor(enforcer) {
-      if (enforcer !== singletonEnforcer) {
+      if (enforcer !== singletonEnforcer$1) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
       this._glslProgram = null;
     }
 
     static getInstance() {
-      if (!this[singleton$2]) {
-        this[singleton$2] = new DrawKickerWorld(singletonEnforcer);
+      if (!this[singleton$3]) {
+        this[singleton$3] = new DrawKickerWorld(singletonEnforcer$1);
       }
-      return this[singleton$2];
+      return this[singleton$3];
     }
 
     static setCamera(gl, glslProgram, material, world_m, normal_m, camera, mesh) {
@@ -6865,7 +6980,9 @@ return mat4(
       this._AABB_max = new Vector3(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
       this._centerPoint = null;
       this._lengthCenterToCorner = null;
-
+      this._threshold_AABB_min = null;
+      this._threshold_AABB_max = null;
+      this._threshold_AABB_lengthCenterToCorner = null;
     }
 
     clone() {
@@ -6914,6 +7031,10 @@ return mat4(
       const lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
       this._lengthCenterToCorner = (lengthCenterToCorner !== lengthCenterToCorner) ? 0 : lengthCenterToCorner;
 
+      if (this._threshold_AABB_min != null && this._AABB_min < this._threshold_AABB_min) ;
+      if (this._threshold_AABB_max != null && this._threshold_AABB_max < this._AABB_max) ;
+      if (this._threshold_AABB_lengthCenterToCorner != null && this._threshold_AABB_lengthCenterToCorner < this._lengthCenterToCorner) ;
+    
       return this;
     }
 
@@ -7024,6 +7145,7 @@ return mat4(
       return 'AABB_min: ' + this._AABB_min + '\n' + 'AABB_max: ' + this._AABB_max + '\n'
         + 'centerPoint: ' + this._centerPoint + '\n' + 'lengthCenterToCorner: ' + this._lengthCenterToCorner;
     }
+
   }
 
   GLBoost$1['AABB'] = AABB;
@@ -15202,7 +15324,7 @@ albedo.rgb *= (1.0 - metallic);
 
   }
 
-  let singleton$3 = Symbol();
+  let singleton$4 = Symbol();
 
   class M_GLBoostMonitor extends L_GLBoostMonitor {
     constructor(enforcer) {
@@ -15210,10 +15332,10 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     static getInstance() {
-      if (!this[singleton$3]) {
-        this[singleton$3] = new M_GLBoostMonitor(L_GLBoostMonitor._singletonEnforcer);
+      if (!this[singleton$4]) {
+        this[singleton$4] = new M_GLBoostMonitor(L_GLBoostMonitor._singletonEnforcer);
       }
-      return this[singleton$3];
+      return this[singleton$4];
     }
 
     getGLBoostObjectsFromArgument(arg) {
@@ -18917,8 +19039,8 @@ albedo.rgb *= (1.0 - metallic);
 
   //      
 
-  let singleton$4 = Symbol();
-  let singletonEnforcer$1 = Symbol();
+  let singleton$5 = Symbol();
+  let singletonEnforcer$2 = Symbol();
 
   /**
    * This is a loader class of Obj file format.
@@ -18930,7 +19052,7 @@ albedo.rgb *= (1.0 - metallic);
      * @param enforcer a Symbol to forbid calling this constructor directly
      */
     constructor(enforcer        ) {
-      if (enforcer !== singletonEnforcer$1) {
+      if (enforcer !== singletonEnforcer$2) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
     }
@@ -18940,10 +19062,10 @@ albedo.rgb *= (1.0 - metallic);
      * @return The singleton instance of ObjLoader class
      */
     static getInstance()            {
-      if (!this[singleton$4]) {
-        this[singleton$4] = new ObjLoader(singletonEnforcer$1);
+      if (!this[singleton$5]) {
+        this[singleton$5] = new ObjLoader(singletonEnforcer$2);
       }
-      return this[singleton$4];
+      return this[singleton$5];
     }
 
     /**
@@ -19664,8 +19786,8 @@ albedo.rgb *= (1.0 - metallic);
   //      
 
 
-  let singleton$5 = Symbol();
-  let singletonEnforcer$2 = Symbol();
+  let singleton$6 = Symbol();
+  let singletonEnforcer$3 = Symbol();
 
   /**
    * This is a loader class of glTF file format. You can see more detail of glTF format at https://github.com/KhronosGroup/glTF .
@@ -19677,7 +19799,7 @@ albedo.rgb *= (1.0 - metallic);
      * @param enforcer a Symbol to forbid calling this constructor directly
      */
     constructor(enforcer        ) {
-      if (enforcer !== singletonEnforcer$2) {
+      if (enforcer !== singletonEnforcer$3) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
     }
@@ -19687,10 +19809,10 @@ albedo.rgb *= (1.0 - metallic);
      * @return The singleton instance of GLTFLoader class
      */
     static getInstance()             {
-      if (!this[singleton$5]) {
-        this[singleton$5] = new GLTFLoader(singletonEnforcer$2);
+      if (!this[singleton$6]) {
+        this[singleton$6] = new GLTFLoader(singletonEnforcer$3);
       }
-      return this[singleton$5];
+      return this[singleton$6];
     }
 
     getDefaultShader(options) {
@@ -21258,8 +21380,8 @@ albedo.rgb *= (1.0 - metallic);
 
   //      
 
-  let singleton$6 = Symbol();
-  let singletonEnforcer$3 = Symbol();
+  let singleton$7 = Symbol();
+  let singletonEnforcer$4 = Symbol();
 
   /**
    * This is a loader class of glTF2 file format. You can see more detail of glTF2 format at https://github.com/KhronosGroup/glTF .
@@ -21271,7 +21393,7 @@ albedo.rgb *= (1.0 - metallic);
      * @param enforcer a Symbol to forbid calling this constructor directly
      */
     constructor(enforcer        ) {
-      if (enforcer !== singletonEnforcer$3) {
+      if (enforcer !== singletonEnforcer$4) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
     }
@@ -21307,10 +21429,10 @@ albedo.rgb *= (1.0 - metallic);
      * @return The singleton instance of GLTFLoader class
      */
     static getInstance()             {
-      if (!this[singleton$6]) {
-        this[singleton$6] = new GLTF2Loader(singletonEnforcer$3);
+      if (!this[singleton$7]) {
+        this[singleton$7] = new GLTF2Loader(singletonEnforcer$4);
       }
-      return this[singleton$6];
+      return this[singleton$7];
     }
 
     /**
@@ -22050,8 +22172,8 @@ albedo.rgb *= (1.0 - metallic);
 
   //      
 
-  let singleton$7 = Symbol();
-  let singletonEnforcer$4 = Symbol();
+  let singleton$8 = Symbol();
+  let singletonEnforcer$5 = Symbol();
 
   /**
    * 
@@ -22063,7 +22185,7 @@ albedo.rgb *= (1.0 - metallic);
      * @param enforcer a Symbol to forbid calling this constructor directly
      */
     constructor(enforcer        ) {
-      if (enforcer !== singletonEnforcer$4) {
+      if (enforcer !== singletonEnforcer$5) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
     }
@@ -22073,10 +22195,10 @@ albedo.rgb *= (1.0 - metallic);
      * @return The singleton instance of GLTFLoader class
      */
     static getInstance()             {
-      if (!this[singleton$7]) {
-        this[singleton$7] = new ModelConverter(singletonEnforcer$4);
+      if (!this[singleton$8]) {
+        this[singleton$8] = new ModelConverter(singletonEnforcer$5);
       }
-      return this[singleton$7];
+      return this[singleton$8];
     }
 
     _getDefaultShader(options) {
@@ -23570,8 +23692,8 @@ albedo.rgb *= (1.0 - metallic);
 
   //      
 
-  let singleton$8 = Symbol();
-  let singletonEnforcer$5 = Symbol();
+  let singleton$9 = Symbol();
+  let singletonEnforcer$6 = Symbol();
 
   /**
    * This is a loader class of glTF VRize extension Data.
@@ -23583,7 +23705,7 @@ albedo.rgb *= (1.0 - metallic);
      * @param enforcer a Symbol to forbid calling this constructor directly
      */
     constructor(enforcer        ) {
-      if (enforcer !== singletonEnforcer$5) {
+      if (enforcer !== singletonEnforcer$6) {
         throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
       }
     }
@@ -23593,10 +23715,10 @@ albedo.rgb *= (1.0 - metallic);
      * @return the singleton instance of ObjLoader class
      */
     static getInstance()           {
-      if (!this[singleton$8]) {
-        this[singleton$8] = new GLBoostGLTFLoaderExtension(singletonEnforcer$5);
+      if (!this[singleton$9]) {
+        this[singleton$9] = new GLBoostGLTFLoaderExtension(singletonEnforcer$6);
       }
-      return this[singleton$8];
+      return this[singleton$9];
     }
 
     setUVTransformToTexture(texture, samplerJson) {
@@ -23906,4 +24028,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-353-g8686d-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-355-gc39b-mod branch: develop';
