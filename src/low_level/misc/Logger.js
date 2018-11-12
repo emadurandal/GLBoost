@@ -105,3 +105,5 @@ export default class Logger {
     console[GLBoost.getValueOfGLBoostConstant(logLevelId)](`[${datestr}][${GLBoost.getValueOfGLBoostConstant(logTypeId)}] ${args}`);
   }
 }
+
+GLBoost['Logger'] = Logger;

@@ -436,6 +436,7 @@ var global = ('global',eval)('this');
     c.define('LOG_OMISSION_PROCESSING');
 
     c.define('LOG_TYPE_NUMERICAL', void 0, 'numerical');
+    c.define('LOG_TYPE_AABB', void 0, 'AABB');
 
   })();
 

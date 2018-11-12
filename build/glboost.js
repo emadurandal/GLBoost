@@ -442,6 +442,7 @@
       c.define('LOG_OMISSION_PROCESSING');
 
       c.define('LOG_TYPE_NUMERICAL', void 0, 'numerical');
+      c.define('LOG_TYPE_AABB', void 0, 'AABB');
 
     })();
 
@@ -3837,112 +3838,6 @@
 
   //      
 
-  let singleton$2 = Symbol();
-  let singletonEnforcer = Symbol();
-
-                           
-                          
-                            
-                     
-                          
-                    
-    
-
-  class Logger {
-                                     
-    // Formatter
-    // logFormatter:any;
-
-    // Log Data Output Target
-                                         
-                                           
-    /**
-     * The constructor of Logger class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
-     * @param enforcer a Symbol to forbid calling this constructor directly
-     */
-    constructor(enforcer        ) {
-      if (enforcer !== singletonEnforcer) {
-        throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
-      }
-      //this.logFormatter = null;
-      this.realtimeTargets = new Map();
-      this.aggregateTargets = new Map();
-      this.logData = [];
-      this.registerRealtimeOutputTarget('default', this.defaultConsoleFunction);
-    }
-
-    /**
-     * The static method to get singleton instance of this class.
-     * @return The singleton instance of GLTFLoader class
-     */
-    static getInstance()         {
-      if (!this[singleton$2]) {
-        this[singleton$2] = new Logger(singletonEnforcer);
-      }
-      return this[singleton$2];
-    }
-
-    registerRealtimeOutputTarget(targetName, target) {
-      this.realtimeTargets.set(targetName, target);
-    }
-
-    registerAggregateOutputTarget(targetName, target) {
-      this.aggregateTargets.set(targetName, target);
-    }
-
-    unregisterRealtimeOutputTarget(targetName) {
-      this.realtimeTargets.delete(targetName);
-    }
-
-    unregisterAggregateOutputTarget(targetName) {
-      this.aggregateTargets.delete(targetName);
-    }
-
-    aggregate(targetName = null) {
-      if (targetName != null) {
-        const targetFunc = this.realtimeTargets[targetName];
-        for (const log of this.logData) {
-          targetFunc(logLevelId, logTypeId, log);
-        }
-    } else {
-        for (var [targetName, targetFunc] of this.realtimeTargets) {
-          for (const log of this.logData) {
-            targetFunc(logLevelId, logTypeId, log);
-          }
-        }
-      }
-    }
-
-    out(logLevelId, logTypeId, ...args) {
-      const unixtime = Date.now();
-      this.logData.push({
-        unixtime: unixtime,
-        logLevelId: logLevelId,
-        args: args
-      });
-
-      for (var [targetName, targetFunc] of this.realtimeTargets) {
-        targetFunc(logLevelId, logTypeId, unixtime, ...args);
-      }
-    }
-
-    defaultConsoleFunction(logLevelId, logTypeId, unixtime, ...args) {
-      //console[GLBoost.getValueOfGLBoostConstant(logLevelId)](`[${GLBoost.getValueOfGLBoostConstant(logTypeId)}] ${args}`);
-
-      const d = new Date(unixtime);
-      const year  = d.getFullYear();
-      const month = d.getMonth() + 1;
-      const day   = d.getDate();
-      const hour  = ( d.getHours()   < 10 ) ? '0' + d.getHours()   : d.getHours();
-      const min   = ( d.getMinutes() < 10 ) ? '0' + d.getMinutes() : d.getMinutes();
-      const sec   = ( d.getSeconds() < 10 ) ? '0' + d.getSeconds() : d.getSeconds();
-      const datestr = year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec;
-      console[GLBoost$1.getValueOfGLBoostConstant(logLevelId)](`[${datestr}][${GLBoost$1.getValueOfGLBoostConstant(logTypeId)}] ${args}`);
-    }
-  }
-
-  //      
-
   class MathClassUtil {
     constructor() {
 
@@ -4090,9 +3985,7 @@
   //    const a = input.x * PVMat44.m30 + input.y * PVMat44.m31 + input.z * PVMat44.m32 + PVMat44.m33;
 
       if (out.w === 0) {
-        //console.warn("Zero division!");
-        const logger = Logger.getInstance();
-        logger.out(GLBoost$1.LOG_LEVEL_WARN, GLBoost$1.LOG_TYPE_NUMERICAL, "Zero Division");
+        console.warn("Zero division!");
       }
 
       const output = new Vector3(out.multiply(1/out.w));
@@ -6104,22 +5997,22 @@
   Shader._shaderHashTable = {};
   Shader._defaultLight = null;
 
-  let singleton$3 = Symbol();
-  let singletonEnforcer$1 = Symbol();
+  let singleton$2 = Symbol();
+  let singletonEnforcer = Symbol();
 
   class DrawKickerWorld {
     constructor(enforcer) {
-      if (enforcer !== singletonEnforcer$1) {
+      if (enforcer !== singletonEnforcer) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
       this._glslProgram = null;
     }
 
     static getInstance() {
-      if (!this[singleton$3]) {
-        this[singleton$3] = new DrawKickerWorld(singletonEnforcer$1);
+      if (!this[singleton$2]) {
+        this[singleton$2] = new DrawKickerWorld(singletonEnforcer);
       }
-      return this[singleton$3];
+      return this[singleton$2];
     }
 
     static setCamera(gl, glslProgram, material, world_m, normal_m, camera, mesh) {
@@ -6980,9 +6873,13 @@ return mat4(
       this._AABB_max = new Vector3(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
       this._centerPoint = null;
       this._lengthCenterToCorner = null;
-      this._threshold_AABB_min = null;
-      this._threshold_AABB_max = null;
+      this._threshold_AABB_min = -1000000000;
+      this._threshold_AABB_max = 1000000000;
       this._threshold_AABB_lengthCenterToCorner = null;
+
+      this._isValid_AABB_min = true;
+      this._isValid_AABB_max = true;
+      this._isValid_AABB_lengthCenterToCorner = true;
     }
 
     clone() {
@@ -7031,11 +6928,43 @@ return mat4(
       const lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
       this._lengthCenterToCorner = (lengthCenterToCorner !== lengthCenterToCorner) ? 0 : lengthCenterToCorner;
 
-      if (this._threshold_AABB_min != null && this._AABB_min < this._threshold_AABB_min) ;
-      if (this._threshold_AABB_max != null && this._threshold_AABB_max < this._AABB_max) ;
-      if (this._threshold_AABB_lengthCenterToCorner != null && this._threshold_AABB_lengthCenterToCorner < this._lengthCenterToCorner) ;
+      if (this._threshold_AABB_min != null &&
+        (this._AABB_min.x < this._threshold_AABB_min || this._AABB_min.y < this._threshold_AABB_min || this._AABB_min.z < this._threshold_AABB_min))
+      {
+        this._isValid_AABB_min = false;
+      }
+      if (this._threshold_AABB_max != null &&
+        (this._AABB_max.x > this._threshold_AABB_max || this._AABB_max.y > this._threshold_AABB_max || this._AABB_max.z > this._threshold_AABB_max))
+      {
+        this._isValid_AABB_max = false;
+      }
+      if (this._threshold_AABB_lengthCenterToCorner != null && this._threshold_AABB_lengthCenterToCorner < this._lengthCenterToCorner) {
+        this._isValid_AABB_lengthCenterToCorner = false;
+      }
     
       return this;
+    }
+
+    isValid() {
+      return this._isValid_AABB_min && this._isValid_AABB_max && this._isValid_AABB_lengthCenterToCorner;
+    }
+
+    isValid_AABB_min() {
+      return this._isValid_AABB_min;
+    }
+
+    isValid_AABB_max() {
+      return this._isValid_AABB_min;
+    }
+
+    isValid_AABB_lengthCenterToCorner() {
+      return this._isValid_AABB_lengthCenterToCorner;
+    }
+
+    resetValidationFlags() {
+      this._isValid_AABB_min = true;
+      this._isValid_AABB_max = true;
+      this._isValid_AABB_lengthCenterToCorner = true; 
     }
 
     mergeAABB(aabb) {
@@ -7145,7 +7074,6 @@ return mat4(
       return 'AABB_min: ' + this._AABB_min + '\n' + 'AABB_max: ' + this._AABB_max + '\n'
         + 'centerPoint: ' + this._centerPoint + '\n' + 'lengthCenterToCorner: ' + this._lengthCenterToCorner;
     }
-
   }
 
   GLBoost$1['AABB'] = AABB;
@@ -14678,6 +14606,112 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1["CubeAbsolute"] = CubeAbsolute;
 
+  //      
+
+  let singleton$3 = Symbol();
+  let singletonEnforcer$1 = Symbol();
+
+                           
+                          
+                            
+                     
+                          
+                    
+    
+
+  class Logger {
+                                     
+    // Formatter
+    // logFormatter:any;
+
+    // Log Data Output Target
+                                         
+                                           
+    /**
+     * The constructor of Logger class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+     * @param enforcer a Symbol to forbid calling this constructor directly
+     */
+    constructor(enforcer        ) {
+      if (enforcer !== singletonEnforcer$1) {
+        throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
+      }
+      //this.logFormatter = null;
+      this.realtimeTargets = new Map();
+      this.aggregateTargets = new Map();
+      this.logData = [];
+      this.registerRealtimeOutputTarget('default', this.defaultConsoleFunction);
+    }
+
+    /**
+     * The static method to get singleton instance of this class.
+     * @return The singleton instance of GLTFLoader class
+     */
+    static getInstance()         {
+      if (!this[singleton$3]) {
+        this[singleton$3] = new Logger(singletonEnforcer$1);
+      }
+      return this[singleton$3];
+    }
+
+    registerRealtimeOutputTarget(targetName, target) {
+      this.realtimeTargets.set(targetName, target);
+    }
+
+    registerAggregateOutputTarget(targetName, target) {
+      this.aggregateTargets.set(targetName, target);
+    }
+
+    unregisterRealtimeOutputTarget(targetName) {
+      this.realtimeTargets.delete(targetName);
+    }
+
+    unregisterAggregateOutputTarget(targetName) {
+      this.aggregateTargets.delete(targetName);
+    }
+
+    aggregate(targetName = null) {
+      if (targetName != null) {
+        const targetFunc = this.realtimeTargets[targetName];
+        for (const log of this.logData) {
+          targetFunc(logLevelId, logTypeId, log);
+        }
+    } else {
+        for (var [targetName, targetFunc] of this.realtimeTargets) {
+          for (const log of this.logData) {
+            targetFunc(logLevelId, logTypeId, log);
+          }
+        }
+      }
+    }
+
+    out(logLevelId, logTypeId, ...args) {
+      const unixtime = Date.now();
+      this.logData.push({
+        unixtime: unixtime,
+        logLevelId: logLevelId,
+        args: args
+      });
+
+      for (var [targetName, targetFunc] of this.realtimeTargets) {
+        targetFunc(logLevelId, logTypeId, unixtime, ...args);
+      }
+    }
+
+    defaultConsoleFunction(logLevelId, logTypeId, unixtime, ...args) {
+      //console[GLBoost.getValueOfGLBoostConstant(logLevelId)](`[${GLBoost.getValueOfGLBoostConstant(logTypeId)}] ${args}`);
+
+      const d = new Date(unixtime);
+      const year  = d.getFullYear();
+      const month = d.getMonth() + 1;
+      const day   = d.getDate();
+      const hour  = ( d.getHours()   < 10 ) ? '0' + d.getHours()   : d.getHours();
+      const min   = ( d.getMinutes() < 10 ) ? '0' + d.getMinutes() : d.getMinutes();
+      const sec   = ( d.getSeconds() < 10 ) ? '0' + d.getSeconds() : d.getSeconds();
+      const datestr = year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec;
+      console[GLBoost$1.getValueOfGLBoostConstant(logLevelId)](`[${datestr}][${GLBoost$1.getValueOfGLBoostConstant(logTypeId)}] ${args}`);
+    }
+  }
+
   /*       */
 
                                                   
@@ -14695,6 +14729,8 @@ albedo.rgb *= (1.0 - metallic);
       this._elements = [];
       this._AABB = new AABB();
       this._isRootJointGroup = false;
+
+      this._logger = Logger.getInstance();
 
   //    this._aabbGizmo = null;
   //    this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
@@ -15124,6 +15160,7 @@ albedo.rgb *= (1.0 - metallic);
      * Note that it's in world space
      */
     updateAABB() {
+      const that = this;
       var aabb = (function mergeAABBRecursively(elem) {
         if (elem instanceof M_Group) {
           var children = elem.getChildren();
@@ -15134,6 +15171,9 @@ albedo.rgb *= (1.0 - metallic);
             } else {
               console.assert('calculation of AABB error!');
             }
+          }
+          if (!elem.AABB.isValid()) {
+            that._logger.out(GLBoost$1.LOG_LEVEL_WARN, GLBoost$1.LOG_TYPE_AABB, 'This AABB has abnormal values', elem.userFlavorName, elem.AABB);
           }
           return elem.AABB;
           //return AABB.multiplyMatrix(elem.transformMatrix, elem.AABB);
@@ -15153,6 +15193,7 @@ albedo.rgb *= (1.0 - metallic);
   //    this._AABB = aabbInWorld;
 
       this._updateAABBGizmo();
+
 
       return newAABB;
     }
@@ -24028,4 +24069,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-355-gc39b-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-359-g28c5-mod branch: develop';

@@ -8,6 +8,7 @@ import L_AbstractMaterial from '../../low_level/materials/L_AbstractMaterial';
 import M_Mesh from './meshes/M_Mesh';
 import M_AABBGizmo from '../elements/gizmos/M_AABBGizmo';
 import GLBoostObject from '../../low_level/core/GLBoostObject';
+import Logger from '../../low_level/misc/Logger';
 
 type QueryMeta = {type: number, format: number};
 
@@ -24,6 +25,8 @@ export default class M_Group extends M_Element {
     this._elements = [];
     this._AABB = new AABB();
     this._isRootJointGroup = false;
+
+    this._logger = Logger.getInstance();
 
 //    this._aabbGizmo = null;
 //    this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
@@ -453,6 +456,7 @@ export default class M_Group extends M_Element {
    * Note that it's in world space
    */
   updateAABB() {
+    const that = this;
     var aabb = (function mergeAABBRecursively(elem) {
       if (elem instanceof M_Group) {
         var children = elem.getChildren();
@@ -463,6 +467,9 @@ export default class M_Group extends M_Element {
           } else {
             console.assert('calculation of AABB error!');
           }
+        }
+        if (!elem.AABB.isValid()) {
+          that._logger.out(GLBoost.LOG_LEVEL_WARN, GLBoost.LOG_TYPE_AABB, 'This AABB has abnormal values', elem.userFlavorName, elem.AABB);
         }
         return elem.AABB;
         //return AABB.multiplyMatrix(elem.transformMatrix, elem.AABB);
@@ -482,6 +489,7 @@ export default class M_Group extends M_Element {
 //    this._AABB = aabbInWorld;
 
     this._updateAABBGizmo();
+
 
     return newAABB;
   }
