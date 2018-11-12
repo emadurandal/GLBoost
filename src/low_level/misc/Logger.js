@@ -34,6 +34,7 @@ export default class Logger {
     this.aggregateTargets = new Map();
     this.logData = [];
     this.registerRealtimeOutputTarget('default', this.defaultConsoleFunction);
+    this.registerAggregateOutputTarget('default', this.defaultConsoleFunction);
   }
 
   /**
@@ -67,18 +68,18 @@ export default class Logger {
     if (targetName != null) {
       const targetFunc = this.realtimeTargets[targetName];
       for (const log of this.logData) {
-        targetFunc(logLevelId, logTypeId, log);
+        targetFunc(log.logLevelId, log.logTypeId, log.unixtime, ...log.args);
       }
   } else {
       for (var [targetName, targetFunc] of this.realtimeTargets) {
         for (const log of this.logData) {
-          targetFunc(logLevelId, logTypeId, log);
+          targetFunc(log.logLevelId, log.logTypeId, log.unixtime, ...log.args);
         }
       }
     }
   }
 
-  out(logLevelId, logTypeId, ...args) {
+  out(logLevelId, logTypeId, isRealtimeOn, ...args) {
     if (GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING === false &&
       (logLevelId === GLBoost.LOG_LEVEL_DEBUG ||
        logLevelId === GLBoost.LOG_LEVEL_INFO ||
@@ -95,11 +96,14 @@ export default class Logger {
     this.logData.push({
       unixtime: unixtime,
       logLevelId: logLevelId,
+      logTypeId: logTypeId,
       args: args
     });
 
-    for (var [targetName, targetFunc] of this.realtimeTargets) {
-      targetFunc(logLevelId, logTypeId, unixtime, ...args);
+    if (isRealtimeOn) {
+      for (var [targetName, targetFunc] of this.realtimeTargets) {
+        targetFunc(logLevelId, logTypeId, unixtime, ...args);
+      }
     }
   }
 

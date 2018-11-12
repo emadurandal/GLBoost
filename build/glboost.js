@@ -961,6 +961,7 @@
       this.aggregateTargets = new Map();
       this.logData = [];
       this.registerRealtimeOutputTarget('default', this.defaultConsoleFunction);
+      this.registerAggregateOutputTarget('default', this.defaultConsoleFunction);
     }
 
     /**
@@ -994,18 +995,18 @@
       if (targetName != null) {
         const targetFunc = this.realtimeTargets[targetName];
         for (const log of this.logData) {
-          targetFunc(logLevelId, logTypeId, log);
+          targetFunc(log.logLevelId, log.logTypeId, log.unixtime, ...log.args);
         }
     } else {
         for (var [targetName, targetFunc] of this.realtimeTargets) {
           for (const log of this.logData) {
-            targetFunc(logLevelId, logTypeId, log);
+            targetFunc(log.logLevelId, log.logTypeId, log.unixtime, ...log.args);
           }
         }
       }
     }
 
-    out(logLevelId, logTypeId, ...args) {
+    out(logLevelId, logTypeId, isRealtimeOn, ...args) {
       if (GLBoost$1.VALUE_CONSOLE_OUT_FOR_DEBUGGING === false &&
         (logLevelId === GLBoost$1.LOG_LEVEL_DEBUG ||
          logLevelId === GLBoost$1.LOG_LEVEL_INFO ||
@@ -1022,11 +1023,14 @@
       this.logData.push({
         unixtime: unixtime,
         logLevelId: logLevelId,
+        logTypeId: logTypeId,
         args: args
       });
 
-      for (var [targetName, targetFunc] of this.realtimeTargets) {
-        targetFunc(logLevelId, logTypeId, unixtime, ...args);
+      if (isRealtimeOn) {
+        for (var [targetName, targetFunc] of this.realtimeTargets) {
+          targetFunc(logLevelId, logTypeId, unixtime, ...args);
+        }
       }
     }
 
@@ -1076,6 +1080,17 @@
       this._glslProgramsLatestUsageCount = 0;
 
       this._logger = Logger.getInstance();
+
+      this._glErrorTypes = ['INVALID_ENUM', 'INVALID_VALUE', 'INVALID_OPERATION', 'INVALID_FRAMEBUFFER_OPERATION',
+      'OUT_OF_MEMORY', 'CONTEXT_LOST_WEBGL'];
+      this._glErrorMessages = [
+        'An unacceptable value has been specified for an enumerated argument. The command is ignored and the error flag is set.',
+        'A numeric argument is out of range. The command is ignored and the error flag is set.',
+        'The specified command is not allowed for the current state. The command is ignored and the error flag is set.',
+        'The currently bound framebuffer is not framebuffer complete when trying to render to or to read from it.',
+        'Not enough memory is left to execute the command.',
+        'If the WebGL context is lost, this error is returned on the first call to getError. Afterwards and until the context has been restored, it returns gl.NO_ERROR.'
+      ]; 
     }
 
     static getInstance(canvas, initParameter, gl, width, height) {
@@ -1106,9 +1121,6 @@
     }
 
     checkGLError() {
-      if (GLBoost$1.VALUE_CONSOLE_OUT_FOR_DEBUGGING === false) {
-        return;
-      }
       if (GLBoost$1.valueOfGLBoostConstants[GLBoost$1.LOG_TYPE_GL] === false) {
         return;
       }
@@ -1116,21 +1128,9 @@
       let gl = this.impl.gl;
       let errorCode = gl.getError();
       if (errorCode !== 0) {
-        let errorTypes = ['INVALID_ENUM', 'INVALID_VALUE', 'INVALID_OPERATION', 'INVALID_FRAMEBUFFER_OPERATION',
-          'OUT_OF_MEMORY', 'CONTEXT_LOST_WEBGL'];
-        let errorMessages = [
-          'An unacceptable value has been specified for an enumerated argument. The command is ignored and the error flag is set.',
-          'A numeric argument is out of range. The command is ignored and the error flag is set.',
-          'The specified command is not allowed for the current state. The command is ignored and the error flag is set.',
-          'The currently bound framebuffer is not framebuffer complete when trying to render to or to read from it.',
-          'Not enough memory is left to execute the command.',
-          'If the WebGL context is lost, this error is returned on the first call to getError. Afterwards and until the context has been restored, it returns gl.NO_ERROR.'
-        ];
-
-        errorTypes.forEach((errorType, i)=>{
+        this.glErrorTypes.forEach((errorType, i)=>{
           if (gl[errorType] === errorCode) {
-            this._logger.out(GLBoost$1.LOG_LEVEL_WARN, GLBoost$1.LOG_TYPE_GL, errorCode, errorMessages[i]);
-  //          MiscUtil.consoleLog(GLBoost.LOG_TYPE_GL, 'WebGL Error: gl.' + errorCode + '\n' + 'Meaning:' + errorMessages[i]);
+            this._logger.out(GLBoost$1.LOG_LEVEL_ERROR, GLBoost$1.LOG_TYPE_GL, false, errorCode, this._glErrorMessages[i]);
           }
         });
       }
@@ -1280,6 +1280,13 @@
         return;
       }
 
+      if (forceUpdate) {
+        this.gl[uniformFuncStr].apply(this.gl, args);
+        this.checkGLError();
+        return;
+      }
+
+
   //    this.gl[uniformFuncStr].apply(this.gl, args);
   /*
       if (uniformLocation.glslProgram.glslProgramsSelfUsageCount < this._glslProgramsLatestUsageCount) {
@@ -1294,6 +1301,7 @@
         return;
       }
 
+      
       if (uniformLocation.glslProgramUsageCountWhenLastSet < this._glslProgramsLatestUsageCount) {
         // Since I have never sent a uniform value to glslProgram which is currently in use, update it.
         this.gl[uniformFuncStr].apply(this.gl, args);
@@ -1303,13 +1311,8 @@
         return;
       }
 
-      if (forceUpdate) {
-        this.gl[uniformFuncStr].apply(this.gl, args);
-        this.checkGLError();
-      } else {
-        MiscUtil.consoleLog(GLBoost$1.LOG_OMISSION_PROCESSING,
-          'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation.glslProgram is not in use.');
-      }
+      MiscUtil.consoleLog(GLBoost$1.LOG_OMISSION_PROCESSING,
+        'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation.glslProgram is not in use.');
     }
 
     // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
@@ -15190,7 +15193,7 @@ albedo.rgb *= (1.0 - metallic);
             }
           }
           if (!elem.AABB.isValid()) {
-            that._logger.out(GLBoost$1.LOG_LEVEL_WARN, GLBoost$1.LOG_TYPE_AABB, 'This AABB has abnormal values', elem.userFlavorName, elem.AABB);
+            that._logger.out(GLBoost$1.LOG_LEVEL_WARN, GLBoost$1.LOG_TYPE_AABB, true, 'This AABB has abnormal values', elem.userFlavorName, elem.AABB);
           }
           return elem.AABB;
           //return AABB.multiplyMatrix(elem.transformMatrix, elem.AABB);
@@ -19756,7 +19759,7 @@ albedo.rgb *= (1.0 - metallic);
     define(GLBoost$1.LOG_SHADER_CODE, true);
     define(GLBoost$1.LOG_GLBOOST_OBJECT_LIFECYCLE, true);
     define(GLBoost$1.LOG_GL_RESOURCE_LIFECYCLE, true);
-    define(GLBoost$1.LOG_TYPE_GL, true);
+    define(GLBoost$1.LOG_TYPE_GL, false);
     define(GLBoost$1.LOG_OMISSION_PROCESSING, false);
   })();
 
@@ -24086,4 +24089,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-360-ge06b-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-361-gb2e6-mod branch: develop';

@@ -469,7 +469,7 @@ export default class M_Group extends M_Element {
           }
         }
         if (!elem.AABB.isValid()) {
-          that._logger.out(GLBoost.LOG_LEVEL_WARN, GLBoost.LOG_TYPE_AABB, 'This AABB has abnormal values', elem.userFlavorName, elem.AABB);
+          that._logger.out(GLBoost.LOG_LEVEL_WARN, GLBoost.LOG_TYPE_AABB, true, 'This AABB has abnormal values', elem.userFlavorName, elem.AABB);
         }
         return elem.AABB;
         //return AABB.multiplyMatrix(elem.transformMatrix, elem.AABB);
