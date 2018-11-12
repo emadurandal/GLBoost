@@ -433,7 +433,6 @@
       c.define('LOG_SHADER_CODE');
       c.define('LOG_GLBOOST_OBJECT_LIFECYCLE');
       c.define('LOG_GL_RESOURCE_LIFECYCLE');
-      c.define('LOG_GL_ERROR');
       c.define('LOG_LEVEL_ERROR', void 0, 'error');
       c.define('LOG_LEVEL_WARN', void 0, 'warn');
       c.define('LOG_LEVEL_LOG', void 0, 'log');
@@ -443,6 +442,7 @@
 
       c.define('LOG_TYPE_NUMERICAL', void 0, 'numerical');
       c.define('LOG_TYPE_AABB', void 0, 'AABB');
+      c.define('LOG_TYPE_GL', void 0, 'GL');
 
     })();
 
@@ -927,6 +927,126 @@
 
   GLBoost$1['L_GLBoostMonitor'] = L_GLBoostMonitor;
 
+  //      
+
+  let singleton$1 = Symbol();
+  let singletonEnforcer = Symbol();
+
+                           
+                          
+                            
+                     
+                          
+                    
+    
+
+  class Logger {
+                                     
+    // Formatter
+    // logFormatter:any;
+
+    // Log Data Output Target
+                                         
+                                           
+    /**
+     * The constructor of Logger class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
+     * @param enforcer a Symbol to forbid calling this constructor directly
+     */
+    constructor(enforcer        ) {
+      if (enforcer !== singletonEnforcer) {
+        throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
+      }
+      //this.logFormatter = null;
+      this.realtimeTargets = new Map();
+      this.aggregateTargets = new Map();
+      this.logData = [];
+      this.registerRealtimeOutputTarget('default', this.defaultConsoleFunction);
+    }
+
+    /**
+     * The static method to get singleton instance of this class.
+     * @return The singleton instance of GLTFLoader class
+     */
+    static getInstance()         {
+      if (!this[singleton$1]) {
+        this[singleton$1] = new Logger(singletonEnforcer);
+      }
+      return this[singleton$1];
+    }
+
+    registerRealtimeOutputTarget(targetName, target) {
+      this.realtimeTargets.set(targetName, target);
+    }
+
+    registerAggregateOutputTarget(targetName, target) {
+      this.aggregateTargets.set(targetName, target);
+    }
+
+    unregisterRealtimeOutputTarget(targetName) {
+      this.realtimeTargets.delete(targetName);
+    }
+
+    unregisterAggregateOutputTarget(targetName) {
+      this.aggregateTargets.delete(targetName);
+    }
+
+    aggregate(targetName = null) {
+      if (targetName != null) {
+        const targetFunc = this.realtimeTargets[targetName];
+        for (const log of this.logData) {
+          targetFunc(logLevelId, logTypeId, log);
+        }
+    } else {
+        for (var [targetName, targetFunc] of this.realtimeTargets) {
+          for (const log of this.logData) {
+            targetFunc(logLevelId, logTypeId, log);
+          }
+        }
+      }
+    }
+
+    out(logLevelId, logTypeId, ...args) {
+      if (GLBoost$1.VALUE_CONSOLE_OUT_FOR_DEBUGGING === false &&
+        (logLevelId === GLBoost$1.LOG_LEVEL_DEBUG ||
+         logLevelId === GLBoost$1.LOG_LEVEL_INFO ||
+         logLevelId === GLBoost$1.LOG_LEVEL_LOG)) {
+        // output error log even when VALUE_CONSOLE_OUT_FOR_DEBUGGING is true.
+        return;
+      }
+      
+      if (GLBoost$1.valueOfGLBoostConstants[logTypeId] != null && GLBoost$1.valueOfGLBoostConstants[logTypeId] === false) {
+        return;
+      }
+
+      const unixtime = Date.now();
+      this.logData.push({
+        unixtime: unixtime,
+        logLevelId: logLevelId,
+        args: args
+      });
+
+      for (var [targetName, targetFunc] of this.realtimeTargets) {
+        targetFunc(logLevelId, logTypeId, unixtime, ...args);
+      }
+    }
+
+    defaultConsoleFunction(logLevelId, logTypeId, unixtime, ...args) {
+      //console[GLBoost.getValueOfGLBoostConstant(logLevelId)](`[${GLBoost.getValueOfGLBoostConstant(logTypeId)}] ${args}`);
+
+      const d = new Date(unixtime);
+      const year  = d.getFullYear();
+      const month = d.getMonth() + 1;
+      const day   = d.getDate();
+      const hour  = ( d.getHours()   < 10 ) ? '0' + d.getHours()   : d.getHours();
+      const min   = ( d.getMinutes() < 10 ) ? '0' + d.getMinutes() : d.getMinutes();
+      const sec   = ( d.getSeconds() < 10 ) ? '0' + d.getSeconds() : d.getSeconds();
+      const datestr = year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec;
+      console[GLBoost$1.getValueOfGLBoostConstant(logLevelId)](`[${datestr}][${GLBoost$1.getValueOfGLBoostConstant(logTypeId)}] ${args}`);
+    }
+  }
+
+  GLBoost$1['Logger'] = Logger;
+
   class GLContext {
 
     constructor(canvas, initParameter, gl, width, height) {
@@ -954,6 +1074,8 @@
 
       this._monitor = L_GLBoostMonitor.getInstance();
       this._glslProgramsLatestUsageCount = 0;
+
+      this._logger = Logger.getInstance();
     }
 
     static getInstance(canvas, initParameter, gl, width, height) {
@@ -987,7 +1109,7 @@
       if (GLBoost$1.VALUE_CONSOLE_OUT_FOR_DEBUGGING === false) {
         return;
       }
-      if (GLBoost$1.valueOfGLBoostConstants[GLBoost$1.LOG_GL_ERROR] === false) {
+      if (GLBoost$1.valueOfGLBoostConstants[GLBoost$1.LOG_TYPE_GL] === false) {
         return;
       }
 
@@ -1007,7 +1129,8 @@
 
         errorTypes.forEach((errorType, i)=>{
           if (gl[errorType] === errorCode) {
-            MiscUtil.consoleLog(GLBoost$1.LOG_GL_ERROR, 'WebGL Error: gl.' + errorCode + '\n' + 'Meaning:' + errorMessages[i]);
+            this._logger.out(GLBoost$1.LOG_LEVEL_WARN, GLBoost$1.LOG_TYPE_GL, errorCode, errorMessages[i]);
+  //          MiscUtil.consoleLog(GLBoost.LOG_TYPE_GL, 'WebGL Error: gl.' + errorCode + '\n' + 'Meaning:' + errorMessages[i]);
           }
         });
       }
@@ -1348,7 +1471,7 @@
   //      
 
                           
-  let singleton$1     = Symbol();
+  let singleton$2     = Symbol();
 
   class EntityRepository {
                                        
@@ -1370,10 +1493,10 @@
     }
 
     static getInstance() {
-      if (!this[singleton$1]) {
-        this[singleton$1] = new EntityRepository(EntityRepository.__singletonEnforcer);
+      if (!this[singleton$2]) {
+        this[singleton$2] = new EntityRepository(EntityRepository.__singletonEnforcer);
       }
-      return this[singleton$1];
+      return this[singleton$2];
     }
 
     
@@ -5997,22 +6120,22 @@
   Shader._shaderHashTable = {};
   Shader._defaultLight = null;
 
-  let singleton$2 = Symbol();
-  let singletonEnforcer = Symbol();
+  let singleton$3 = Symbol();
+  let singletonEnforcer$1 = Symbol();
 
   class DrawKickerWorld {
     constructor(enforcer) {
-      if (enforcer !== singletonEnforcer) {
+      if (enforcer !== singletonEnforcer$1) {
         throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
       }
       this._glslProgram = null;
     }
 
     static getInstance() {
-      if (!this[singleton$2]) {
-        this[singleton$2] = new DrawKickerWorld(singletonEnforcer);
+      if (!this[singleton$3]) {
+        this[singleton$3] = new DrawKickerWorld(singletonEnforcer$1);
       }
-      return this[singleton$2];
+      return this[singleton$3];
     }
 
     static setCamera(gl, glslProgram, material, world_m, normal_m, camera, mesh) {
@@ -14606,112 +14729,6 @@ albedo.rgb *= (1.0 - metallic);
 
   GLBoost$1["CubeAbsolute"] = CubeAbsolute;
 
-  //      
-
-  let singleton$3 = Symbol();
-  let singletonEnforcer$1 = Symbol();
-
-                           
-                          
-                            
-                     
-                          
-                    
-    
-
-  class Logger {
-                                     
-    // Formatter
-    // logFormatter:any;
-
-    // Log Data Output Target
-                                         
-                                           
-    /**
-     * The constructor of Logger class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
-     * @param enforcer a Symbol to forbid calling this constructor directly
-     */
-    constructor(enforcer        ) {
-      if (enforcer !== singletonEnforcer$1) {
-        throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
-      }
-      //this.logFormatter = null;
-      this.realtimeTargets = new Map();
-      this.aggregateTargets = new Map();
-      this.logData = [];
-      this.registerRealtimeOutputTarget('default', this.defaultConsoleFunction);
-    }
-
-    /**
-     * The static method to get singleton instance of this class.
-     * @return The singleton instance of GLTFLoader class
-     */
-    static getInstance()         {
-      if (!this[singleton$3]) {
-        this[singleton$3] = new Logger(singletonEnforcer$1);
-      }
-      return this[singleton$3];
-    }
-
-    registerRealtimeOutputTarget(targetName, target) {
-      this.realtimeTargets.set(targetName, target);
-    }
-
-    registerAggregateOutputTarget(targetName, target) {
-      this.aggregateTargets.set(targetName, target);
-    }
-
-    unregisterRealtimeOutputTarget(targetName) {
-      this.realtimeTargets.delete(targetName);
-    }
-
-    unregisterAggregateOutputTarget(targetName) {
-      this.aggregateTargets.delete(targetName);
-    }
-
-    aggregate(targetName = null) {
-      if (targetName != null) {
-        const targetFunc = this.realtimeTargets[targetName];
-        for (const log of this.logData) {
-          targetFunc(logLevelId, logTypeId, log);
-        }
-    } else {
-        for (var [targetName, targetFunc] of this.realtimeTargets) {
-          for (const log of this.logData) {
-            targetFunc(logLevelId, logTypeId, log);
-          }
-        }
-      }
-    }
-
-    out(logLevelId, logTypeId, ...args) {
-      const unixtime = Date.now();
-      this.logData.push({
-        unixtime: unixtime,
-        logLevelId: logLevelId,
-        args: args
-      });
-
-      for (var [targetName, targetFunc] of this.realtimeTargets) {
-        targetFunc(logLevelId, logTypeId, unixtime, ...args);
-      }
-    }
-
-    defaultConsoleFunction(logLevelId, logTypeId, unixtime, ...args) {
-      //console[GLBoost.getValueOfGLBoostConstant(logLevelId)](`[${GLBoost.getValueOfGLBoostConstant(logTypeId)}] ${args}`);
-
-      const d = new Date(unixtime);
-      const year  = d.getFullYear();
-      const month = d.getMonth() + 1;
-      const day   = d.getDate();
-      const hour  = ( d.getHours()   < 10 ) ? '0' + d.getHours()   : d.getHours();
-      const min   = ( d.getMinutes() < 10 ) ? '0' + d.getMinutes() : d.getMinutes();
-      const sec   = ( d.getSeconds() < 10 ) ? '0' + d.getSeconds() : d.getSeconds();
-      const datestr = year + '-' + month + '-' + day + ' ' + hour + ':' + min + ':' + sec;
-      console[GLBoost$1.getValueOfGLBoostConstant(logLevelId)](`[${datestr}][${GLBoost$1.getValueOfGLBoostConstant(logTypeId)}] ${args}`);
-    }
-  }
-
   /*       */
 
                                                   
@@ -19739,7 +19756,7 @@ albedo.rgb *= (1.0 - metallic);
     define(GLBoost$1.LOG_SHADER_CODE, true);
     define(GLBoost$1.LOG_GLBOOST_OBJECT_LIFECYCLE, true);
     define(GLBoost$1.LOG_GL_RESOURCE_LIFECYCLE, true);
-    define(GLBoost$1.LOG_GL_ERROR, true);
+    define(GLBoost$1.LOG_TYPE_GL, true);
     define(GLBoost$1.LOG_OMISSION_PROCESSING, false);
   })();
 
@@ -24069,4 +24086,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-359-g28c5-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-360-ge06b-mod branch: develop';

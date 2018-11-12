@@ -38,6 +38,6 @@ import Vector3 from './low_level/math/Vector3';
   define(GLBoost.LOG_SHADER_CODE, true);
   define(GLBoost.LOG_GLBOOST_OBJECT_LIFECYCLE, true);
   define(GLBoost.LOG_GL_RESOURCE_LIFECYCLE, true);
-  define(GLBoost.LOG_GL_ERROR, true);
+  define(GLBoost.LOG_TYPE_GL, true);
   define(GLBoost.LOG_OMISSION_PROCESSING, false);
 })();

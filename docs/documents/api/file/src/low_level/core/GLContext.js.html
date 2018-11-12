@@ -237,7 +237,7 @@ export default class GLContext {
     if (GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING === false) {
       return;
     }
-    if (GLBoost.valueOfGLBoostConstants[GLBoost.LOG_GL_ERROR] === false) {
+    if (GLBoost.valueOfGLBoostConstants[GLBoost.LOG_TYPE_GL] === false) {
       return;
     }
 
@@ -257,7 +257,7 @@ export default class GLContext {
 
       errorTypes.forEach((errorType, i)=&gt;{
         if (gl[errorType] === errorCode) {
-          MiscUtil.consoleLog(GLBoost.LOG_GL_ERROR, &apos;WebGL Error: gl.&apos; + errorCode + &apos;\n&apos; + &apos;Meaning:&apos; + errorMessages[i]);
+          MiscUtil.consoleLog(GLBoost.LOG_TYPE_GL, &apos;WebGL Error: gl.&apos; + errorCode + &apos;\n&apos; + &apos;Meaning:&apos; + errorMessages[i]);
         }
       });
     }

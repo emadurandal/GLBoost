@@ -2977,9 +2977,9 @@
                               "line": 41,
                               "column": 29
                             },
-                            "identifierName": "LOG_GL_ERROR"
+                            "identifierName": "LOG_TYPE_GL"
                           },
-                          "name": "LOG_GL_ERROR"
+                          "name": "LOG_TYPE_GL"
                         },
                         "computed": false
                       },
@@ -9327,7 +9327,7 @@
         "postfix": false,
         "binop": null
       },
-      "value": "LOG_GL_ERROR",
+      "value": "LOG_TYPE_GL",
       "start": 1680,
       "end": 1692,
       "loc": {

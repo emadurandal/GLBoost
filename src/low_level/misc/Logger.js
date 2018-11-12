@@ -79,6 +79,18 @@ export default class Logger {
   }
 
   out(logLevelId, logTypeId, ...args) {
+    if (GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING === false &&
+      (logLevelId === GLBoost.LOG_LEVEL_DEBUG ||
+       logLevelId === GLBoost.LOG_LEVEL_INFO ||
+       logLevelId === GLBoost.LOG_LEVEL_LOG)) {
+      // output error log even when VALUE_CONSOLE_OUT_FOR_DEBUGGING is true.
+      return;
+    }
+    
+    if (GLBoost.valueOfGLBoostConstants[logTypeId] != null && GLBoost.valueOfGLBoostConstants[logTypeId] === false) {
+      return;
+    }
+
     const unixtime = Date.now();
     this.logData.push({
       unixtime: unixtime,

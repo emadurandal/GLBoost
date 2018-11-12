@@ -4,6 +4,7 @@ import GLContextWebGL1Impl from '../impl/GLContextWebGL1Impl';
 import GLContextWebGL2Impl from '../impl/GLContextWebGL2Impl';
 import GLExtensionsManager from './GLExtensionsManager';
 import L_GLBoostMonitor from './L_GLBoostMonitor';
+import Logger from '../misc/Logger';
 
 export default class GLContext {
 
@@ -32,6 +33,8 @@ export default class GLContext {
 
     this._monitor = L_GLBoostMonitor.getInstance();
     this._glslProgramsLatestUsageCount = 0;
+
+    this._logger = Logger.getInstance();
   }
 
   static getInstance(canvas, initParameter, gl, width, height) {
@@ -65,7 +68,7 @@ export default class GLContext {
     if (GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING === false) {
       return;
     }
-    if (GLBoost.valueOfGLBoostConstants[GLBoost.LOG_GL_ERROR] === false) {
+    if (GLBoost.valueOfGLBoostConstants[GLBoost.LOG_TYPE_GL] === false) {
       return;
     }
 
@@ -85,7 +88,8 @@ export default class GLContext {
 
       errorTypes.forEach((errorType, i)=>{
         if (gl[errorType] === errorCode) {
-          MiscUtil.consoleLog(GLBoost.LOG_GL_ERROR, 'WebGL Error: gl.' + errorCode + '\n' + 'Meaning:' + errorMessages[i]);
+          this._logger.out(GLBoost.LOG_LEVEL_WARN, GLBoost.LOG_TYPE_GL, errorCode, errorMessages[i]);
+//          MiscUtil.consoleLog(GLBoost.LOG_TYPE_GL, 'WebGL Error: gl.' + errorCode + '\n' + 'Meaning:' + errorMessages[i]);
         }
       });
     }
