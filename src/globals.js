@@ -437,6 +437,8 @@ var global = ('global',eval)('this');
     c.define('LOG_TYPE_NUMERICAL', void 0, 'numerical');
     c.define('LOG_TYPE_AABB', void 0, 'AABB');
     c.define('LOG_TYPE_GL', void 0, 'GL');
+    c.define('LOG_TYPE_PERFORMANCE', void 0, 'PERFORMANCE');
+     
 
   })();
 

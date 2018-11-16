@@ -5,6 +5,7 @@ import GLBoostObject from '../low_level/core/GLBoostObject';
 import Matrix44 from '../low_level/math/Matrix44';
 import Vector3 from '../low_level/math/Vector3';
 import EffekseerElement from './plugins/EffekseerElement';
+import Logger from '../low_level/misc/Logger';
 
 /**
  * This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.
@@ -21,6 +22,8 @@ export default class Renderer extends GLBoostObject {
     if (_clearColor) {
       gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
     }
+
+    this.__logger = Logger.getInstance();
 
     this.__animationFrameId = -1;
     this.__isWebVRMode = false;
@@ -87,6 +90,7 @@ export default class Renderer extends GLBoostObject {
       if (!renderPass.isEnableToDraw || !renderPass.scene) {
         return;
       }
+      renderPass._startUnixTime = performance.now();
 
       if (renderPassTag !== renderPass.tag) {
         renderPass.clearAssignShaders();
@@ -206,6 +210,10 @@ export default class Renderer extends GLBoostObject {
 
       renderPass.postRender(camera ? true:false, lights);
 
+      renderPass._endUnixTime = performance.now();
+    });
+    expression.renderPasses.forEach((renderPass, index)=>{
+      this.__logger.out(GLBoost.LOG_LEVEL_INFO, GLBoost.LOG_TYPE_PERFORMANCE, false, `RenderPass[${index}]: ${renderPass._endUnixTime - renderPass._startUnixTime}`);
     });
   }
 

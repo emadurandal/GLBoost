@@ -21,6 +21,8 @@ export default class Logger {
   // Log Data Output Target
   realtimeTargets:Map<string, Function>
   aggregateTargets:Map<string, Function>;
+
+  logCapacity: number;
   /**
    * The constructor of Logger class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
    * @param enforcer a Symbol to forbid calling this constructor directly
@@ -33,6 +35,7 @@ export default class Logger {
     this.realtimeTargets = new Map();
     this.aggregateTargets = new Map();
     this.logData = [];
+    this.logCapacity = 5000;
     this.registerRealtimeOutputTarget('default', this.defaultConsoleFunction);
     this.registerAggregateOutputTarget('default', this.defaultConsoleFunction);
   }
@@ -104,6 +107,10 @@ export default class Logger {
       for (var [targetName, targetFunc] of this.realtimeTargets) {
         targetFunc(logLevelId, logTypeId, unixtime, ...args);
       }
+    }
+
+    if (this.logData.length > this.logCapacity + 1000) {
+      this.logData.splice(0, this.logData.length - this.logCapacity);
     }
   }
 

@@ -443,6 +443,8 @@
       c.define('LOG_TYPE_NUMERICAL', void 0, 'numerical');
       c.define('LOG_TYPE_AABB', void 0, 'AABB');
       c.define('LOG_TYPE_GL', void 0, 'GL');
+      c.define('LOG_TYPE_PERFORMANCE', void 0, 'PERFORMANCE');
+       
 
     })();
 
@@ -948,6 +950,8 @@
     // Log Data Output Target
                                          
                                            
+
+                        
     /**
      * The constructor of Logger class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
      * @param enforcer a Symbol to forbid calling this constructor directly
@@ -960,6 +964,7 @@
       this.realtimeTargets = new Map();
       this.aggregateTargets = new Map();
       this.logData = [];
+      this.logCapacity = 5000;
       this.registerRealtimeOutputTarget('default', this.defaultConsoleFunction);
       this.registerAggregateOutputTarget('default', this.defaultConsoleFunction);
     }
@@ -1031,6 +1036,10 @@
         for (var [targetName, targetFunc] of this.realtimeTargets) {
           targetFunc(logLevelId, logTypeId, unixtime, ...args);
         }
+      }
+
+      if (this.logData.length > this.logCapacity + 1000) {
+        this.logData.splice(0, this.logData.length - this.logCapacity);
       }
     }
 
@@ -16272,6 +16281,10 @@ albedo.rgb *= (1.0 - metallic);
           let renderSpecificMaterials = [];
           obj.getAppropriateMaterials().forEach((material, index) => {
             let newMaterial = this._glBoostSystem._glBoostContext.createClassicMaterial();
+            newMaterial._textureDic = Object.assign({}, material._textureDic);
+            newMaterial._texturePurposeDic = material._texturePurposeDic.concat();
+            newMaterial._textureContributionRateDic = Object.assign({}, material._textureContributionRateDic);
+             
             //newMaterial._originalMaterial = material;
             renderSpecificMaterials.push(newMaterial);
           });
@@ -16366,6 +16379,8 @@ albedo.rgb *= (1.0 - metallic);
         gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
       }
 
+      this.__logger = Logger.getInstance();
+
       this.__animationFrameId = -1;
       this.__isWebVRMode = false;
       this.__webvrFrameData = null;
@@ -16431,6 +16446,7 @@ albedo.rgb *= (1.0 - metallic);
         if (!renderPass.isEnableToDraw || !renderPass.scene) {
           return;
         }
+        renderPass._startUnixTime = performance.now();
 
         if (renderPassTag !== renderPass.tag) {
           renderPass.clearAssignShaders();
@@ -16550,6 +16566,10 @@ albedo.rgb *= (1.0 - metallic);
 
         renderPass.postRender(camera ? true:false, lights);
 
+        renderPass._endUnixTime = performance.now();
+      });
+      expression.renderPasses.forEach((renderPass, index)=>{
+        this.__logger.out(GLBoost.LOG_LEVEL_INFO, GLBoost.LOG_TYPE_PERFORMANCE, false, `RenderPass[${index}]: ${renderPass._endUnixTime - renderPass._startUnixTime}`);
       });
     }
 
@@ -24089,4 +24109,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-361-gb2e6-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-363-g08e6-mod branch: develop';
