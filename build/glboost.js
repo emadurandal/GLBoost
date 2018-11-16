@@ -16446,7 +16446,9 @@ albedo.rgb *= (1.0 - metallic);
         if (!renderPass.isEnableToDraw || !renderPass.scene) {
           return;
         }
-        renderPass._startUnixTime = performance.now();
+        if (GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING && GLBoost.valueOfGLBoostConstants[GLBoost.LOG_TYPE_PERFORMANCE] !== false) {
+          renderPass._startUnixTime = performance.now();
+        }
 
         if (renderPassTag !== renderPass.tag) {
           renderPass.clearAssignShaders();
@@ -16568,9 +16570,11 @@ albedo.rgb *= (1.0 - metallic);
 
         renderPass._endUnixTime = performance.now();
       });
-      expression.renderPasses.forEach((renderPass, index)=>{
-        this.__logger.out(GLBoost.LOG_LEVEL_INFO, GLBoost.LOG_TYPE_PERFORMANCE, false, `RenderPass[${index}]: ${renderPass._endUnixTime - renderPass._startUnixTime}`);
-      });
+      if (GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING && GLBoost.valueOfGLBoostConstants[GLBoost.LOG_TYPE_PERFORMANCE] !== false) {
+        expression.renderPasses.forEach((renderPass, index)=>{
+          this.__logger.out(GLBoost.LOG_LEVEL_INFO, GLBoost.LOG_TYPE_PERFORMANCE, false, `RenderPass[${index}]: ${renderPass._endUnixTime - renderPass._startUnixTime}`);
+        });
+      }
     }
 
     _drawGizmos(gizmos, expression, lights, camera, renderPass, index, viewport, isDepthTest) {
@@ -24109,4 +24113,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-363-g08e6-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-364-gfc16-mod branch: develop';
