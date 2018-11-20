@@ -94,6 +94,9 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
   }
 
   _mouseWheel(e) {
+    if (this._currentDir === null) {
+      return;
+    }
     const delta = e.wheelDelta * this._mouseWheelSpeedScale;
     const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
     this._currentPos.add(Vector3.multiply(horizontalDir, delta));
