@@ -101,7 +101,6 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
   }
 
   _mouseDown(evt) {
-    evt.preventDefault();
     evt.stopPropagation();
     this._isMouseDown = true;
 
@@ -113,7 +112,6 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
   }
 
   _mouseMove(evt) {
-    evt.preventDefault();
     evt.stopPropagation();
     if (!this._isMouseDown) {
       return;
