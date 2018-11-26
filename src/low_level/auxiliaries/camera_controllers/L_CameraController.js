@@ -61,6 +61,7 @@ export default class L_CameraController extends GLBoostObject {
     this._shiftCameraTo = null;
 
     this._onMouseDown = (evt) => {
+      evt.preventDefault();
       evt.stopPropagation();
       
       let rect = evt.target.getBoundingClientRect();
@@ -96,6 +97,7 @@ export default class L_CameraController extends GLBoostObject {
     };
 
     this._onMouseMove = (evt) => {
+      evt.preventDefault();
       evt.stopPropagation();
       
       if (this._isKeyUp) {
@@ -165,12 +167,17 @@ export default class L_CameraController extends GLBoostObject {
     };
 
     this._onMouseWheel = (evt) => {
+      evt.preventDefault();
 
       this.dolly += evt.deltaY / 600;
     };
 
     this._onContexMenu = (evt) => {
-      event.returnValue = false;
+      if (evt.preventDefault) {
+        evt.preventDefault();
+      } else {
+        event.returnValue = false;
+      }
     };
 
     this._onMouseDblClick = (evt) => {
