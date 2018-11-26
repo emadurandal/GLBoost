@@ -637,6 +637,28 @@
         console.log(text);
       }
     }
+
+    static isMobile() {
+      var ua = [
+        "iPod",
+        "iPad",
+        "iPhone",
+        "Android"
+      ];
+      
+      for (var i = 0; i < ua.length; i++) {
+        if (navigator.userAgent.indexOf(ua[i]) > 0) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    static preventDefaultForDesktopOnly(e) {
+      if(!MiscUtil.isMobile()) {
+        e.preventDefault();
+      }
+    }
   }
 
   GLBoost$1['MiscUtil'] = MiscUtil;
@@ -2478,7 +2500,13 @@
     }
 
     static invert(quat) {
-      return new Quaternion(-quat.x, -quat.y, -quat.z, quat.w).multiply(1.0/(quat.x*quat.x + quat.y*quat.y + quat.z*quat.z + quat.w*quat.w));
+      quat = new Quaternion(-quat.x, -quat.y, -quat.z, quat.w);
+      const inorm2 = 1.0/(quat.x*quat.x + quat.y*quat.y + quat.z*quat.z + quat.w*quat.w);
+      quat.x *= inorm2;
+      quat.y *= inorm2;
+      quat.z *= inorm2;
+      quat.w *= inorm2;
+      return quat;
     }
 
     static qlerp(lhq, rhq, ratio) {
@@ -11586,7 +11614,7 @@ albedo.rgb *= (1.0 - metallic);
       this._shiftCameraTo = null;
 
       this._onMouseDown = (evt) => {
-        evt.preventDefault();
+        MiscUtil.preventDefaultForDesktopOnly(evt);
         evt.stopPropagation();
         
         let rect = evt.target.getBoundingClientRect();
@@ -11622,7 +11650,7 @@ albedo.rgb *= (1.0 - metallic);
       };
 
       this._onMouseMove = (evt) => {
-        evt.preventDefault();
+        MiscUtil.preventDefaultForDesktopOnly(evt);
         evt.stopPropagation();
         
         if (this._isKeyUp) {
@@ -11688,14 +11716,14 @@ albedo.rgb *= (1.0 - metallic);
       };
 
       this._onMouseWheel = (evt) => {
-        evt.preventDefault();
+        MiscUtil.preventDefaultForDesktopOnly(evt);
 
         this.dolly += evt.deltaY / 600;
       };
 
       this._onContexMenu = (evt) => {
         if (evt.preventDefault) {
-          evt.preventDefault();
+          MiscUtil.preventDefaultForDesktopOnly(evt);
         } else {
           event.returnValue = false;
         }
@@ -12149,6 +12177,9 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     _mouseWheel(e) {
+      if (this._currentDir === null) {
+        return;
+      }
       const delta = e.wheelDelta * this._mouseWheelSpeedScale;
       const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
       this._currentPos.add(Vector3.multiply(horizontalDir, delta));
@@ -12156,7 +12187,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     _mouseDown(evt) {
-      evt.preventDefault();
+      MiscUtil.preventDefaultForDesktopOnly(evt);
       evt.stopPropagation();
       this._isMouseDown = true;
 
@@ -12168,7 +12199,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     _mouseMove(evt) {
-      evt.preventDefault();
+      MiscUtil.preventDefaultForDesktopOnly(evt);
       evt.stopPropagation();
       if (!this._isMouseDown) {
         return;
@@ -24113,4 +24144,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-364-gfc16-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-369-gb970a-mod branch: develop';

@@ -23,6 +23,28 @@ export default class MiscUtil {
       console.log(text);
     }
   }
+
+  static isMobile() {
+    var ua = [
+      "iPod",
+      "iPad",
+      "iPhone",
+      "Android"
+    ]
+    
+    for (var i = 0; i < ua.length; i++) {
+      if (navigator.userAgent.indexOf(ua[i]) > 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static preventDefaultForDesktopOnly(e) {
+    if(!MiscUtil.isMobile()) {
+      e.preventDefault();
+    }
+  }
 }
 
 GLBoost['MiscUtil'] = MiscUtil;

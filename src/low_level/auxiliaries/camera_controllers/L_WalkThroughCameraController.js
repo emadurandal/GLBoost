@@ -3,6 +3,7 @@ import Vector3 from '../../math/Vector3';
 import Matrix33 from '../../math/Matrix33';
 import MathClassUtil from '../../math/MathClassUtil';
 import GLBoost from '../../../globals';
+import MiscUtil from '../../misc/MiscUtil';
 
 export default class L_WalkThroughCameraController extends GLBoostObject {
   constructor(glBoostContext, options = {
@@ -104,7 +105,7 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
   }
 
   _mouseDown(evt) {
-    evt.preventDefault();
+    MiscUtil.preventDefaultForDesktopOnly(evt)
     evt.stopPropagation();
     this._isMouseDown = true;
 
@@ -116,7 +117,7 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
   }
 
   _mouseMove(evt) {
-    evt.preventDefault();
+    MiscUtil.preventDefaultForDesktopOnly(evt)
     evt.stopPropagation();
     if (!this._isMouseDown) {
       return;

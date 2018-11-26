@@ -5,6 +5,7 @@ import Matrix33 from '../../math/Matrix33';
 import M_AbstractCamera from  '../../../middle_level/elements/cameras/M_AbstractCamera';
 import MathClassUtil from '../../math/MathClassUtil';
 import MathUtil from '../../math/MathUtil';
+import MiscUtil from '../../misc/MiscUtil';
 import GLBoost from '../../../globals';
 
 export default class L_CameraController extends GLBoostObject {
@@ -61,7 +62,7 @@ export default class L_CameraController extends GLBoostObject {
     this._shiftCameraTo = null;
 
     this._onMouseDown = (evt) => {
-      evt.preventDefault();
+      MiscUtil.preventDefaultForDesktopOnly(evt)
       evt.stopPropagation();
       
       let rect = evt.target.getBoundingClientRect();
@@ -97,7 +98,7 @@ export default class L_CameraController extends GLBoostObject {
     };
 
     this._onMouseMove = (evt) => {
-      evt.preventDefault();
+      MiscUtil.preventDefaultForDesktopOnly(evt)
       evt.stopPropagation();
       
       if (this._isKeyUp) {
@@ -167,14 +168,14 @@ export default class L_CameraController extends GLBoostObject {
     };
 
     this._onMouseWheel = (evt) => {
-      evt.preventDefault();
+      MiscUtil.preventDefaultForDesktopOnly(evt)
 
       this.dolly += evt.deltaY / 600;
     };
 
     this._onContexMenu = (evt) => {
       if (evt.preventDefault) {
-        evt.preventDefault();
+        MiscUtil.preventDefaultForDesktopOnly(evt)
       } else {
         event.returnValue = false;
       }
