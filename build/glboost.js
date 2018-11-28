@@ -16703,6 +16703,13 @@ albedo.rgb *= (1.0 - metallic);
       this._glContext.canvasHeight = height;
     }
 
+    makeNormalsOfViewFrustum(camera                  ) {
+      const viewMatrix = camera.lookAtRHMatrix();
+      const projectionMatrix = camera.projectionRHMatrix();
+      const vpMatrix = Matrix44$1.multiply(viewMatrix, projectionMatrix);
+      
+    }
+
     /**
      * This method treats the given callback function as a render loop and call it every frame.
      */
@@ -24144,4 +24151,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-369-gb970a-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-370-g3c3c3-mod branch: develop';
