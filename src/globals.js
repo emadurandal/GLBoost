@@ -427,8 +427,18 @@ var global = ('global',eval)('this');
     c.define('LOG_SHADER_CODE');
     c.define('LOG_GLBOOST_OBJECT_LIFECYCLE');
     c.define('LOG_GL_RESOURCE_LIFECYCLE');
-    c.define('LOG_GL_ERROR');
+    c.define('LOG_LEVEL_ERROR', void 0, 'error');
+    c.define('LOG_LEVEL_WARN', void 0, 'warn');
+    c.define('LOG_LEVEL_LOG', void 0, 'log');
+    c.define('LOG_LEVEL_INFO', void 0, 'info');
+    c.define('LOG_LEVEL_DEBUG', void 0, 'debug');
     c.define('LOG_OMISSION_PROCESSING');
+
+    c.define('LOG_TYPE_NUMERICAL', void 0, 'numerical');
+    c.define('LOG_TYPE_AABB', void 0, 'AABB');
+    c.define('LOG_TYPE_GL', void 0, 'GL');
+    c.define('LOG_TYPE_PERFORMANCE', void 0, 'PERFORMANCE');
+     
 
   })();
 

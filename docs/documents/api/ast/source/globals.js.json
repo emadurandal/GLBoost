@@ -48873,10 +48873,10 @@
                                     }
                                   },
                                   "extra": {
-                                    "rawValue": "LOG_GL_ERROR",
-                                    "raw": "'LOG_GL_ERROR'"
+                                    "rawValue": "LOG_TYPE_GL",
+                                    "raw": "'LOG_TYPE_GL'"
                                   },
-                                  "value": "LOG_GL_ERROR"
+                                  "value": "LOG_TYPE_GL"
                                 }
                               ]
                             }
@@ -143521,7 +143521,7 @@
         "binop": null,
         "updateContext": null
       },
-      "value": "LOG_GL_ERROR",
+      "value": "LOG_TYPE_GL",
       "start": 16533,
       "end": 16547,
       "loc": {

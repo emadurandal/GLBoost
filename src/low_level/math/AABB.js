@@ -9,7 +9,13 @@ export default class AABB {
     this._AABB_max = new Vector3(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
     this._centerPoint = null;
     this._lengthCenterToCorner = null;
+    this._threshold_AABB_min = -1000000000;
+    this._threshold_AABB_max = 1000000000;
+    this._threshold_AABB_lengthCenterToCorner = null;
 
+    this._isValid_AABB_min = true;
+    this._isValid_AABB_max = true;
+    this._isValid_AABB_lengthCenterToCorner = true;
   }
 
   clone() {
@@ -58,7 +64,43 @@ export default class AABB {
     const lengthCenterToCorner = Vector3.lengthBtw(this._centerPoint, this._AABB_max);
     this._lengthCenterToCorner = (lengthCenterToCorner !== lengthCenterToCorner) ? 0 : lengthCenterToCorner;
 
+    if (this._threshold_AABB_min != null &&
+      (this._AABB_min.x < this._threshold_AABB_min || this._AABB_min.y < this._threshold_AABB_min || this._AABB_min.z < this._threshold_AABB_min))
+    {
+      this._isValid_AABB_min = false;
+    }
+    if (this._threshold_AABB_max != null &&
+      (this._AABB_max.x > this._threshold_AABB_max || this._AABB_max.y > this._threshold_AABB_max || this._AABB_max.z > this._threshold_AABB_max))
+    {
+      this._isValid_AABB_max = false;
+    }
+    if (this._threshold_AABB_lengthCenterToCorner != null && this._threshold_AABB_lengthCenterToCorner < this._lengthCenterToCorner) {
+      this._isValid_AABB_lengthCenterToCorner = false;
+    }
+  
     return this;
+  }
+
+  isValid() {
+    return this._isValid_AABB_min && this._isValid_AABB_max && this._isValid_AABB_lengthCenterToCorner;
+  }
+
+  isValid_AABB_min() {
+    return this._isValid_AABB_min;
+  }
+
+  isValid_AABB_max() {
+    return this._isValid_AABB_min;
+  }
+
+  isValid_AABB_lengthCenterToCorner() {
+    return this._isValid_AABB_lengthCenterToCorner;
+  }
+
+  resetValidationFlags() {
+    this._isValid_AABB_min = true;
+    this._isValid_AABB_max = true;
+    this._isValid_AABB_lengthCenterToCorner = true; 
   }
 
   mergeAABB(aabb) {

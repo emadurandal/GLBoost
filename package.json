@@ -8,7 +8,7 @@
   },
   "scripts": {
     "setup": "cp ./pre-commit ./.git/hooks",
-    "build": "npm run setup && npm run build-middle && npx uglify --source-map \"base='./build/',url='glboost.min.js.map'\" -o ./build/glboost.min.js -- ./build/glboost.js && bash versioning.sh",
+    "build": "npm run setup && npm run build-middle && npx uglifyjs --source-map \"base='./build/',url='glboost.min.js.map'\" -o ./build/glboost.min.js -- ./build/glboost.js && bash versioning.sh",
     "build-middle": "rollup -c src/middle_level/rollup.config.js",
     "test": "jest",
     "esdoc": "esdoc -c esdoc.json",
@@ -45,14 +45,14 @@
     "esdoc-ecmascript-proposal-plugin": "^1.0.0",
     "esdoc-flow-type-plugin": "^1.1.0",
     "esdoc-standard-plugin": "^1.0.0",
-    "eslint": "^5.6.1",
+    "eslint": "^5.9.0",
     "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-config-prettier": "^3.1.0",
+    "eslint-config-prettier": "^3.3.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-flowtype": "^2.50.3",
     "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-jest": "^21.24.1",
-    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-jest": "^21.27.2",
+    "eslint-plugin-promise": "^3.8.0",
     "eslint-plugin-standard": "^3.0.1",
     "flow-bin": "^0.82.0",
     "flow-typed": "^2.5.1",
@@ -60,9 +60,9 @@
     "http-server": "^0.10.0",
     "jest": "^23.6.0",
     "prettier-eslint": "^8.8.2",
-    "rollup": "^0.66.4",
+    "rollup": "^0.66.6",
     "rollup-plugin-flow": "^1.1.1",
-    "uglify": "^0.1.5"
+    "uglify-es": "^3.3.10"
   },
   "dependencies": {}
 }

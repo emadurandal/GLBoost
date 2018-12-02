@@ -4642,9 +4642,9 @@
                                   "line": 68,
                                   "column": 60
                                 },
-                                "identifierName": "LOG_GL_ERROR"
+                                "identifierName": "LOG_TYPE_GL"
                               },
-                              "name": "LOG_GL_ERROR"
+                              "name": "LOG_TYPE_GL"
                             },
                             "computed": false
                           },
@@ -5790,9 +5790,9 @@
                                                           "line": 88,
                                                           "column": 50
                                                         },
-                                                        "identifierName": "LOG_GL_ERROR"
+                                                        "identifierName": "LOG_TYPE_GL"
                                                       },
-                                                      "name": "LOG_GL_ERROR"
+                                                      "name": "LOG_TYPE_GL"
                                                     },
                                                     "computed": false
                                                   },
@@ -30409,7 +30409,7 @@
         "postfix": false,
         "binop": null
       },
-      "value": "LOG_GL_ERROR",
+      "value": "LOG_TYPE_GL",
       "start": 1953,
       "end": 1965,
       "loc": {
@@ -32901,7 +32901,7 @@
         "postfix": false,
         "binop": null
       },
-      "value": "LOG_GL_ERROR",
+      "value": "LOG_TYPE_GL",
       "start": 3106,
       "end": 3118,
       "loc": {

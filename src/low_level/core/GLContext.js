@@ -4,6 +4,7 @@ import GLContextWebGL1Impl from '../impl/GLContextWebGL1Impl';
 import GLContextWebGL2Impl from '../impl/GLContextWebGL2Impl';
 import GLExtensionsManager from './GLExtensionsManager';
 import L_GLBoostMonitor from './L_GLBoostMonitor';
+import Logger from '../misc/Logger';
 
 export default class GLContext {
 
@@ -32,6 +33,19 @@ export default class GLContext {
 
     this._monitor = L_GLBoostMonitor.getInstance();
     this._glslProgramsLatestUsageCount = 0;
+
+    this._logger = Logger.getInstance();
+
+    this._glErrorTypes = ['INVALID_ENUM', 'INVALID_VALUE', 'INVALID_OPERATION', 'INVALID_FRAMEBUFFER_OPERATION',
+    'OUT_OF_MEMORY', 'CONTEXT_LOST_WEBGL'];
+    this._glErrorMessages = [
+      'An unacceptable value has been specified for an enumerated argument. The command is ignored and the error flag is set.',
+      'A numeric argument is out of range. The command is ignored and the error flag is set.',
+      'The specified command is not allowed for the current state. The command is ignored and the error flag is set.',
+      'The currently bound framebuffer is not framebuffer complete when trying to render to or to read from it.',
+      'Not enough memory is left to execute the command.',
+      'If the WebGL context is lost, this error is returned on the first call to getError. Afterwards and until the context has been restored, it returns gl.NO_ERROR.'
+    ]; 
   }
 
   static getInstance(canvas, initParameter, gl, width, height) {
@@ -62,30 +76,16 @@ export default class GLContext {
   }
 
   checkGLError() {
-    if (GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING === false) {
-      return;
-    }
-    if (GLBoost.valueOfGLBoostConstants[GLBoost.LOG_GL_ERROR] === false) {
+    if (GLBoost.valueOfGLBoostConstants[GLBoost.LOG_TYPE_GL] === false) {
       return;
     }
 
     let gl = this.impl.gl;
     let errorCode = gl.getError();
     if (errorCode !== 0) {
-      let errorTypes = ['INVALID_ENUM', 'INVALID_VALUE', 'INVALID_OPERATION', 'INVALID_FRAMEBUFFER_OPERATION',
-        'OUT_OF_MEMORY', 'CONTEXT_LOST_WEBGL'];
-      let errorMessages = [
-        'An unacceptable value has been specified for an enumerated argument. The command is ignored and the error flag is set.',
-        'A numeric argument is out of range. The command is ignored and the error flag is set.',
-        'The specified command is not allowed for the current state. The command is ignored and the error flag is set.',
-        'The currently bound framebuffer is not framebuffer complete when trying to render to or to read from it.',
-        'Not enough memory is left to execute the command.',
-        'If the WebGL context is lost, this error is returned on the first call to getError. Afterwards and until the context has been restored, it returns gl.NO_ERROR.'
-      ];
-
-      errorTypes.forEach((errorType, i)=>{
+      this.glErrorTypes.forEach((errorType, i)=>{
         if (gl[errorType] === errorCode) {
-          MiscUtil.consoleLog(GLBoost.LOG_GL_ERROR, 'WebGL Error: gl.' + errorCode + '\n' + 'Meaning:' + errorMessages[i]);
+          this._logger.out(GLBoost.LOG_LEVEL_ERROR, GLBoost.LOG_TYPE_GL, false, errorCode, this._glErrorMessages[i]);
         }
       });
     }
@@ -235,6 +235,13 @@ export default class GLContext {
       return;
     }
 
+    if (forceUpdate) {
+      this.gl[uniformFuncStr].apply(this.gl, args);
+      this.checkGLError();
+      return;
+    }
+
+
 //    this.gl[uniformFuncStr].apply(this.gl, args);
 /*
     if (uniformLocation.glslProgram.glslProgramsSelfUsageCount < this._glslProgramsLatestUsageCount) {
@@ -249,6 +256,7 @@ export default class GLContext {
       return;
     }
 
+    
     if (uniformLocation.glslProgramUsageCountWhenLastSet < this._glslProgramsLatestUsageCount) {
       // Since I have never sent a uniform value to glslProgram which is currently in use, update it.
       this.gl[uniformFuncStr].apply(this.gl, args);
@@ -258,13 +266,8 @@ export default class GLContext {
       return;
     }
 
-    if (forceUpdate) {
-      this.gl[uniformFuncStr].apply(this.gl, args);
-      this.checkGLError();
-    } else {
-      MiscUtil.consoleLog(GLBoost.LOG_OMISSION_PROCESSING,
-        'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation.glslProgram is not in use.');
-    }
+    MiscUtil.consoleLog(GLBoost.LOG_OMISSION_PROCESSING,
+      'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation.glslProgram is not in use.');
   }
 
   // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.

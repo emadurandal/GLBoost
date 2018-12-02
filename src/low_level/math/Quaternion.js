@@ -29,7 +29,13 @@ export default class Quaternion {
   }
 
   static invert(quat) {
-    return new Quaternion(-quat.x, -quat.y, -quat.z, quat.w).multiply(1.0/(quat.x*quat.x + quat.y*quat.y + quat.z*quat.z + quat.w*quat.w));
+    quat = new Quaternion(-quat.x, -quat.y, -quat.z, quat.w);
+    const inorm2 = 1.0/(quat.x*quat.x + quat.y*quat.y + quat.z*quat.z + quat.w*quat.w);
+    quat.x *= inorm2;
+    quat.y *= inorm2;
+    quat.z *= inorm2;
+    quat.w *= inorm2;
+    return quat;
   }
 
   static qlerp(lhq, rhq, ratio) {
