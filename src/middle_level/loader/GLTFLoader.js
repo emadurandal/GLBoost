@@ -330,7 +330,7 @@ export default class GLTFLoader {
       let bufferInfo = json.buffers[bufferName];
       const splitted = bufferInfo.uri.split('/');
       const filename = splitted[splitted.length - 1];
-      if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
+      if (bufferInfo.uri.match(/^data:application\/(.*);base64,/)) {
         promisesToLoadResources.push(
           new Promise((fulfilled, rejected) => {
             let arrayBuffer = DataUtil.base64ToArrayBuffer(bufferInfo.uri);

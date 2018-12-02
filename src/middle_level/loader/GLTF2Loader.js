@@ -585,7 +585,7 @@ export default class GLTF2Loader {
             resolve(gltfJson);
           }
         ));
-      } else if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
+      } else if (bufferInfo.uri.match(/^data:application\/(.*);base64,/)) {
         promisesToLoadResources.push(
           new Promise((resolve, rejected) => {
             let arrayBuffer = DataUtil.base64ToArrayBuffer(bufferInfo.uri);

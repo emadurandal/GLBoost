@@ -20215,7 +20215,7 @@ albedo.rgb *= (1.0 - metallic);
         let bufferInfo = json.buffers[bufferName];
         const splitted = bufferInfo.uri.split('/');
         const filename = splitted[splitted.length - 1];
-        if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
+        if (bufferInfo.uri.match(/^data:application\/(.*);base64,/)) {
           promisesToLoadResources.push(
             new Promise((fulfilled, rejected) => {
               let arrayBuffer = DataUtil.base64ToArrayBuffer(bufferInfo.uri);
@@ -22081,7 +22081,7 @@ albedo.rgb *= (1.0 - metallic);
               resolve(gltfJson);
             }
           ));
-        } else if (bufferInfo.uri.match(/^data:application\/octet-stream;base64,/)) {
+        } else if (bufferInfo.uri.match(/^data:application\/(.*);base64,/)) {
           promisesToLoadResources.push(
             new Promise((resolve, rejected) => {
               let arrayBuffer = DataUtil.base64ToArrayBuffer(bufferInfo.uri);
@@ -24151,4 +24151,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-370-g3c3c3-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-371-g05d5-mod branch: develop';
