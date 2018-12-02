@@ -1,5 +1,5 @@
-version: 0.0.4-372-g2cbd-mod
+version: 0.0.4-375-g50af-mod
 branch: develop
-3ae3239a628de04ee7a2ffb8904e65300a7b9f342c0fc5bde2e266cca3e8f7db ./build/glboost.js
-de8d3e8140f17c51319dcdb0d5f865908377cb248d49e93bd723c4f4d9492b39 ./build/glboost.min.js
-a852931dca8d1c2b59a3814ea78df0fdd148af3fe8a52ddd2dbfabce7b4b2147 ./build/glboost.min.js.map
+539eb6a320e48294955f8a81a3476283114f876bc45d6b6828fba6eba2cda44f ./build/glboost.js
+b30e7aa451c60f73f518059ba21dcc9072cbe9a03ecacebdac9cab27ac0dc841 ./build/glboost.min.js
+db89eef4ee6d7340623c98c7ad1c2220ede39ad450bf55cd6c1229b1c1485634 ./build/glboost.min.js.map
