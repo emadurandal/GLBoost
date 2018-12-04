@@ -3,6 +3,7 @@
     "basic",
     "index_buffer",
     "texture",
+    "video_texture",
     "triangle_strip",
     "custom_shader",
     "custom_shader_2",
