@@ -25,7 +25,7 @@ https://viewer.glboost.org/
 
 ## Test Examples
 
-[Check our test examples page](https://rawgit.com/emadurandal/GLBoost/master/examples/index.html)
+[Check our test examples page](https://cdn.staticaly.com/gh/emadurandal/GLBoost/f5a33385/examples/index.html)
 
 If you want to watch examples in local. Go to GLBoost top directory by terminal and start local web server up.
 
