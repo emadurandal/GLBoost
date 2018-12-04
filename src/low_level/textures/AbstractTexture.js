@@ -55,6 +55,7 @@ export default class AbstractTexture extends GLBoostObject {
     } else {
       gl.bindTexture(gl.TEXTURE_2D, this._texture);
     }
+    this.updateTexture();
 
     return true;
   }
@@ -201,6 +202,9 @@ export default class AbstractTexture extends GLBoostObject {
 
   set toMultiplyAlphaToColorPreviously(flag) {
     this._toMultiplyAlphaToColorPreviously = flag;
+  }
+
+  updateTexture() {
   }
 }
 GLBoost['AbstractTexture'] = AbstractTexture;

@@ -17,6 +17,7 @@ import MutableTexture from '../textures/MutableTexture';
 import Texture from '../textures/Texture';
 import PhinaTexture from '../textures/PhinaTexture';
 import CubeTexture from '../textures/CubeTexture';
+import VideoTexture from '../textures/VideoTexture';
 import Cube from '../primitives/Cube';
 import Plane from '../primitives/Plane';
 import Sphere from '../primitives/Sphere';
@@ -152,6 +153,10 @@ export default class GLBoostLowContext {
 
   createCubeTexture(userFlavorName?:string, parameters?:Object) {
     return new CubeTexture(this.__system, userFlavorName, parameters);
+  }
+
+  createVideoTexture(userFlavorName?:string) {
+    return new VideoTexture(this.__system, userFlavorName);
   }
 
   createScreen(screen:Object, customVertexAttributes:Object) {
