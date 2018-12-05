@@ -1,113 +1,113 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
+  <head>
+    <title>GLBoost Texture example</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link rel="stylesheet" href="app.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>
+    <script src="../../../build/glboost.js"></script>
+  </head>
 
-<head>
-  <title>GLBoost Texture example</title>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, user-scalable=no" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <link rel="stylesheet" href="app.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.6.15/browser-polyfill.min.js"></script>
-  <script src="../../../build/glboost.js"></script>
-</head>
+  <body>
+    <header><p class="header-title">GLBoost Texture example</p></header>
+    <main>
+      <canvas id="world" width="600" height="600"></canvas>
+      <div>
+        <p>
+          For cross origin reasons, please try this example in your local
+          environment.
+        </p>
+        <button id="playButton">Play</button>
+      </div>
+    </main>
+    <script>
+      async function webgl() {
+        var arg = new Object();
+        var pair = location.search.substring(1).split("&");
+        for (var i = 0; pair[i]; i++) {
+          var kv = pair[i].split("=");
+          arg[kv[0]] = kv[1];
+        }
 
-<body>
-  <header>
-    <p class="header-title">GLBoost Texture example</p>
-  </header>
-  <main>
-    <canvas id="world" width="600" height="600"></canvas>
-    <div>
-      <p>For cross origin reasons, please try this example in your local environment.</p>
-      <button id="playButton">Play</button>
-    </div>
-  </main>
-  <script>
+        GLBoost.VALUE_TARGET_WEBGL_VERSION = arg.webglver
+          ? parseInt(arg.webglver)
+          : 1;
+        var SCREEN_WIDTH = 640;
+        var SCREEN_HEIGHT = 640;
 
-    async function webgl() {
+        var canvas = document.getElementById("world");
+        var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
+        var scene = glBoostContext.createScene();
 
-      var arg = new Object;
-      var pair = location.search.substring(1).split('&');
-      for (var i = 0; pair[i]; i++) {
-        var kv = pair[i].split('=');
-        arg[kv[0]] = kv[1];
+        var renderer = glBoostContext.createRenderer({
+          canvas: canvas,
+          clearColor: {
+            red: 0.6,
+            green: 0.6,
+            blue: 0.6,
+            alpha: 1
+          }
+        });
+
+        var positions = [
+          new GLBoost.Vector3(-0.75, -0.5, 0.0),
+          new GLBoost.Vector3(0.75, -0.5, 0.0),
+          new GLBoost.Vector3(-0.75, 0.5, 0.0),
+
+          new GLBoost.Vector3(-0.75, 0.5, 0.0),
+          new GLBoost.Vector3(0.75, -0.5, 0.0),
+          new GLBoost.Vector3(0.75, 0.5, 0.0)
+        ];
+
+        var texcoords = [
+          new GLBoost.Vector2(0.0, 1.0),
+          new GLBoost.Vector2(1.0, 1.0),
+          new GLBoost.Vector2(0.0, 0.0),
+
+          new GLBoost.Vector2(0.0, 0.0),
+          new GLBoost.Vector2(1.0, 1.0),
+          new GLBoost.Vector2(1.0, 0.0)
+        ];
+
+        var geometry = glBoostContext.createGeometry();
+        var texture = glBoostContext.createVideoTexture("MyVideoTexture");
+        await texture.generateTextureFromVideoUri(
+          "https://rawcdn.githack.com/emadurandal/GLBoost/65ef8ff16b61abc3f06f435758610e59877c1eae/examples/test/video_texture/resources/video.mp4",
+          document.getElementById("playButton")
+        );
+        var material = glBoostContext.createClassicMaterial();
+        material.setTexture(texture);
+        geometry.setVerticesData({
+          position: positions,
+          texcoord: texcoords
+        });
+        var mesh = glBoostContext.createMesh(geometry, material);
+        scene.addChild(mesh);
+
+        var expression = glBoostContext.createExpressionAndRenderPasses(1);
+        expression.renderPasses[0].scene = scene;
+        expression.renderPasses[0].setClearColor(
+          new GLBoost.Vector4(0.8, 0.8, 0.8, 1)
+        );
+        expression.prepareToRender();
+
+        var render = function() {
+          renderer.clearCanvas();
+          renderer.update(expression);
+          renderer.draw(expression);
+          requestAnimationFrame(render);
+        };
+        render();
+
+        // var button = document.getElementById('playButton');
+        // button.addEventListener('click', () => {
+        //   render();
+        // });
       }
 
-      GLBoost.VALUE_TARGET_WEBGL_VERSION = arg.webglver ? parseInt(arg.webglver) : 1;
-      var SCREEN_WIDTH = 640;
-      var SCREEN_HEIGHT = 640;
-
-      var canvas = document.getElementById("world");
-      var glBoostContext = new GLBoost.GLBoostMiddleContext(canvas);
-      var scene = glBoostContext.createScene();
-
-      var renderer = glBoostContext.createRenderer({
-        canvas: canvas,
-        clearColor: {
-          red: 0.6,
-          green: 0.6,
-          blue: 0.6,
-          alpha: 1
-        }
-      });
-
-      var positions = [
-        new GLBoost.Vector3(-0.75, -0.5, 0.0),
-        new GLBoost.Vector3(0.75, -0.5, 0.0),
-        new GLBoost.Vector3(-0.75, 0.5, 0.0),
-
-        new GLBoost.Vector3(-0.75, 0.5, 0.0),
-        new GLBoost.Vector3(0.75, -0.5, 0.0),
-        new GLBoost.Vector3(0.75, 0.5, 0.0)
-      ];
-
-      var texcoords = [
-        new GLBoost.Vector2(0.0, 1.0),
-        new GLBoost.Vector2(1.0, 1.0),
-        new GLBoost.Vector2(0.0, 0.0),
-
-        new GLBoost.Vector2(0.0, 0.0),
-        new GLBoost.Vector2(1.0, 1.0),
-        new GLBoost.Vector2(1.0, 0.0)
-      ];
-
-      var geometry = glBoostContext.createGeometry();
-      var texture = glBoostContext.createVideoTexture('MyVideoTexture');
-      //await texture.generateTextureFromVideoUri('resources/big-buck-bunny_trailer.webm');
-      await texture.generateTextureFromVideoUri('resources/video.mp4', document.getElementById('playButton'));
-      var material = glBoostContext.createClassicMaterial();
-      material.setTexture(texture);
-      geometry.setVerticesData({
-        position: positions,
-        texcoord: texcoords
-      });
-      var mesh = glBoostContext.createMesh(geometry, material);
-      scene.addChild(mesh);
-
-      var expression = glBoostContext.createExpressionAndRenderPasses(1);
-      expression.renderPasses[0].scene = scene;
-      expression.renderPasses[0].setClearColor(new GLBoost.Vector4(0.8, 0.8, 0.8, 1));
-      expression.prepareToRender();
-
-      var render = function () {
-        renderer.clearCanvas();
-        renderer.update(expression);
-        renderer.draw(expression);
-        requestAnimationFrame(render);
-      };
-      render();
-
-      // var button = document.getElementById('playButton');
-      // button.addEventListener('click', () => {
-      //   render();
-      // });
-
-    }
-
-    webgl();
-
-
-  </script>
-</body>
-
+      webgl();
+    </script>
+  </body>
 </html>
