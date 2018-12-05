@@ -1,19 +1,15 @@
 import AbstractTexture from "./AbstractTexture";
 
-
 export default class VideoTexture extends AbstractTexture {
   constructor(glBoostContext, userFlavorName) {
     super(glBoostContext);
-
   }
 
   async generateTextureFromVideoUri(uri, playButtonDomElement) {
-    return new Promise((resolve, reject)=> {
-
-
+    return new Promise((resolve, reject) => {
       var button = playButtonDomElement;
-      
-      const playAndSetupTexture = ()=> {
+
+      const playAndSetupTexture = () => {
         video.play();
 
         this._width = video.width;
@@ -25,29 +21,41 @@ export default class VideoTexture extends AbstractTexture {
         this._isTextureReady = true;
 
         resolve();
-      }
+      };
 
       // input が押されたらレンダリング開始
-      button.addEventListener('click', ()=> {
-        playAndSetupTexture();
-      }, true);
+      button.addEventListener(
+        "click",
+        () => {
+          playAndSetupTexture();
+        },
+        true
+      );
 
-      const video = document.createElement('video');
+      const video = document.createElement("video");
+      video.crossOrigin = "anonymous";
       video.autoplay = true;
       video.preload = "auto";
       this._video = video;
-  
-      video.addEventListener('canplaythrough', ()=> {
-        if(button.value !== 'running'){
-//          button.value = 'can play video';
-          button.disabled = false;
-        }
-      }, true);
 
-      video.addEventListener('ended', function(){
-        video.play();
-      }, true);
-    
+      video.addEventListener(
+        "canplaythrough",
+        () => {
+          if (button.value !== "running") {
+            //          button.value = 'can play video';
+            button.disabled = false;
+          }
+        },
+        true
+      );
+
+      video.addEventListener(
+        "ended",
+        function() {
+          video.play();
+        },
+        true
+      );
 
       video.src = uri;
     });
@@ -77,14 +85,20 @@ export default class VideoTexture extends AbstractTexture {
   }
 
   get isImageAssignedForTexture() {
-    return typeof this._img == 'undefined';
+    return typeof this._img == "undefined";
   }
 
   updateTexture() {
     //gl.bindTexture(gl.TEXTURE_2D, this._texture);
     //gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     var gl = this._glContext.gl;
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA,
-          gl.UNSIGNED_BYTE, this._video);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      this._video
+    );
   }
 }
