@@ -75,7 +75,8 @@
         var texture = glBoostContext.createVideoTexture("MyVideoTexture");
         await texture.generateTextureFromVideoUri(
           "https://rawcdn.githack.com/emadurandal/GLBoost/65ef8ff16b61abc3f06f435758610e59877c1eae/examples/test/video_texture/resources/video.mp4",
-          document.getElementById("playButton")
+          document.getElementById("playButton"),
+          true
         );
         var material = glBoostContext.createClassicMaterial();
         material.setTexture(texture);

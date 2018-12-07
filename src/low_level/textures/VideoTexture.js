@@ -5,7 +5,7 @@ export default class VideoTexture extends AbstractTexture {
     super(glBoostContext);
   }
 
-  async generateTextureFromVideoUri(uri, playButtonDomElement) {
+  async generateTextureFromVideoUri(uri, playButtonDomElement, mutedAutoPlay) {
     return new Promise((resolve, reject) => {
       var button = playButtonDomElement;
 
@@ -34,7 +34,11 @@ export default class VideoTexture extends AbstractTexture {
 
       const video = document.createElement("video");
       video.crossOrigin = "anonymous";
-      video.autoplay = true;
+      video.setAttribute("playsinline", "playsinline");
+      if (mutedAutoPlay) {
+        video.autoplay = true;
+        video.muted = true;
+      }
       video.preload = "auto";
       this._video = video;
 
@@ -44,6 +48,7 @@ export default class VideoTexture extends AbstractTexture {
           if (button.value !== "running") {
             //          button.value = 'can play video';
             button.disabled = false;
+            playAndSetupTexture();
           }
         },
         true
