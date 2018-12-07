@@ -1869,22 +1869,23 @@
     },
 
     function(val) {
-      return typeof val === 'function';
+      return typeof val === "function";
     }
-
   };
 
   for (let fn in IsUtil) {
     if (IsUtil.hasOwnProperty(fn)) {
-      const interfaces = ['not', 'all', 'any'];
-      if (fn.indexOf('_') === -1 && !interfaces.includes(fn)) {
-        interfaces.forEach((itf)=>{
-          const op = '_' + itf;
+      const interfaces = ["not", "all", "any"];
+      if (fn.indexOf("_") === -1 && !interfaces.includes(fn)) {
+        interfaces.forEach(itf => {
+          const op = "_" + itf;
           IsUtil[itf][fn] = IsUtil[op](IsUtil[fn]);
         });
       }
     }
   }
+
+  GLBoost$1["IsUtil"] = IsUtil;
 
   //      
 
@@ -13075,7 +13076,7 @@ albedo.rgb *= (1.0 - metallic);
       super(glBoostContext);
     }
 
-    async generateTextureFromVideoUri(uri, playButtonDomElement) {
+    async generateTextureFromVideoUri(uri, playButtonDomElement, mutedAutoPlay) {
       return new Promise((resolve, reject) => {
         var button = playButtonDomElement;
 
@@ -13104,7 +13105,11 @@ albedo.rgb *= (1.0 - metallic);
 
         const video = document.createElement("video");
         video.crossOrigin = "anonymous";
-        video.autoplay = true;
+        video.setAttribute("playsinline", "playsinline");
+        if (mutedAutoPlay) {
+          video.autoplay = true;
+          video.muted = true;
+        }
         video.preload = "auto";
         this._video = video;
 
@@ -13114,6 +13119,7 @@ albedo.rgb *= (1.0 - metallic);
             if (button.value !== "running") {
               //          button.value = 'can play video';
               button.disabled = false;
+              playAndSetupTexture();
             }
           },
           true
@@ -14885,10 +14891,10 @@ albedo.rgb *= (1.0 - metallic);
 
   /*       */
 
-                                                  
+                                                    
 
   class M_Group extends M_Element {
-                         
+                          
                         
                   
                                
@@ -14903,9 +14909,9 @@ albedo.rgb *= (1.0 - metallic);
 
       this._logger = Logger.getInstance();
 
-  //    this._aabbGizmo = null;
-  //    this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
-  //    this._gizmos.push(this._aabbGizmo);
+      //    this._aabbGizmo = null;
+      //    this._aabbGizmo = new M_AABBGizmo(this._glBoostContext);
+      //    this._gizmos.push(this._aabbGizmo);
     }
 
     /**
@@ -14914,8 +14920,7 @@ albedo.rgb *= (1.0 - metallic);
      * @param isDuplicateOk - allow duplicating if need
      */
     addChild(element         , isDuplicateOk          = false) {
-
-      if (isDuplicateOk){
+      if (isDuplicateOk) {
         // if forgive duplicated register by copy
         let elem = null;
         if (element._parent) {
@@ -14956,20 +14961,20 @@ albedo.rgb *= (1.0 - metallic);
       this._elements.length = 0;
     }
 
-    getChildren()                {
+    getChildren()                 {
       return this._elements;
     }
 
-    getAnyJointAsChild()               {
+    getAnyJointAsChild()                 {
       for (let element of this._elements) {
-        if (element.className === 'M_Joint') {
+        if (element.className === "M_Joint") {
           return element;
         }
       }
       return null;
     }
 
-    _setDirtyToAnimatedElement(inputName       )      {
+    _setDirtyToAnimatedElement(inputName        )       {
       if (this.hasAnimation(inputName)) {
         this._needUpdate();
       }
@@ -14980,37 +14985,47 @@ albedo.rgb *= (1.0 - metallic);
           if (children[i]._setDirtyToAnimatedElement != null) {
             children[i]._setDirtyToAnimatedElement(inputName);
           }
-        }  
+        }
       }
     }
 
     _validateByQuery(object               , query        , queryMeta           ) {
-      let propertyName = '';
+      let propertyName = "";
       if (queryMeta.type === GLBoost$1.QUERY_TYPE_INSTANCE_NAME) {
-        propertyName = 'instanceName';
+        propertyName = "instanceName";
       } else if (queryMeta.type === GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME) {
-        propertyName = 'userFlavorName';
-      } else if (queryMeta.type === GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR) {
-        propertyName = 'instanceNameWithUserFlavor';
+        propertyName = "userFlavorName";
+      } else if (
+        queryMeta.type === GLBoost$1.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR
+      ) {
+        propertyName = "instanceNameWithUserFlavor";
       }
 
       if (queryMeta.format === GLBoost$1.QUERY_FORMAT_STRING_PERFECT_MATCHING) {
         if (object[propertyName] === query) {
           return object;
         }
-      } else if (queryMeta.format === GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING) {
-          if (object[propertyName].indexOf(query) !== -1) {
-            return object;
-          }
+      } else if (
+        queryMeta.format === GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING
+      ) {
+        if (object[propertyName].indexOf(query) !== -1) {
+          return object;
+        }
       } else if (queryMeta.format === GLBoost$1.QUERY_FORMAT_REGEXP) {
         if (object[propertyName].match(query)) {
           return object;
         }
       }
-
     }
 
-    searchElement(query        , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
+    searchElement(
+      query        ,
+      queryMeta            = {
+        type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME,
+        format: GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING
+      },
+      element          = this
+    ) {
       /*
       if (element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) {
         return element;
@@ -15019,7 +15034,6 @@ albedo.rgb *= (1.0 - metallic);
       if (this._validateByQuery(element, query, queryMeta)) {
         return element;
       }
-
 
       if (element instanceof M_Group) {
         let children = element.getChildren();
@@ -15033,16 +15047,31 @@ albedo.rgb *= (1.0 - metallic);
       return null;
     }
 
-    searchElementByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
-      if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+    searchElementByNameAndType(
+      query        ,
+      type               ,
+      queryMeta            = {
+        type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME,
+        format: GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING
+      },
+      element          = this
+    ) {
+      if (
+        this._validateByQuery(element, query, queryMeta) &&
+        element instanceof type
+      ) {
         return element;
       }
-
 
       if (element instanceof M_Group) {
         let children = element.getChildren();
         for (let i = 0; i < children.length; i++) {
-          let hitChild = this.searchElementByNameAndType(query, type, queryMeta, children[i]);
+          let hitChild = this.searchElementByNameAndType(
+            query,
+            type,
+            queryMeta,
+            children[i]
+          );
           if (hitChild) {
             return hitChild;
           }
@@ -15051,13 +15080,26 @@ albedo.rgb *= (1.0 - metallic);
       return null;
     }
 
-    searchElementsByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
+    searchElementsByNameAndType(
+      query        ,
+      type               ,
+      queryMeta            = {
+        type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME,
+        format: GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING
+      },
+      element          = this
+    ) {
       let resultElements = [];
 
       if (element instanceof M_Group) {
         let children = element.getChildren();
         for (let i = 0; i < children.length; i++) {
-          let hitChildren = this.searchElementsByNameAndType(query, type, queryMeta, children[i]);
+          let hitChildren = this.searchElementsByNameAndType(
+            query,
+            type,
+            queryMeta,
+            children[i]
+          );
           if (hitChildren) {
             resultElements = resultElements.concat(hitChildren);
           }
@@ -15067,17 +15109,18 @@ albedo.rgb *= (1.0 - metallic);
       if ((element.userFlavorName === userFlavorNameOrRegExp || element.userFlavorName.match(userFlavorNameOrRegExp)) && element instanceof type) {
           resultElements.push(element);
       }*/
-      if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+      if (
+        this._validateByQuery(element, query, queryMeta) &&
+        element instanceof type
+      ) {
         resultElements.push(element);
       }
-
 
       return resultElements;
     }
 
-    searchElementsByType(type     , element           = this) {
-
-      if (type['name'].indexOf('Gizmo') !== -1 && element instanceof M_Element) {
+    searchElementsByType(type     , element            = this) {
+      if (type["name"].indexOf("Gizmo") !== -1 && element instanceof M_Element) {
         let gizmos = element._gizmos;
         for (let gizmo of gizmos) {
           if (gizmo instanceof type) {
@@ -15103,26 +15146,39 @@ albedo.rgb *= (1.0 - metallic);
         }
         return results;
       }
-      
+
       if (element instanceof type) {
         return element;
       }
-      
+
       return null;
     }
 
-    searchGLBoostObjectByNameAndType(query        , type               , queryMeta            = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element                               = this) {
+    searchGLBoostObjectByNameAndType(
+      query        ,
+      type               ,
+      queryMeta            = {
+        type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME,
+        format: GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING
+      },
+      element                               = this
+    ) {
       if (element instanceof M_Group) {
         let children = element.getChildren();
         for (let i = 0; i < children.length; i++) {
-          let hitChild = this.searchGLBoostObjectByNameAndType(query, type, queryMeta, children[i]);
+          let hitChild = this.searchGLBoostObjectByNameAndType(
+            query,
+            type,
+            queryMeta,
+            children[i]
+          );
           if (hitChild) {
             return hitChild;
           }
         }
       }
 
-      if (type.name.indexOf('Gizmo') !== -1 && element instanceof M_Element) {
+      if (type.name.indexOf("Gizmo") !== -1 && element instanceof M_Element) {
         let gizmos = element._gizmos;
         for (let gizmo of gizmos) {
           if (this._validateByQuery(gizmo, query, queryMeta)) {
@@ -15130,8 +15186,8 @@ albedo.rgb *= (1.0 - metallic);
           }
         }
       }
-      
-      if (type.name.indexOf('Material') !== -1 && element instanceof M_Mesh) {
+
+      if (type.name.indexOf("Material") !== -1 && element instanceof M_Mesh) {
         let materials = element.getAppropriateMaterials();
         for (let material of materials) {
           if (material instanceof type) {
@@ -15142,8 +15198,8 @@ albedo.rgb *= (1.0 - metallic);
         }
         return null;
       }
-      
-      if (type.name.indexOf('Texture') !== -1 && element instanceof M_Mesh) {
+
+      if (type.name.indexOf("Texture") !== -1 && element instanceof M_Mesh) {
         let materials = element.getAppropriateMaterials();
         for (let material of materials) {
           const textures = material.getTextures();
@@ -15157,20 +15213,36 @@ albedo.rgb *= (1.0 - metallic);
         }
         return null;
       }
-      
-      if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+
+      if (
+        this._validateByQuery(element, query, queryMeta) &&
+        element instanceof type
+      ) {
         return element;
       }
 
       return null;
     }
 
-    searchGLBoostObjectsByNameAndType(query     , type               , queryMeta           = {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING}, element          = this) {
+    searchGLBoostObjectsByNameAndType(
+      query     ,
+      type               ,
+      queryMeta            = {
+        type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME,
+        format: GLBoost$1.QUERY_FORMAT_STRING_PARTIAL_MATCHING
+      },
+      element          = this
+    ) {
       let objects = [];
       if (element instanceof M_Group) {
         let children = element.getChildren();
         for (let i = 0; i < children.length; i++) {
-          let hitChildren = this.searchGLBoostObjectsByNameAndType(query, type, queryMeta, children[i]);
+          let hitChildren = this.searchGLBoostObjectsByNameAndType(
+            query,
+            type,
+            queryMeta,
+            children[i]
+          );
           if (hitChildren.length > 0) {
             objects = objects.concat(hitChildren);
           }
@@ -15178,7 +15250,7 @@ albedo.rgb *= (1.0 - metallic);
         return objects;
       }
 
-      if (type.name.indexOf('Gizmo') !== -1 && element instanceof M_Element) {
+      if (type.name.indexOf("Gizmo") !== -1 && element instanceof M_Element) {
         let gizmos = element._gizmos;
         for (let gizmo of gizmos) {
           if (this._validateByQuery(gizmo, query, queryMeta)) {
@@ -15187,8 +15259,8 @@ albedo.rgb *= (1.0 - metallic);
         }
         return objects;
       }
-      
-      if (type.name.indexOf('Material') !== -1 && element instanceof M_Mesh) {
+
+      if (type.name.indexOf("Material") !== -1 && element instanceof M_Mesh) {
         let materials = element.getAppropriateMaterials();
         for (let material of materials) {
           if (material instanceof type) {
@@ -15199,8 +15271,8 @@ albedo.rgb *= (1.0 - metallic);
         }
         return objects;
       }
-      
-      if (type.name.indexOf('Texture') !== -1 && element instanceof M_Mesh) {
+
+      if (type.name.indexOf("Texture") !== -1 && element instanceof M_Mesh) {
         let materials = element.getAppropriateMaterials();
         for (let material of materials) {
           const textures = material.getTextures();
@@ -15214,8 +15286,11 @@ albedo.rgb *= (1.0 - metallic);
         }
         return objects;
       }
-      
-      if (this._validateByQuery(element, query, queryMeta) && element instanceof type) {
+
+      if (
+        this._validateByQuery(element, query, queryMeta) &&
+        element instanceof type
+      ) {
         return [element];
       }
       return objects;
@@ -15234,7 +15309,7 @@ albedo.rgb *= (1.0 - metallic);
         return objects;
       }
 
-      if (type.name.indexOf('Gizmo') !== -1 && element instanceof M_Element) {
+      if (type.name.indexOf("Gizmo") !== -1 && element instanceof M_Element) {
         let gizmos = element._gizmos;
         for (let gizmo of gizmos) {
           objects.push(gizmo);
@@ -15242,7 +15317,7 @@ albedo.rgb *= (1.0 - metallic);
         return objects;
       }
 
-      if (type.name.indexOf('Material') !== -1 && element instanceof M_Mesh) {
+      if (type.name.indexOf("Material") !== -1 && element instanceof M_Mesh) {
         let materials = element.getAppropriateMaterials();
         for (let material of materials) {
           if (material instanceof type) {
@@ -15251,8 +15326,8 @@ albedo.rgb *= (1.0 - metallic);
         }
         return objects;
       }
-      
-      if (type.name.indexOf('Texture') !== -1 && element instanceof M_Mesh) {
+
+      if (type.name.indexOf("Texture") !== -1 && element instanceof M_Mesh) {
         let materials = element.getAppropriateMaterials();
         for (let material of materials) {
           const textures = material.getTextures();
@@ -15272,15 +15347,21 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     getStartAnimationInputValue(inputLineName        , element          = this) {
-
       if (element instanceof M_Group) {
-        let latestInputValue = element.getStartInputValueOfAnimation(inputLineName);
+        let latestInputValue = element.getStartInputValueOfAnimation(
+          inputLineName
+        );
         let children = element.getChildren();
         for (let i = 0; i < children.length; i++) {
-          let hitChildOrInputValue = this.getStartAnimationInputValue(inputLineName, children[i]);
+          let hitChildOrInputValue = this.getStartAnimationInputValue(
+            inputLineName,
+            children[i]
+          );
 
           if (hitChildOrInputValue instanceof M_Element) {
-            let startInputValueOfThisElement = hitChildOrInputValue.getStartInputValueOfAnimation(inputLineName);
+            let startInputValueOfThisElement = hitChildOrInputValue.getStartInputValueOfAnimation(
+              inputLineName
+            );
             if (startInputValueOfThisElement < latestInputValue) {
               latestInputValue = startInputValueOfThisElement;
             }
@@ -15291,24 +15372,27 @@ albedo.rgb *= (1.0 - metallic);
             }
           }
         }
-        
+
         return latestInputValue;
       }
 
       return element.getStartInputValueOfAnimation(inputLineName);
     }
 
-
     getEndAnimationInputValue(inputLineName        , element          = this) {
-
       if (element instanceof M_Group) {
         let latestInputValue = element.getEndInputValueOfAnimation(inputLineName);
         let children = element.getChildren();
         for (let i = 0; i < children.length; i++) {
-          let hitChildOrInputValue = this.getEndAnimationInputValue(inputLineName, children[i]);
+          let hitChildOrInputValue = this.getEndAnimationInputValue(
+            inputLineName,
+            children[i]
+          );
 
           if (hitChildOrInputValue instanceof M_Element) {
-            let endInputValueOfThisElement = hitChildOrInputValue.getEndInputValueOfAnimation(inputLineName);
+            let endInputValueOfThisElement = hitChildOrInputValue.getEndInputValueOfAnimation(
+              inputLineName
+            );
             if (endInputValueOfThisElement > latestInputValue) {
               latestInputValue = endInputValueOfThisElement;
             }
@@ -15335,16 +15419,23 @@ albedo.rgb *= (1.0 - metallic);
       var aabb = (function mergeAABBRecursively(elem) {
         if (elem instanceof M_Group) {
           var children = elem.getChildren();
-          for(let i=0; i<children.length; i++) {
+          for (let i = 0; i < children.length; i++) {
             var aabb = mergeAABBRecursively(children[i]);
             if (aabb instanceof AABB) {
               elem.AABB.mergeAABB(aabb);
             } else {
-              console.assert('calculation of AABB error!');
+              console.assert("calculation of AABB error!");
             }
           }
           if (!elem.AABB.isValid()) {
-            that._logger.out(GLBoost$1.LOG_LEVEL_WARN, GLBoost$1.LOG_TYPE_AABB, true, 'This AABB has abnormal values', elem.userFlavorName, elem.AABB);
+            that._logger.out(
+              GLBoost$1.LOG_LEVEL_WARN,
+              GLBoost$1.LOG_TYPE_AABB,
+              true,
+              "This AABB has abnormal values",
+              elem.userFlavorName,
+              elem.AABB
+            );
           }
           return elem.AABB;
           //return AABB.multiplyMatrix(elem.transformMatrix, elem.AABB);
@@ -15361,10 +15452,9 @@ albedo.rgb *= (1.0 - metallic);
 
       let newAABB = this.AABB;
 
-  //    this._AABB = aabbInWorld;
+      //    this._AABB = aabbInWorld;
 
       this._updateAABBGizmo();
-
 
       return newAABB;
     }
@@ -15373,22 +15463,32 @@ albedo.rgb *= (1.0 - metallic);
       return this._AABB;
     }
 
-    clone(clonedOriginalRootElement      = this, clonedRootElement      = null, onCompleteFuncs      = []) {
+    clone(
+      clonedOriginalRootElement      = this,
+      clonedRootElement      = null,
+      onCompleteFuncs      = []
+    ) {
       let instance = new M_Group(this._glBoostSystem);
       if (clonedRootElement === null) {
         clonedRootElement = instance;
       }
       this._copy(instance);
 
-      this._elements.forEach((element)=>{
-        if (typeof element.clone !== 'undefined') {
-          instance._elements.push(element.clone(clonedOriginalRootElement, clonedRootElement, onCompleteFuncs));
+      this._elements.forEach(element => {
+        if (typeof element.clone !== "undefined") {
+          instance._elements.push(
+            element.clone(
+              clonedOriginalRootElement,
+              clonedRootElement,
+              onCompleteFuncs
+            )
+          );
         } else {
           instance._elements.push(element);
         }
       });
 
-      onCompleteFuncs.forEach((func)=>{
+      onCompleteFuncs.forEach(func => {
         func();
       });
 
@@ -15418,7 +15518,7 @@ albedo.rgb *= (1.0 - metallic);
       return this._isVisible;
     }
 
-    setSpecifiedPropertyRecursively(propertyName         , value     ) {
+    setSpecifiedPropertyRecursively(propertyName        , value     ) {
       let setValueRecursively = function(elem           ) {
         elem[propertyName] = value;
         if (elem instanceof M_Group) {
@@ -15431,7 +15531,12 @@ albedo.rgb *= (1.0 - metallic);
       setValueRecursively(this);
     }
 
-    executeSpecifiedFunctionRecursively(func          , thisObj     , args            , childIndexToInsertToArgs = null) {
+    executeSpecifiedFunctionRecursively(
+      func          ,
+      thisObj     ,
+      args            ,
+      childIndexToInsertToArgs = null
+    ) {
       let execRecursively = function(elem           ) {
         if (childIndexToInsertToArgs != null) {
           args[childIndexToInsertToArgs] = elem;
@@ -15456,7 +15561,7 @@ albedo.rgb *= (1.0 - metallic);
       let world_m = this.worldMatrix;
       let aabbInWorld = AABB.multiplyMatrix(world_m, this._AABB);
 
-  //    this._aabbGizmo.updateGizmoDisplay(aabbInWorld.minPoint, aabbInWorld.maxPoint);
+      //    this._aabbGizmo.updateGizmoDisplay(aabbInWorld.minPoint, aabbInWorld.maxPoint);
     }
 
     readyForDiscard() {
@@ -15470,10 +15575,13 @@ albedo.rgb *= (1.0 - metallic);
           // Must be M_Element
           elem.readyForDiscard();
         } else {
-          if (typeof EffekseerElement !== undefined && elem instanceof EffekseerElement) {
-            console.log('Nothing to do for discarding at this time.');
+          if (
+            typeof EffekseerElement !== undefined &&
+            elem instanceof EffekseerElement
+          ) {
+            console.log("Nothing to do for discarding at this time.");
           }
-          console.error('not M_Group nor M_Element');
+          console.error("not M_Group nor M_Element");
         }
       };
       collectElements(this);
@@ -15481,7 +15589,13 @@ albedo.rgb *= (1.0 - metallic);
       this.removeAll();
     }
 
-    rayCast(arg1        , arg2        , camera     , viewport     , ignoreInstanceNameList           ) {
+    rayCast(
+      arg1        ,
+      arg2        ,
+      camera     ,
+      viewport     ,
+      ignoreInstanceNameList            
+    ) {
       const meshes = this.searchElementsByType(M_Mesh);
       let currentShortestT = Number.MAX_VALUE;
       let currentShortestIntersectedPosVec3 = null;
@@ -15493,7 +15607,10 @@ albedo.rgb *= (1.0 - metallic);
         if (!mesh.isPickable) {
           continue;
         }
-        if (ignoreInstanceNameList && ignoreInstanceNameList.indexOf(mesh.instanceName) !== -1) {
+        if (
+          ignoreInstanceNameList &&
+          ignoreInstanceNameList.indexOf(mesh.instanceName) !== -1
+        ) {
           continue;
         }
         let result = null;
@@ -15533,8 +15650,9 @@ albedo.rgb *= (1.0 - metallic);
       };
       collectElements(this);
     }
-
   }
+
+  GLBoost$1["M_Group"] = M_Group;
 
   let singleton$4 = Symbol();
 
@@ -24255,4 +24373,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-385-g3c13-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-388-gd606-mod branch: develop';
