@@ -1,3 +1,4 @@
+import GLBoost from "../../globals";
 
 const IsUtil = {
   not: {},
@@ -46,21 +47,22 @@ const IsUtil = {
   },
 
   function(val) {
-    return typeof val === 'function';
+    return typeof val === "function";
   }
-
-}
+};
 
 for (let fn in IsUtil) {
   if (IsUtil.hasOwnProperty(fn)) {
-    const interfaces = ['not', 'all', 'any'];
-    if (fn.indexOf('_') === -1 && !interfaces.includes(fn)) {
-      interfaces.forEach((itf)=>{
-        const op = '_' + itf;
+    const interfaces = ["not", "all", "any"];
+    if (fn.indexOf("_") === -1 && !interfaces.includes(fn)) {
+      interfaces.forEach(itf => {
+        const op = "_" + itf;
         IsUtil[itf][fn] = IsUtil[op](IsUtil[fn]);
       });
     }
   }
 }
+
+GLBoost["IsUtil"] = IsUtil;
 
 export default IsUtil;
