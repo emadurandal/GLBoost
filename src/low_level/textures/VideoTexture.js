@@ -106,4 +106,13 @@ export default class VideoTexture extends AbstractTexture {
       this._video
     );
   }
+
+  set playbackRate(value) {
+    this._video.playbackRate = value;
+  }
+
+  get playbackRate() {
+    const playbackRate = this._video.playbackRate;
+    return playbackRate != null ? playbackRate : 1;
+  }
 }
