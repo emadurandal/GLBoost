@@ -7088,7 +7088,9 @@
   class DrawKickerWorld {
     constructor(enforcer) {
       if (enforcer !== singletonEnforcer$1) {
-        throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
+        throw new Error(
+          "This is a Singleton class. get the instance using 'getInstance' static method."
+        );
       }
       this._glslProgram = null;
     }
@@ -7101,15 +7103,31 @@
     }
 
     static setCamera(gl, glslProgram, material, world_m, normal_m, camera, mesh) {
-      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', world_m.flatten());
-      Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
+      Shader.trySettingMatrix44ToUniform(
+        gl,
+        glslProgram,
+        material,
+        material._semanticsDic,
+        "WORLD",
+        world_m.flatten()
+      );
+      Shader.trySettingMatrix33ToUniform(
+        gl,
+        glslProgram,
+        material,
+        material._semanticsDic,
+        "MODELVIEWINVERSETRANSPOSE",
+        normal_m.flatten()
+      );
 
       if (camera) {
         let viewMatrix;
         if (mesh.isAffectedByViewMatrix) {
           let cameraMatrix = camera.lookAtRHMatrix();
-            viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf);
-  //        viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrix);
+          viewMatrix = cameraMatrix.multiply(
+            camera.inverseWorldMatrixWithoutMySelf
+          );
+          //        viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrix);
         } else {
           viewMatrix = Matrix44$1.identity();
         }
@@ -7121,40 +7139,120 @@
           projectionMatrix = Matrix44$1.identity();
         }
 
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$1.multiply(viewMatrix, world_m).flatten());
+        Shader.trySettingMatrix44ToUniform(
+          gl,
+          glslProgram,
+          material,
+          material._semanticsDic,
+          "VIEW",
+          viewMatrix.flatten()
+        );
+        Shader.trySettingMatrix44ToUniform(
+          gl,
+          glslProgram,
+          material,
+          material._semanticsDic,
+          "PROJECTION",
+          projectionMatrix.flatten()
+        );
+        Shader.trySettingMatrix44ToUniform(
+          gl,
+          glslProgram,
+          material,
+          material._semanticsDic,
+          "MODELVIEW",
+          Matrix44$1.multiply(viewMatrix, world_m).flatten()
+        );
 
-        camera._lastPVMatrixFromLight = Matrix44$1.multiply(projectionMatrix, viewMatrix);
+        camera._lastPVMatrixFromLight = Matrix44$1.multiply(
+          projectionMatrix,
+          viewMatrix
+        );
       }
     }
 
-    static setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, leftOrRight) {
-      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', world_m.flatten());
-      Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
+    static setVRCamera(
+      gl,
+      glslProgram,
+      material,
+      world_m,
+      normal_m,
+      webvrFrameData,
+      mesh,
+      leftOrRight
+    ) {
+      Shader.trySettingMatrix44ToUniform(
+        gl,
+        glslProgram,
+        material,
+        material._semanticsDic,
+        "WORLD",
+        world_m.flatten()
+      );
+      Shader.trySettingMatrix33ToUniform(
+        gl,
+        glslProgram,
+        material,
+        material._semanticsDic,
+        "MODELVIEWINVERSETRANSPOSE",
+        normal_m.flatten()
+      );
 
       if (webvrFrameData) {
         let viewMatrix;
         if (mesh.isAffectedByViewMatrix) {
-          const invertSittingToStandingTransform = (new Matrix44$1(webvrFrameData.sittingToStandingTransform, true)).invert();
-          const leftOrRightViewMatrix = new Matrix44$1(webvrFrameData[leftOrRight + 'ViewMatrix'], true);
-          viewMatrix = Matrix44$1.multiply(leftOrRightViewMatrix, invertSittingToStandingTransform);
+          const invertSittingToStandingTransform = new Matrix44$1(
+            webvrFrameData.sittingToStandingTransform,
+            true
+          ).invert();
+          const leftOrRightViewMatrix = new Matrix44$1(
+            webvrFrameData[leftOrRight + "ViewMatrix"],
+            true
+          );
+          viewMatrix = Matrix44$1.multiply(
+            leftOrRightViewMatrix,
+            invertSittingToStandingTransform
+          );
         } else {
           viewMatrix = Matrix44$1.identity();
         }
 
         let projectionMatrix;
         if (mesh.isAffectedByProjectionMatrix) {
-          projectionMatrix = new Matrix44$1(webvrFrameData[leftOrRight + 'ProjectionMatrix'], true);
+          projectionMatrix = new Matrix44$1(
+            webvrFrameData[leftOrRight + "ProjectionMatrix"],
+            true
+          );
         } else {
           projectionMatrix = Matrix44$1.identity();
         }
 
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
-        Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44$1.multiply(viewMatrix, world_m).flatten());
+        Shader.trySettingMatrix44ToUniform(
+          gl,
+          glslProgram,
+          material,
+          material._semanticsDic,
+          "VIEW",
+          viewMatrix.flatten()
+        );
+        Shader.trySettingMatrix44ToUniform(
+          gl,
+          glslProgram,
+          material,
+          material._semanticsDic,
+          "PROJECTION",
+          projectionMatrix.flatten()
+        );
+        Shader.trySettingMatrix44ToUniform(
+          gl,
+          glslProgram,
+          material,
+          material._semanticsDic,
+          "MODELVIEW",
+          Matrix44$1.multiply(viewMatrix, world_m).flatten()
+        );
 
-  //      camera._lastPVMatrixFromLight = Matrix44.multiply(projectionMatrix, viewMatrix);
+        //      camera._lastPVMatrixFromLight = Matrix44.multiply(projectionMatrix, viewMatrix);
       }
     }
 
@@ -7183,16 +7281,14 @@
 
       var isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
 
-      let input = mesh._getCurrentAnimationInputValue('time');
+      let input = mesh._getCurrentAnimationInputValue("time");
 
-
-
-      for (let i=0; i<originalMaterials.length;i++) {
+      for (let i = 0; i < originalMaterials.length; i++) {
         let material = originalMaterials[i];
         let isOutlineVisible = false;
         if (forceThisMaterial) {
           material = forceThisMaterial;
-          if (forceThisMaterial.userFlavorName === 'OutlineGizmoMaterial') {
+          if (forceThisMaterial.userFlavorName === "OutlineGizmoMaterial") {
             isOutlineVisible = true;
           }
         }
@@ -7200,13 +7296,23 @@
           continue;
         }
 
-        let renderpassSpecificMaterial = material['renderpassSpecificMaterial_' + expression.renderPasses[renderPassIndex].instanceName + '_material_' + i];
+        let renderpassSpecificMaterial =
+          material[
+            "renderpassSpecificMaterial_" +
+              expression.renderPasses[renderPassIndex].instanceName +
+              "_material_" +
+              i
+          ];
         if (renderpassSpecificMaterial) {
           material = renderpassSpecificMaterial;
         }
 
         if (!material.shaderInstance) {
-          console.warn(`Failed to Render due to this material '${material.userFlavorName}(${material.instanceName})' has not shaderInstance.`);
+          console.warn(
+            `Failed to Render due to this material '${material.userFlavorName}(${
+            material.instanceName
+          })' has not shaderInstance.`
+          );
           continue;
         }
         this._glslProgram = material.shaderInstance.glslProgram;
@@ -7215,19 +7321,36 @@
         let glslProgram = this._glslProgram;
 
         if (!isVAOBound) {
-        if (DrawKickerWorld._lastGeometry !== geometryName) {
+          if (DrawKickerWorld._lastGeometry !== geometryName) {
             for (let attribName in vboDic) {
               gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[attribName]);
-              geometry.setUpVertexAttribs(gl, glslProgram, geometry._allVertexAttribs(vertices));
+              geometry.setUpVertexAttribs(
+                gl,
+                glslProgram,
+                geometry._allVertexAttribs(vertices)
+              );
             }
           }
         }
 
-        material._glContext.uniform3i(material.getUniform(glslProgram, 'uniform_objectIdsAndOutlineFlag'), mesh.objectIndex, 0, isOutlineVisible, true);
+        material._glContext.uniform3i(
+          material.getUniform(glslProgram, "uniform_objectIdsAndOutlineFlag"),
+          mesh.objectIndex,
+          0,
+          isOutlineVisible,
+          true
+        );
 
         let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
-        let query_result_uniform_opacity = material.getUniform(glslProgram, 'uniform_opacity');
-        material._glContext.uniform1f(query_result_uniform_opacity, opacity, true);
+        let query_result_uniform_opacity = material.getUniform(
+          glslProgram,
+          "uniform_opacity"
+        );
+        material._glContext.uniform1f(
+          query_result_uniform_opacity,
+          opacity,
+          true
+        );
 
         let world_m;
         let normal_m;
@@ -7244,22 +7367,38 @@
           normal_m = Matrix33.identity();
         }
 
-        if (material.getUniform(glslProgram, 'uniform_lightPosition_0')) {
-          lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
-          
-          if (material.getUniform(glslProgram, 'uniform_viewPosition')) {
-            let cameraPos = new Vector4$1(0, 0, 1, 1);
-            if (camera) {
-              cameraPos = camera.worldMatrixWithoutMySelf.multiplyVector(new Vector4$1(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
+        if (material.getUniform(glslProgram, "uniform_viewPosition")) {
+          let cameraPos = new Vector4$1(0, 0, 1, 1);
+          if (camera) {
+            cameraPos = camera.worldMatrixWithoutMySelf.multiplyVector(
+              new Vector4$1(
+                camera.eyeInner.x,
+                camera.eyeInner.y,
+                camera.eyeInner.z,
+                1.0
+              )
+            );
             //  console.log(cameraPos);
-            }
-            material._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z, true);
           }
+          material._glContext.uniform3f(
+            material.getUniform(glslProgram, "uniform_viewPosition"),
+            cameraPos.x,
+            cameraPos.y,
+            cameraPos.z,
+            true
+          );
+        }
+
+        if (material.getUniform(glslProgram, "uniform_lightPosition_0")) {
+          lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
 
           for (let j = 0; j < lights.length; j++) {
             let light = lights[j];
-            if (material.getUniform(glslProgram, `uniform_lightPosition_${j}`) && material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`)) {
-              let lightPosition = new Vector4$1(0, 0, 0, 1);            
+            if (
+              material.getUniform(glslProgram, `uniform_lightPosition_${j}`) &&
+              material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`)
+            ) {
+              let lightPosition = new Vector4$1(0, 0, 0, 1);
               let lightDirection = new Vector4$1(0, 0, 0, 1);
               let lightIntensity = light.intensity;
               if (!light.isVisible) {
@@ -7268,41 +7407,86 @@
 
               // Directional: [0.0, 0.4), Point:[0.4, 0.6), Spot:[0.6, 1.0]
               let lightType = 0.0; // M_DirectionalLight
-              if (light.className === 'M_PointLight') {
+              if (light.className === "M_PointLight") {
                 lightType = 0.5;
-              } else if (light.className === 'M_SpotLight') {
+              } else if (light.className === "M_SpotLight") {
                 lightType = 1.0;
               }
-              if (light.className === 'M_PointLight' || light.className === 'M_SpotLight') {
+              if (
+                light.className === "M_PointLight" ||
+                light.className === "M_SpotLight"
+              ) {
                 lightPosition = light.worldMatrix.multiplyVector(lightPosition);
               }
-              if (light.className === 'M_DirectionalLight' || light.className === 'M_SpotLight') {
-  //              lightDirection = new Vector3(0, 0, 1);
-  //              lightDirection = light.worldMatrix.multiplyVector(lightDirection.toVector4()).toVector3();
+              if (
+                light.className === "M_DirectionalLight" ||
+                light.className === "M_SpotLight"
+              ) {
+                //              lightDirection = new Vector3(0, 0, 1);
+                //              lightDirection = light.worldMatrix.multiplyVector(lightDirection.toVector4()).toVector3();
                 lightDirection = light.directionInWorld;
                 lightDirection.normalize();
               }
-              material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightPosition_${j}`), lightPosition.x, lightPosition.y, lightPosition.z, true);
-              material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightDirection_${j}`), lightDirection.x, lightDirection.y, lightDirection.z, true);
-              material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`), lightIntensity.x, lightIntensity.y, lightIntensity.z, 1.0, true);
-              if (light.className === 'M_SpotLight') {
-                material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightSpotInfo_${j}`), lightType, light.spotCosCutoff, light.spotExponent, true);              
+              material._glContext.uniform3f(
+                material.getUniform(glslProgram, `uniform_lightPosition_${j}`),
+                lightPosition.x,
+                lightPosition.y,
+                lightPosition.z,
+                true
+              );
+              material._glContext.uniform3f(
+                material.getUniform(glslProgram, `uniform_lightDirection_${j}`),
+                lightDirection.x,
+                lightDirection.y,
+                lightDirection.z,
+                true
+              );
+              material._glContext.uniform4f(
+                material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`),
+                lightIntensity.x,
+                lightIntensity.y,
+                lightIntensity.z,
+                1.0,
+                true
+              );
+              if (light.className === "M_SpotLight") {
+                material._glContext.uniform3f(
+                  material.getUniform(glslProgram, `uniform_lightSpotInfo_${j}`),
+                  lightType,
+                  light.spotCosCutoff,
+                  light.spotExponent,
+                  true
+                );
               } else {
-                material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightSpotInfo_${j}`), lightType, 0, 0, true);              
+                material._glContext.uniform3f(
+                  material.getUniform(glslProgram, `uniform_lightSpotInfo_${j}`),
+                  lightType,
+                  0,
+                  0,
+                  true
+                );
               }
             }
           }
         }
 
         {
-          let needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
+          let needTobeStillDirty = material.shaderInstance.setUniforms(
+            gl,
+            glslProgram,
+            scene,
+            material,
+            camera,
+            mesh,
+            lights
+          );
           material.shaderInstance.dirty = needTobeStillDirty ? true : false;
 
           material.setUpStates(mesh);
 
           this._setUpOrTearDownTextures(true, material);
         }
-        
+
         this._setupOtherTextures(lights);
 
         geometry.drawIntermediate(gl, glslProgram, mesh, material);
@@ -7311,45 +7495,113 @@
 
         if (isWebVRMode) {
           // Left Eye
-   //       DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
+          //       DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
 
-          gl.viewport.apply(gl, [viewport[0], viewport[1], viewport[2] * 0.5, viewport[3]]);
-          DrawKickerWorld.setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, 'left');
-          DrawKickerWorld.drawGeometry(geometry, glem, gl, i, primitiveType, vertexN);
+          gl.viewport.apply(gl, [
+            viewport[0],
+            viewport[1],
+            viewport[2] * 0.5,
+            viewport[3]
+          ]);
+          DrawKickerWorld.setVRCamera(
+            gl,
+            glslProgram,
+            material,
+            world_m,
+            normal_m,
+            webvrFrameData,
+            mesh,
+            "left"
+          );
+          DrawKickerWorld.drawGeometry(
+            geometry,
+            glem,
+            gl,
+            i,
+            primitiveType,
+            vertexN
+          );
 
           // Right Eye
-          gl.viewport.apply(gl, [viewport[2] * 0.5, viewport[1], viewport[2] * 0.5, viewport[3]]);
-          DrawKickerWorld.setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, 'right');
-          DrawKickerWorld.drawGeometry(geometry, glem, gl, i, primitiveType, vertexN);
+          gl.viewport.apply(gl, [
+            viewport[2] * 0.5,
+            viewport[1],
+            viewport[2] * 0.5,
+            viewport[3]
+          ]);
+          DrawKickerWorld.setVRCamera(
+            gl,
+            glslProgram,
+            material,
+            world_m,
+            normal_m,
+            webvrFrameData,
+            mesh,
+            "right"
+          );
+          DrawKickerWorld.drawGeometry(
+            geometry,
+            glem,
+            gl,
+            i,
+            primitiveType,
+            vertexN
+          );
         } else {
-          DrawKickerWorld.setCamera(gl, glslProgram, material, world_m, normal_m, camera, mesh);
-          DrawKickerWorld.drawGeometry(geometry, glem, gl, i, primitiveType, vertexN);
+          DrawKickerWorld.setCamera(
+            gl,
+            glslProgram,
+            material,
+            world_m,
+            normal_m,
+            camera,
+            mesh
+          );
+          DrawKickerWorld.drawGeometry(
+            geometry,
+            glem,
+            gl,
+            i,
+            primitiveType,
+            vertexN
+          );
         }
 
-
-        material.shaderInstance.setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights);
+        material.shaderInstance.setUniformsAsTearDown(
+          gl,
+          glslProgram,
+          scene,
+          material,
+          camera,
+          mesh,
+          lights
+        );
 
         this._tearDownOtherTextures(lights);
 
         material.tearDownStates();
-
       }
 
       glem.bindVertexArray(gl, null);
 
-  //    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-  //    gl.bindBuffer(gl.ELEMENT_BUFFER, null);
+      //    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      //    gl.bindBuffer(gl.ELEMENT_BUFFER, null);
 
       //DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
     }
 
     static drawGeometry(geometry, glem, gl, i, primitiveType, vertexN) {
       if (geometry.isIndexed()) {
-        //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName]);      
+        //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName]);
         let indexBitSizeGLConstant = glem.elementIndexBitSizeGLConstant(gl);
         let indexByteSizeNumber = glem.elementIndexByteSizeNumber(gl);
         let offset = geometry.getIndexStartOffsetArrayAtMaterial(i);
-        gl.drawElements(primitiveType, vertexN, indexBitSizeGLConstant, offset * indexByteSizeNumber);
+        gl.drawElements(
+          primitiveType,
+          vertexN,
+          indexBitSizeGLConstant,
+          offset * indexByteSizeNumber
+        );
         //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
       } else {
         gl.drawArrays(primitiveType, 0, vertexN);
@@ -7357,9 +7609,9 @@
     }
 
     _setUpOrTearDownTextures(isSetUp, material) {
-      let methodName = 'tearDownTexture';
+      let methodName = "tearDownTexture";
       if (isSetUp) {
-        methodName = 'setUpTexture';
+        methodName = "setUpTexture";
       }
 
       let isTextureProcessDone = true;
@@ -7368,23 +7620,28 @@
         let textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
         let textureName = textureSamplerDic.textureName;
         let textureUnitIndex = textureSamplerDic.textureUnitIndex;
-        isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
+        isTextureProcessDone = material[methodName](
+          textureName,
+          textureUnitIndex
+        );
       }
 
       return isTextureProcessDone;
     }
 
     _setupOtherTextures(lights) {
-      for(let i=0; i<lights.length; i++) {
-        if (lights[i].camera && lights[i].camera.texture) {// && lights[i].isCastingShadow) {
+      for (let i = 0; i < lights.length; i++) {
+        if (lights[i].camera && lights[i].camera.texture) {
+          // && lights[i].isCastingShadow) {
           lights[i].camera.texture.setUp();
         }
       }
     }
 
     _tearDownOtherTextures(lights) {
-      for(let i=0; i<lights.length; i++) {
-        if (lights[i].camera && lights[i].camera.texture)  {// && lights[i].isCastingShadow) {
+      for (let i = 0; i < lights.length; i++) {
+        if (lights[i].camera && lights[i].camera.texture) {
+          // && lights[i].isCastingShadow) {
           lights[i].camera.texture.tearDown();
         }
       }
@@ -15390,6 +15647,7 @@ albedo.rgb *= (1.0 - metallic);
                       
                                   
                               
+                                 
 
     constructor(glBoostContext                , geometry     , material     ) {
       super(glBoostContext);
@@ -15403,10 +15661,17 @@ albedo.rgb *= (1.0 - metallic);
       this._transformedDepth = 0;
       this._outlineGizmo = null;
       this._isPickable = true;
+      this._isTransparentForce = false;
     }
 
     prepareToRender(expression     , existCamera_f     , lights     ) {
-      this._geometry.prepareToRender(expression, existCamera_f, lights, this._material, this);
+      this._geometry.prepareToRender(
+        expression,
+        existCamera_f,
+        lights,
+        this._material,
+        this
+      );
       /*
       if (this._geometry._materials.length === 0 && this._material) {
         let shaderInstance = this._geometry.prepareGLSLProgramAndSetVertexNtoMaterial(expression, this._material, 0, existCamera_f, lights);
@@ -15419,20 +15684,18 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     draw(data     ) {
-      this._geometry.draw(
-        {
-          expression: data.expression,
-          lights: data.lights,
-          camera: data.camera,
-          scene: data.renderPass.scene,
-          renderPassIndex: data.renderPassIndex,
-          mesh: this,
-          viewport: data.viewport,
-          isWebVRMode: data.isWebVRMode,
-          webvrFrameData: data.webvrFrameData,
-          forceThisMaterial: data.forceThisMaterial,
-        }
-      );
+      this._geometry.draw({
+        expression: data.expression,
+        lights: data.lights,
+        camera: data.camera,
+        scene: data.renderPass.scene,
+        renderPassIndex: data.renderPassIndex,
+        mesh: this,
+        viewport: data.viewport,
+        isWebVRMode: data.isWebVRMode,
+        webvrFrameData: data.webvrFrameData,
+        forceThisMaterial: data.forceThisMaterial
+      });
     }
 
     set geometry(geometry     ) {
@@ -15458,14 +15721,19 @@ albedo.rgb *= (1.0 - metallic);
       var mat = this.worldMatrix;
       let componentN = this._geometry._vertices.components.position;
       let length = positions.length / componentN;
-      for (let i=0; i<length; i++) {
-        let posVector4 = new Vector4$1(positions[i*componentN], positions[i*componentN+1], positions[i*componentN+2], 1);
+      for (let i = 0; i < length; i++) {
+        let posVector4 = new Vector4$1(
+          positions[i * componentN],
+          positions[i * componentN + 1],
+          positions[i * componentN + 2],
+          1
+        );
         let transformedPosVec = mat.multiplyVector(posVector4);
-        positions[i*componentN] = transformedPosVec.x;
-        positions[i*componentN+1] = transformedPosVec.y;
-        positions[i*componentN+2] = transformedPosVec.z;
+        positions[i * componentN] = transformedPosVec.x;
+        positions[i * componentN + 1] = transformedPosVec.y;
+        positions[i * componentN + 2] = transformedPosVec.z;
         if (componentN > 3) {
-          positions[i * componentN+3] = transformedPosVec.w;
+          positions[i * componentN + 3] = transformedPosVec.w;
         }
       }
       this._geometry._vertices.position = positions;
@@ -15473,16 +15741,21 @@ albedo.rgb *= (1.0 - metallic);
       if (this._geometry._vertices.normal) {
         var normals = this._geometry._vertices.normal;
         length = normals.length / 3;
-        for (let i=0; i<length; i++) {
-          let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
-          let transformedNormalVec = this.normalMatrix.multiplyVector(normalVector3).normalize();
-          normals[i*3] = transformedNormalVec.x;
-          normals[i*3+1] = transformedNormalVec.y;
-          normals[i*3+2] = transformedNormalVec.z;
+        for (let i = 0; i < length; i++) {
+          let normalVector3 = new Vector3(
+            normals[i * 3],
+            normals[i * 3 + 1],
+            normals[i * 3 + 2]
+          );
+          let transformedNormalVec = this.normalMatrix
+            .multiplyVector(normalVector3)
+            .normalize();
+          normals[i * 3] = transformedNormalVec.x;
+          normals[i * 3 + 1] = transformedNormalVec.y;
+          normals[i * 3 + 2] = transformedNormalVec.z;
         }
         this._geometry._vertices.normal = normals;
       }
-
     }
 
     bakeInverseTransformToGeometry() {
@@ -15490,14 +15763,19 @@ albedo.rgb *= (1.0 - metallic);
       var invMat = this.inverseWorldMatrix;
       let componentN = this._geometry._vertices.components.position;
       let length = positions.length / componentN;
-      for (let i=0; i<length; i++) {
-        let posVector4 = new Vector4$1(positions[i*componentN], positions[i*componentN+1], positions[i*componentN+2], 1);
+      for (let i = 0; i < length; i++) {
+        let posVector4 = new Vector4$1(
+          positions[i * componentN],
+          positions[i * componentN + 1],
+          positions[i * componentN + 2],
+          1
+        );
         let transformedPosVec = invMat.multiplyVector(posVector4);
-        positions[i*componentN] = transformedPosVec.x;
-        positions[i*componentN+1] = transformedPosVec.y;
-        positions[i*componentN+2] = transformedPosVec.z;
+        positions[i * componentN] = transformedPosVec.x;
+        positions[i * componentN + 1] = transformedPosVec.y;
+        positions[i * componentN + 2] = transformedPosVec.z;
         if (componentN > 3) {
-          positions[i * componentN+3] = transformedPosVec.w;
+          positions[i * componentN + 3] = transformedPosVec.w;
         }
       }
       this._geometry._vertices.position = positions;
@@ -15506,24 +15784,38 @@ albedo.rgb *= (1.0 - metallic);
       if (this._geometry._vertices.normal) {
         var normals = this._geometry._vertices.normal;
         length = normals.length / 3;
-        for (let i=0; i<length; i++) {
-          let normalVector3 = new Vector3(normals[i*3], normals[i*3+1], normals[i*3+2]);
-          const invNormalMat = new Matrix33(Matrix44$1.invert(mat).transpose().invert());
-          let transformedNormalVec = invNormalMat.multiplyVector(normalVector3).normalize();
-          normals[i*3] = transformedNormalVec.x;
-          normals[i*3+1] = transformedNormalVec.y;
-          normals[i*3+2] = transformedNormalVec.z;
+        for (let i = 0; i < length; i++) {
+          let normalVector3 = new Vector3(
+            normals[i * 3],
+            normals[i * 3 + 1],
+            normals[i * 3 + 2]
+          );
+          const invNormalMat = new Matrix33(
+            Matrix44$1.invert(mat)
+              .transpose()
+              .invert()
+          );
+          let transformedNormalVec = invNormalMat
+            .multiplyVector(normalVector3)
+            .normalize();
+          normals[i * 3] = transformedNormalVec.x;
+          normals[i * 3 + 1] = transformedNormalVec.y;
+          normals[i * 3 + 2] = transformedNormalVec.z;
         }
         this._geometry._vertices.normal = normals;
       }
-
     }
 
     _copyMaterials() {
-      if (this.geometry._indicesArray.length !== this.geometry._materials.length) {
-        for (let i=0; i<this.geometry._indicesArray.length;i++) {
-          this.geometry._materials[i] = this._material;//.clone();
-          this.geometry._materials[i].setVertexN(this.geometry, this.geometry._indicesArray[i].length);
+      if (
+        this.geometry._indicesArray.length !== this.geometry._materials.length
+      ) {
+        for (let i = 0; i < this.geometry._indicesArray.length; i++) {
+          this.geometry._materials[i] = this._material; //.clone();
+          this.geometry._materials[i].setVertexN(
+            this.geometry,
+            this.geometry._indicesArray[i].length
+          );
         }
       }
     }
@@ -15534,22 +15826,22 @@ albedo.rgb *= (1.0 - metallic);
 
         let meshes = meshOrMeshes;
         let geometries = [];
-        for (let i=0; i<meshes.length; i++) {
+        for (let i = 0; i < meshes.length; i++) {
           meshes[i].bakeTransformToGeometry();
           geometries.push(meshes[i].geometry);
         }
 
         this.geometry.merge(geometries);
 
-        for (let i=0; i<meshes.length; i++) {
+        for (let i = 0; i < meshes.length; i++) {
           delete meshes[i];
         }
 
         this._copyMaterials();
 
         this.bakeInverseTransformToGeometry();
-
-      } else { //
+      } else {
+        //
         let mesh = meshOrMeshes;
         mesh.bakeTransformToGeometry();
         this.bakeTransformToGeometry();
@@ -15562,27 +15854,25 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     mergeHarder(meshOrMeshes                        ) {
-
       if (Array.isArray(meshOrMeshes)) {
-
         this.bakeTransformToGeometry();
 
         let meshes = meshOrMeshes;
         let geometries = [];
-        for (let i=0; i<meshes.length; i++) {
+        for (let i = 0; i < meshes.length; i++) {
           meshes[i].bakeTransformToGeometry();
           geometries.push(meshes[i].geometry);
         }
 
         this.geometry.mergeHarder(geometries);
 
-        for (let i=0; i<meshes.length; i++) {
+        for (let i = 0; i < meshes.length; i++) {
           delete meshes[i];
         }
 
         this.bakeInverseTransformToGeometry();
-
-      } else { //
+      } else {
+        //
         let mesh = meshOrMeshes;
         mesh.bakeTransformToGeometry();
         this.bakeTransformToGeometry();
@@ -15606,7 +15896,7 @@ albedo.rgb *= (1.0 - metallic);
       //console.log(this.userFlavorName + " centerPosition: " + centerPosition);
       var transformedCenterPosition = mv_m.multiplyVector(centerPosition);
 
-      this._transformedDepth = transformedCenterPosition.z;//transformedCenterPosition.length();// //
+      this._transformedDepth = transformedCenterPosition.z; //transformedCenterPosition.length();// //
     }
 
     get transformedDepth() {
@@ -15614,7 +15904,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     get isTransparent() {
-      let isTransparent = (this._opacity < 1.0) ? true : false;
+      let isTransparent = this._opacity < 1.0 ? true : false;
       isTransparent = isTransparent || this._isTransparentForce;
       isTransparent = isTransparent || this._isTransparentForce;
       return isTransparent;
@@ -15630,7 +15920,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     get AABBInLocal() {
-      return this._geometry.rawAABB;//.clone();
+      return this._geometry.rawAABB; //.clone();
     }
 
     get rawAABBInLocal() {
@@ -15641,7 +15931,6 @@ albedo.rgb *= (1.0 - metallic);
       return this.geometry._getAppropriateMaterials(this);
     }
 
-
     rayCast(arg1         , arg2        , camera     , viewport     ) {
       let origVecInLocal = null;
       let dirVecInLocal = null;
@@ -15649,24 +15938,47 @@ albedo.rgb *= (1.0 - metallic);
         const origVecInWorld = arg1;
         const dirVec = arg2;
         const invWorldMatrix = Matrix44$1.invert(this.worldMatrix);
-        origVecInLocal = new Vector3(invWorldMatrix.multiplyVector(new Vector4$1(origVecInWorld)));
+        origVecInLocal = new Vector3(
+          invWorldMatrix.multiplyVector(new Vector4$1(origVecInWorld))
+        );
         const distVecInWorld = Vector3.add(origVecInWorld, dirVec);
-        const distVecInLocal = new Vector3(invWorldMatrix.multiplyVector(new Vector4$1(distVecInWorld)));
-        dirVecInLocal = Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
+        const distVecInLocal = new Vector3(
+          invWorldMatrix.multiplyVector(new Vector4$1(distVecInWorld))
+        );
+        dirVecInLocal = Vector3.subtract(
+          distVecInLocal,
+          origVecInLocal
+        ).normalize();
       } else {
         const x = arg1;
         const y = arg2;
-        const invPVW = Matrix44$1.multiply(camera.projectionRHMatrix(), Matrix44$1.multiply(camera.lookAtRHMatrix(), this.worldMatrix)).invert();
-        origVecInLocal = MathClassUtil.unProject(new Vector3(x, y, 0), invPVW, viewport);
-        const distVecInLocal = MathClassUtil.unProject(new Vector3(x, y, 1), invPVW, viewport);
-        dirVecInLocal = Vector3.subtract(distVecInLocal, origVecInLocal).normalize();
+        const invPVW = Matrix44$1.multiply(
+          camera.projectionRHMatrix(),
+          Matrix44$1.multiply(camera.lookAtRHMatrix(), this.worldMatrix)
+        ).invert();
+        origVecInLocal = MathClassUtil.unProject(
+          new Vector3(x, y, 0),
+          invPVW,
+          viewport
+        );
+        const distVecInLocal = MathClassUtil.unProject(
+          new Vector3(x, y, 1),
+          invPVW,
+          viewport
+        );
+        dirVecInLocal = Vector3.subtract(
+          distVecInLocal,
+          origVecInLocal
+        ).normalize();
       }
 
       const material = this.getAppropriateMaterials()[0];
 
       const gl = this._glContext.gl;
       const isCulling = material.states.enable.includes(gl.CULL_FACE);
-      const cullMode = IsUtil.exist(material.states.functions.cullFace) ? material.states.functions.cullFace: gl.BACK;
+      const cullMode = IsUtil.exist(material.states.functions.cullFace)
+        ? material.states.functions.cullFace
+        : gl.BACK;
 
       let isFrontFacePickable = true;
       let isBackFacePickable = true;
@@ -15680,16 +15992,23 @@ albedo.rgb *= (1.0 - metallic);
           isBackFacePickable = false;
         }
       }
-      const result = this.geometry.rayCast(origVecInLocal, dirVecInLocal, isFrontFacePickable, isBackFacePickable);
+      const result = this.geometry.rayCast(
+        origVecInLocal,
+        dirVecInLocal,
+        isFrontFacePickable,
+        isBackFacePickable
+      );
       let intersectPositionInWorld = null;
       if (result[0]) {
-        intersectPositionInWorld = new Vector3(this.worldMatrix.multiplyVector(new Vector4$1(result[0])));
+        intersectPositionInWorld = new Vector3(
+          this.worldMatrix.multiplyVector(new Vector4$1(result[0]))
+        );
       }
       return [intersectPositionInWorld, result[1]];
     }
 
     get gizmos() {
-      if (this.isOutlineVisible && this.className === 'M_Mesh') {
+      if (this.isOutlineVisible && this.className === "M_Mesh") {
         return this._gizmos.concat([this._outlineGizmo]);
       } else {
         return this._gizmos;
@@ -15697,8 +16016,10 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     set isOutlineVisible(flg         ) {
-      if (flg && this._outlineGizmo === null && this.className === 'M_Mesh') {
-        this._outlineGizmo = this._glBoostSystem._glBoostContext.createOutlineGizmo(this);
+      if (flg && this._outlineGizmo === null && this.className === "M_Mesh") {
+        this._outlineGizmo = this._glBoostSystem._glBoostContext.createOutlineGizmo(
+          this
+        );
       }
 
       if (this._outlineGizmo) {
@@ -15725,7 +16046,11 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     clone() {
-      let instance = new M_Mesh(this._glBoostSystem, this.geometry, this.material);
+      let instance = new M_Mesh(
+        this._glBoostSystem,
+        this.geometry,
+        this.material
+      );
       this._copy(instance);
 
       return instance;
@@ -15757,7 +16082,7 @@ albedo.rgb *= (1.0 - metallic);
   }
   M_Mesh._geometries = {};
 
-  GLBoost$1['M_Mesh'] = M_Mesh;
+  GLBoost$1["M_Mesh"] = M_Mesh;
 
   /*       */
 
@@ -25092,14 +25417,15 @@ albedo.rgb *= (1.0 - metallic);
    * This is a loader class of glTF VRize extension Data.
    */
   class GLBoostGLTFLoaderExtension {
-
     /**
      * The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
      * @param enforcer a Symbol to forbid calling this constructor directly
      */
     constructor(enforcer        ) {
       if (enforcer !== singletonEnforcer$6) {
-        throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
+        throw new Error(
+          "This is a Singleton class. get the instance using 'getInstance' static method."
+        );
       }
     }
 
@@ -25107,7 +25433,7 @@ albedo.rgb *= (1.0 - metallic);
      * The static method to get singleton instance of this class.
      * @return the singleton instance of ObjLoader class
      */
-    static getInstance()           {
+    static getInstance()            {
       if (!this[singleton$9]) {
         this[singleton$9] = new GLBoostGLTFLoaderExtension(singletonEnforcer$6);
       }
@@ -25146,7 +25472,8 @@ albedo.rgb *= (1.0 - metallic);
         rootGroup.LastSaved_ApplicationName = asset.LastSaved_ApplicationName;
       }
       if (asset && asset.LastSaved_ApplicationVersion) {
-        rootGroup.LastSaved_ApplicationVersion = asset.LastSaved_ApplicationVersion;
+        rootGroup.LastSaved_ApplicationVersion =
+          asset.LastSaved_ApplicationVersion;
       }
 
       // Animation Tracks
@@ -25156,14 +25483,17 @@ albedo.rgb *= (1.0 - metallic);
 
       // Transparent Meshes Draw Order
       if (asset && asset.extras) {
-        const transparentMeshesAsManualOrder = (asset.extras.transparent_meshes_draw_order != null) ? asset.extras.transparent_meshes_draw_order : [];
+        const transparentMeshesAsManualOrder =
+          asset.extras.transparent_meshes_draw_order != null
+            ? asset.extras.transparent_meshes_draw_order
+            : [];
         let meshParents = rootGroup.searchElementsByType(M_Group);
         const transparentMeshes = [];
         for (let name of transparentMeshesAsManualOrder) {
           for (let parent of meshParents) {
             if (parent.userFlavorName === name) {
               const mesh = parent.getChildren()[0];
-              if (mesh.isTransparent) {
+              if (mesh != null && mesh.isTransparent) {
                 transparentMeshes.push(mesh);
               }
               break;
@@ -25172,24 +25502,23 @@ albedo.rgb *= (1.0 - metallic);
         }
         rootGroup.transparentMeshesAsManualOrder = transparentMeshes;
       }
-
     }
 
     loadExtensionInfoAndSetToRootGroup(rootGroup, json, glBoostContext) {
-      rootGroup['extensions'] = json.extensions;
+      rootGroup["extensions"] = json.extensions;
       if (json.extensions && json.extensions.GLBoost) {
         const ext = json.extensions.GLBoost;
 
         // Assignment for Backward Compatibility
         if (ext.animation) {
           if (ext.animation.fps != null) {
-            rootGroup.animationFps = ext.animation.fps; 
+            rootGroup.animationFps = ext.animation.fps;
           }
           if (ext.animation.tracks != null) {
             rootGroup.animationTracks = ext.animation.tracks;
           }
         }
-        
+
         const transparentMeshesDrawOrder = ext.transparentMeshesDrawOrder;
         if (transparentMeshesDrawOrder) {
           let meshParents = rootGroup.searchElementsByType(M_Group);
@@ -25198,7 +25527,7 @@ albedo.rgb *= (1.0 - metallic);
             for (let parent of meshParents) {
               if (parent.userFlavorName === name) {
                 const mesh = parent.getChildren()[0];
-                if (mesh.isTransparent) {
+                if (mesh != null && mesh.isTransparent) {
                   transparentMeshes.push(mesh);
                 }
                 break;
@@ -25212,18 +25541,23 @@ albedo.rgb *= (1.0 - metallic);
       if (json.extensions && json.extensions.Effekseer) {
         const ext = json.extensions.Effekseer;
         for (let effect of ext.effects) {
-          const group = rootGroup.searchElement(effect.nodeName, {type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost$1.QUERY_FORMAT_STRING_PERFECT_MATCHING});
+          const group = rootGroup.searchElement(effect.nodeName, {
+            type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME,
+            format: GLBoost$1.QUERY_FORMAT_STRING_PERFECT_MATCHING
+          });
           const effekseerElm = glBoostContext.createEffekseerElement();
-          const promise = effekseerElm.load(asset.extras.basePath + effect.efkName + '.efk', true, true);
-          promise.then((effect)=>{
+          const promise = effekseerElm.load(
+            json.asset.extras.basePath + effect.efkName + ".efk",
+            true,
+            true
+          );
+          promise.then(effect => {
             group.addChild(effect);
           });
         }
       }
     }
-
   }
-
 
   GLBoost$1["GLBoostGLTFLoaderExtension"] = GLBoostGLTFLoaderExtension;
 
@@ -25421,4 +25755,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-395-g0d5f-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-396-gfcc1-mod branch: develop';
