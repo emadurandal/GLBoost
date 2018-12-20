@@ -552,6 +552,10 @@ export default class L_CameraController extends GLBoostObject {
     this._camaras.add(camera);
   }
 
+  removeCamera(camera) {
+    this._camaras.delete(camera);
+  }
+
   set target(object) {
     this._target = object;
     this.updateTargeting();

@@ -1,7 +1,7 @@
 /* @flow */
 
-import L_AbstractCamera from './L_AbstractCamera';
-import Matrix44 from '../../math/Matrix44';
+import L_AbstractCamera from "./L_AbstractCamera";
+import Matrix44 from "../../math/Matrix44";
 
 export default class L_PerspectiveCamera extends L_AbstractCamera {
   _fovy: number;
@@ -41,7 +41,12 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
 
   projectionRHMatrix() {
     if (this._dirtyProjection) {
-      this._projectionMatrix = L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNearInner, this._zFarInner);
+      this._projectionMatrix = L_PerspectiveCamera.perspectiveRHMatrix(
+        this._fovy,
+        this._aspect,
+        this._zNearInner,
+        this._zFarInner
+      );
       this._dirtyProjection = false;
       return this._projectionMatrix.clone();
     } else {
@@ -49,24 +54,53 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
     }
   }
 
-  static perspectiveRHMatrix(fovy: number, aspect: number, zNear: number, zFar: number) {
-
-    var yscale = 1.0 / Math.tan(0.5*fovy*Math.PI/180);
+  static perspectiveRHMatrix(
+    fovy: number,
+    aspect: number,
+    zNear: number,
+    zFar: number
+  ) {
+    var yscale = 1.0 / Math.tan((0.5 * fovy * Math.PI) / 180);
     var xscale = yscale / aspect;
 
     if (zFar) {
       return new Matrix44(
-        xscale, 0.0, 0.0, 0.0,
-        0.0, yscale, 0.0, 0.0,
-        0.0, 0.0, - (zFar + zNear) / (zFar - zNear), - (2.0 * zFar * zNear) / (zFar - zNear),
-        0.0, 0.0, -1.0, 0.0
+        xscale,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        yscale,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -(zFar + zNear) / (zFar - zNear),
+        -(2.0 * zFar * zNear) / (zFar - zNear),
+        0.0,
+        0.0,
+        -1.0,
+        0.0
       );
     } else {
       return new Matrix44(
-        xscale, 0.0, 0.0, 0.0,
-        0.0, yscale, 0.0, 0.0,
-        0.0, 0.0, -1,0, -2*zNear,
-        0.0, 0.0, -1.0, 0.0
+        xscale,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        yscale,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -1,
+        0,
+        -2 * zNear,
+        0.0,
+        0.0,
+        -1.0,
+        0.0
       );
     }
 
@@ -124,9 +158,14 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
 
   get left() {
     if (this._xscale != null) {
-      L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNearInner, this._zFarInner);
+      L_PerspectiveCamera.perspectiveRHMatrix(
+        this._fovy,
+        this._aspect,
+        this._zNearInner,
+        this._zFarInner
+      );
     }
-    return -this._zNear/this._xscale;
+    return -this._zNear / this._xscale;
   }
 
   get right() {
@@ -137,11 +176,22 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
     return -this.bottom;
   }
 
+  set left(value) {}
+  set top(value) {}
+  set right(value) {}
+  set top(value) {}
+  set bottom(value) {}
+
   get bottom() {
     if (this._xscale != null) {
-      L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNearInner, this._zFarInner);
+      L_PerspectiveCamera.perspectiveRHMatrix(
+        this._fovy,
+        this._aspect,
+        this._zNearInner,
+        this._zFarInner
+      );
     }
-    return this._zNear/this._yscale;
+    return this._zNear / this._yscale;
   }
 
   get allInfo() {
@@ -167,7 +217,7 @@ export default class L_PerspectiveCamera extends L_AbstractCamera {
 
     return info;
   }
-  
+
   get allInfoAsInnerData() {
     const info = super.allInfoAsInnerData;
 

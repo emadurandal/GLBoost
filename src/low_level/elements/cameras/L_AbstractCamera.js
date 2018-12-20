@@ -1,14 +1,16 @@
-import Vector3 from '../../math/Vector3';
-import L_Element from '../L_Element';
-import Matrix44 from '../../math/Matrix44';
-import MathClassUtil from '../../math/MathClassUtil';
+import Vector3 from "../../math/Vector3";
+import L_Element from "../L_Element";
+import Matrix44 from "../../math/Matrix44";
+import MathClassUtil from "../../math/MathClassUtil";
 
 export default class L_AbstractCamera extends L_Element {
   constructor(glBoostContext, toRegister, lookat) {
     super(glBoostContext, toRegister);
 
     if (this.constructor === L_AbstractCamera) {
-      throw new TypeError('Cannot construct AbstractCamera instances directly.');
+      throw new TypeError(
+        "Cannot construct AbstractCamera instances directly."
+      );
     }
 
     this._translate = lookat.eye;
@@ -17,7 +19,6 @@ export default class L_AbstractCamera extends L_Element {
     this._up = lookat.up;
     this._upInner = lookat.up;
     this._centerInner = this._up.clone();
-
 
     this._cameraController = null;
 
@@ -39,8 +40,17 @@ export default class L_AbstractCamera extends L_Element {
     return this._cameraController;
   }
 
+  removeCameraController(controller) {
+    this._cameraController = void 0;
+    if (this._middleLevelCamera !== null) {
+      controller.removeCamera(this._middleLevelCamera);
+    } else {
+      controller.removeCamera(this);
+    }
+  }
+
   _affectedByCameraController() {
-    if (this._cameraController !== null) {
+    if (this._cameraController != null) {
       let results = this._cameraController.convert(this);
       this._translateInner = results[0];
       this._centerInner = results[1];
@@ -69,7 +79,7 @@ export default class L_AbstractCamera extends L_Element {
   }
 
   _needUpdateView(withTryingResetOfCameraController = true) {
-    if (this._cameraController !== null && withTryingResetOfCameraController) {
+    if (this._cameraController != null && withTryingResetOfCameraController) {
       this._cameraController.tryReset();
     }
     this._dirtyView = true;
@@ -78,7 +88,11 @@ export default class L_AbstractCamera extends L_Element {
   lookAtRHMatrix() {
     if (this._dirtyView) {
       this._affectedByCameraController();
-      this._viewMatrix = L_AbstractCamera.lookAtRHMatrix(this.translateInner, this.centerInner, this.upInner);
+      this._viewMatrix = L_AbstractCamera.lookAtRHMatrix(
+        this.translateInner,
+        this.centerInner,
+        this.upInner
+      );
       this._dirtyView = false;
       return this._viewMatrix.clone();
     } else {
@@ -87,15 +101,28 @@ export default class L_AbstractCamera extends L_Element {
   }
 
   static lookAtRHMatrix(eye, center, up) {
-
     var f = Vector3.normalize(Vector3.subtract(center, eye));
     var s = Vector3.normalize(Vector3.cross(f, up));
     var u = Vector3.cross(s, f);
 
-    return new Matrix44(s.x, s.y, s.z, -Vector3.dotProduct(s,eye),
-      u.x, u.y, u.z, -Vector3.dotProduct(u,eye),
-      -f.x, -f.y, -f.z, Vector3.dotProduct(f,eye),
-      0, 0, 0, 1);
+    return new Matrix44(
+      s.x,
+      s.y,
+      s.z,
+      -Vector3.dotProduct(s, eye),
+      u.x,
+      u.y,
+      u.z,
+      -Vector3.dotProduct(u, eye),
+      -f.x,
+      -f.y,
+      -f.z,
+      Vector3.dotProduct(f, eye),
+      0,
+      0,
+      0,
+      1
+    );
   }
 
   setAsMainCamera(scene) {
@@ -174,21 +201,21 @@ export default class L_AbstractCamera extends L_Element {
 
   get allInfoExceptInnerData() {
     const info = {};
-    
+
     info.translate = this.translate;
     info.center = this.center;
     info.up = this.up;
-    
+
     return info;
   }
 
   get allInfoAsInnerData() {
     const info = {};
-    
+
     info.translate = this.translateInner;
     info.center = this.centerInner;
     info.up = this.upInner;
-    
+
     return info;
   }
 
@@ -210,12 +237,16 @@ export default class L_AbstractCamera extends L_Element {
     if (typeof arg === "string") {
       json = JSON.parse(arg);
     }
-    for(let key in json) {
-      if(json.hasOwnProperty(key) && key in this) {
+    for (let key in json) {
+      if (json.hasOwnProperty(key) && key in this) {
         if (key === "quaternion") {
-          this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToQuaternion(json[key]));
+          this[key] = MathClassUtil.cloneOfMathObjects(
+            MathClassUtil.arrayToQuaternion(json[key])
+          );
         } else {
-          this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToVectorOrMatrix(json[key]));
+          this[key] = MathClassUtil.cloneOfMathObjects(
+            MathClassUtil.arrayToVectorOrMatrix(json[key])
+          );
         }
       }
     }

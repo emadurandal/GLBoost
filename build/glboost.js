@@ -8585,11 +8585,13 @@ return mat4(
       this._vboObj = {};
       this._AABB = new AABB();
       this._drawKicker = DrawKickerWorld.getInstance();
-
     }
 
     _createShaderInstance(glBoostContext, shaderClass) {
-      let shaderInstance = new shaderClass(glBoostContext, VertexWorldShaderSource);
+      let shaderInstance = new shaderClass(
+        glBoostContext,
+        VertexWorldShaderSource
+      );
       return shaderInstance;
     }
 
@@ -8599,7 +8601,11 @@ return mat4(
     _allVertexAttribs(vertices) {
       var attribNameArray = [];
       for (var attribName in vertices) {
-        if (attribName !== 'components' && attribName !== 'componentBytes' && attribName !== 'componentType') {
+        if (
+          attribName !== "components" &&
+          attribName !== "componentBytes" &&
+          attribName !== "componentType"
+        ) {
           attribNameArray.push(attribName);
         }
       }
@@ -8608,17 +8614,17 @@ return mat4(
     }
 
     _checkAndSetVertexComponentNumber(allVertexAttribs) {
-      allVertexAttribs.forEach((attribName)=> {
+      allVertexAttribs.forEach(attribName => {
         let element = this._vertices[attribName][0];
         let componentN = MathClassUtil.compomentNumberOfVector(element);
         if (componentN === 0) {
           // if 0, it must be a number. so users must set components info.
           return;
         }
-        if (typeof this._vertices.components === 'undefined') {
+        if (typeof this._vertices.components === "undefined") {
           this._vertices.components = {};
         }
-        if (typeof this._vertices.componentType === 'undefined') {
+        if (typeof this._vertices.componentType === "undefined") {
           this._vertices.componentType = {};
         }
 
@@ -8628,86 +8634,68 @@ return mat4(
     }
 
     _calcBaryCentricCoord(vertexNum, positionElementNumPerVertex) {
-      this._vertices.barycentricCoord = new Float32Array(vertexNum*positionElementNumPerVertex);
+      this._vertices.barycentricCoord = new Float32Array(
+        vertexNum * positionElementNumPerVertex
+      );
       this._vertices.components.barycentricCoord = 3;
       this._vertices.componentType.barycentricCoord = 5126; // gl.FLOAT
       if (!this._indicesArray) {
-        for (let i=0; i<vertexNum; i++) {
-          this._vertices.barycentricCoord[i*positionElementNumPerVertex+0] = (i % 3 === 0) ? 1 : 0;   // 1 0 0  1 0 0  1 0 0
-          this._vertices.barycentricCoord[i*positionElementNumPerVertex+1] = (i % 3 === 1) ? 1 : 0;   // 0 1 0  0 1 0  0 1 0
-          this._vertices.barycentricCoord[i*positionElementNumPerVertex+2] = (i % 3 === 2) ? 1 : 0;   // 0 0 1  0 0 1  0 0 1
+        for (let i = 0; i < vertexNum; i++) {
+          this._vertices.barycentricCoord[i * positionElementNumPerVertex + 0] =
+            i % 3 === 0 ? 1 : 0; // 1 0 0  1 0 0  1 0 0
+          this._vertices.barycentricCoord[i * positionElementNumPerVertex + 1] =
+            i % 3 === 1 ? 1 : 0; // 0 1 0  0 1 0  0 1 0
+          this._vertices.barycentricCoord[i * positionElementNumPerVertex + 2] =
+            i % 3 === 2 ? 1 : 0; // 0 0 1  0 0 1  0 0 1
         }
       } else {
-        for (let i=0; i<this._indicesArray.length; i++) {
+        for (let i = 0; i < this._indicesArray.length; i++) {
           let vertexIndices = this._indicesArray[i];
-          for (let j=0; j<vertexIndices.length; j++) {
-            this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+0] = (j % 3 === 0) ? 1 : 0;   // 1 0 0  1 0 0  1 0 0
-            this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+1] = (j % 3 === 1) ? 1 : 0;   // 0 1 0  0 1 0  0 1 0
-            this._vertices.barycentricCoord[vertexIndices[j]*positionElementNumPerVertex+2] = (j % 3 === 2) ? 1 : 0;   // 0 0 1  0 0 1  0 0 1
+          for (let j = 0; j < vertexIndices.length; j++) {
+            this._vertices.barycentricCoord[
+              vertexIndices[j] * positionElementNumPerVertex + 0
+            ] = j % 3 === 0 ? 1 : 0; // 1 0 0  1 0 0  1 0 0
+            this._vertices.barycentricCoord[
+              vertexIndices[j] * positionElementNumPerVertex + 1
+            ] = j % 3 === 1 ? 1 : 0; // 0 1 0  0 1 0  0 1 0
+            this._vertices.barycentricCoord[
+              vertexIndices[j] * positionElementNumPerVertex + 2
+            ] = j % 3 === 2 ? 1 : 0; // 0 0 1  0 0 1  0 0 1
           }
         }
       }
     }
 
-    _calcTangentPerVertex(pos0Vec3, pos1Vec3, pos2Vec3, uv0Vec2, uv1Vec2, uv2Vec2) {
+    _calcTangentPerVertex(
+      pos0Vec3,
+      pos1Vec3,
+      pos2Vec3,
+      uv0Vec2,
+      uv1Vec2,
+      uv2Vec2
+    ) {
       let cp0 = [
-        new Vector3(
-          pos0Vec3.x,
-          uv0Vec2.x,
-          uv0Vec2.y
-        ),
-        new Vector3(
-          pos0Vec3.y,
-          uv0Vec2.x,
-          uv0Vec2.y
-        ),
-        new Vector3(
-          pos0Vec3.z,
-          uv0Vec2.x,
-          uv0Vec2.y
-        )
+        new Vector3(pos0Vec3.x, uv0Vec2.x, uv0Vec2.y),
+        new Vector3(pos0Vec3.y, uv0Vec2.x, uv0Vec2.y),
+        new Vector3(pos0Vec3.z, uv0Vec2.x, uv0Vec2.y)
       ];
 
       let cp1 = [
-        new Vector3(
-          pos1Vec3.x,
-          uv1Vec2.x,
-          uv1Vec2.y
-        ),
-        new Vector3(
-          pos1Vec3.y,
-          uv1Vec2.x,
-          uv1Vec2.y
-        ),
-        new Vector3(
-          pos1Vec3.z,
-          uv1Vec2.x,
-          uv1Vec2.y
-        )
+        new Vector3(pos1Vec3.x, uv1Vec2.x, uv1Vec2.y),
+        new Vector3(pos1Vec3.y, uv1Vec2.x, uv1Vec2.y),
+        new Vector3(pos1Vec3.z, uv1Vec2.x, uv1Vec2.y)
       ];
 
       let cp2 = [
-        new Vector3(
-          pos2Vec3.x,
-          uv2Vec2.x,
-          uv2Vec2.y
-        ),
-        new Vector3(
-          pos2Vec3.y,
-          uv2Vec2.x,
-          uv2Vec2.y
-        ),
-        new Vector3(
-          pos2Vec3.z,
-          uv2Vec2.x,
-          uv2Vec2.y
-        )
+        new Vector3(pos2Vec3.x, uv2Vec2.x, uv2Vec2.y),
+        new Vector3(pos2Vec3.y, uv2Vec2.x, uv2Vec2.y),
+        new Vector3(pos2Vec3.z, uv2Vec2.x, uv2Vec2.y)
       ];
 
       let u = [];
       let v = [];
 
-      for ( let i = 0; i < 3; i++ ) {
+      for (let i = 0; i < 3; i++) {
         let v1 = Vector3.subtract(cp1[i], cp0[i]);
         let v2 = Vector3.subtract(cp2[i], cp1[i]);
         let abc = Vector3.cross(v1, v2);
@@ -8718,14 +8706,24 @@ return mat4(
           return new Vector3(0, 0, 0);
         }
 
-        u[i] = - abc.y / abc.x;
-        v[i] = - abc.z / abc.x;
+        u[i] = -abc.y / abc.x;
+        v[i] = -abc.z / abc.x;
       }
 
-      return (new Vector3(u[0], u[1], u[2])).normalize();
+      return new Vector3(u[0], u[1], u[2]).normalize();
     }
 
-    _calcTangentFor3Vertices(vertexIndices, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, incrementNum) {
+    _calcTangentFor3Vertices(
+      vertexIndices,
+      i,
+      pos0IndexBase,
+      pos1IndexBase,
+      pos2IndexBase,
+      uv0IndexBase,
+      uv1IndexBase,
+      uv2IndexBase,
+      incrementNum
+    ) {
       let pos0Vec3 = new Vector3(
         this._vertices.position[pos0IndexBase],
         this._vertices.position[pos0IndexBase + 1],
@@ -8760,7 +8758,7 @@ return mat4(
       );
 
       const componentNum3 = 3;
-      let tan0IndexBase = (i    ) * componentNum3;
+      let tan0IndexBase = i * componentNum3;
       let tan1IndexBase = (i + 1) * componentNum3;
       let tan2IndexBase = (i + 2) * componentNum3;
       if (vertexIndices) {
@@ -8769,35 +8767,63 @@ return mat4(
         tan2IndexBase = vertexIndices[i + 2] * componentNum3;
       }
 
-      let tan0Vec3 = this._calcTangentPerVertex(pos0Vec3, pos1Vec3, pos2Vec3, uv0Vec2, uv1Vec2, uv2Vec2);
+      let tan0Vec3 = this._calcTangentPerVertex(
+        pos0Vec3,
+        pos1Vec3,
+        pos2Vec3,
+        uv0Vec2,
+        uv1Vec2,
+        uv2Vec2
+      );
       this._vertices.tangent[tan0IndexBase] = tan0Vec3.x;
       this._vertices.tangent[tan0IndexBase + 1] = tan0Vec3.y;
       this._vertices.tangent[tan0IndexBase + 2] = tan0Vec3.z;
 
-      let tan1Vec3 = this._calcTangentPerVertex(pos1Vec3, pos2Vec3, pos0Vec3, uv1Vec2, uv2Vec2, uv0Vec2);
+      let tan1Vec3 = this._calcTangentPerVertex(
+        pos1Vec3,
+        pos2Vec3,
+        pos0Vec3,
+        uv1Vec2,
+        uv2Vec2,
+        uv0Vec2
+      );
       this._vertices.tangent[tan1IndexBase] = tan1Vec3.x;
       this._vertices.tangent[tan1IndexBase + 1] = tan1Vec3.y;
       this._vertices.tangent[tan1IndexBase + 2] = tan1Vec3.z;
 
-      let tan2Vec3 = this._calcTangentPerVertex(pos2Vec3, pos0Vec3, pos1Vec3, uv2Vec2, uv0Vec2, uv1Vec2);
+      let tan2Vec3 = this._calcTangentPerVertex(
+        pos2Vec3,
+        pos0Vec3,
+        pos1Vec3,
+        uv2Vec2,
+        uv0Vec2,
+        uv1Vec2
+      );
       this._vertices.tangent[tan2IndexBase] = tan2Vec3.x;
       this._vertices.tangent[tan2IndexBase + 1] = tan2Vec3.y;
       this._vertices.tangent[tan2IndexBase + 2] = tan2Vec3.z;
     }
 
-    _calcTangent(vertexNum, positionElementNumPerVertex, texcoordElementNumPerVertex, primitiveType) {
-
-      this._vertices.tangent = new Float32Array(vertexNum*positionElementNumPerVertex);
+    _calcTangent(
+      vertexNum,
+      positionElementNumPerVertex,
+      texcoordElementNumPerVertex,
+      primitiveType
+    ) {
+      this._vertices.tangent = new Float32Array(
+        vertexNum * positionElementNumPerVertex
+      );
       this._vertices.components.tangent = 3;
       this._vertices.componentType.tangent = 5126; // gl.FLOAT
 
       let incrementNum = 3; // gl.TRIANGLES
-      if (primitiveType === GLBoost$1.TRIANGLE_STRIP) { // gl.TRIANGLE_STRIP
+      if (primitiveType === GLBoost$1.TRIANGLE_STRIP) {
+        // gl.TRIANGLE_STRIP
         incrementNum = 1;
       }
-      if ( this._vertices.texcoord ) {
+      if (this._vertices.texcoord) {
         if (!this._indicesArray) {
-          for (let i=0; i<vertexNum-2; i+=incrementNum) {
+          for (let i = 0; i < vertexNum - 2; i += incrementNum) {
             let pos0IndexBase = i * positionElementNumPerVertex;
             let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
             let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
@@ -8805,31 +8831,56 @@ return mat4(
             let uv1IndexBase = (i + 1) * texcoordElementNumPerVertex;
             let uv2IndexBase = (i + 2) * texcoordElementNumPerVertex;
 
-            this._calcTangentFor3Vertices(null, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, incrementNum);
-
+            this._calcTangentFor3Vertices(
+              null,
+              i,
+              pos0IndexBase,
+              pos1IndexBase,
+              pos2IndexBase,
+              uv0IndexBase,
+              uv1IndexBase,
+              uv2IndexBase,
+              incrementNum
+            );
           }
         } else {
-          for (let i=0; i<this._indicesArray.length; i++) {
+          for (let i = 0; i < this._indicesArray.length; i++) {
             let vertexIndices = this._indicesArray[i];
-            for (let j=0; j<vertexIndices.length-2; j+=incrementNum) {
-              let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex; /// ０つ目の頂点
-              let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex; /// １つ目の頂点
-              let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex; /// ２つ目の頂点
-              let uv0IndexBase = vertexIndices[j    ]  * texcoordElementNumPerVertex;
-              let uv1IndexBase = vertexIndices[j + 1]  * texcoordElementNumPerVertex;
-              let uv2IndexBase = vertexIndices[j + 2]  * texcoordElementNumPerVertex;
+            for (let j = 0; j < vertexIndices.length - 2; j += incrementNum) {
+              let pos0IndexBase = vertexIndices[j] * positionElementNumPerVertex; /// ０つ目の頂点
+              let pos1IndexBase =
+                vertexIndices[j + 1] * positionElementNumPerVertex; /// １つ目の頂点
+              let pos2IndexBase =
+                vertexIndices[j + 2] * positionElementNumPerVertex; /// ２つ目の頂点
+              let uv0IndexBase = vertexIndices[j] * texcoordElementNumPerVertex;
+              let uv1IndexBase =
+                vertexIndices[j + 1] * texcoordElementNumPerVertex;
+              let uv2IndexBase =
+                vertexIndices[j + 2] * texcoordElementNumPerVertex;
 
-              this._calcTangentFor3Vertices(vertexIndices, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, uv0IndexBase, uv1IndexBase, uv2IndexBase, incrementNum);
-
+              this._calcTangentFor3Vertices(
+                vertexIndices,
+                j,
+                pos0IndexBase,
+                pos1IndexBase,
+                pos2IndexBase,
+                uv0IndexBase,
+                uv1IndexBase,
+                uv2IndexBase,
+                incrementNum
+              );
             }
           }
         }
       }
-
-
     }
 
-    setVerticesData(vertices, indicesArray, primitiveType = GLBoost$1.TRIANGLES, performanceHint = GLBoost$1.STATIC_DRAW) {
+    setVerticesData(
+      vertices,
+      indicesArray,
+      primitiveType = GLBoost$1.TRIANGLES,
+      performanceHint = GLBoost$1.STATIC_DRAW
+    ) {
       this._vertices = vertices;
       this._indicesArray = indicesArray;
 
@@ -8841,12 +8892,13 @@ return mat4(
       let positionElementNumPerVertex = this._vertices.components.position;
       let texcoordElementNumPerVertex = this._vertices.components.texcoord;
 
-      if (typeof this._vertices.position.buffer !== 'undefined') {
+      if (typeof this._vertices.position.buffer !== "undefined") {
         vertexNum = this._vertices.position.length / positionElementNumPerVertex;
         positionElementNum = this._vertices.position.length;
       } else {
         vertexNum = this._vertices.position.length; // vertices must be type of Vector3
-        positionElementNum = this._vertices.position.length * positionElementNumPerVertex;
+        positionElementNum =
+          this._vertices.position.length * positionElementNumPerVertex;
       }
 
       // for Wireframe
@@ -8856,43 +8908,54 @@ return mat4(
       this._checkAndSetVertexComponentNumber(allVertexAttribs);
 
       // vector to array
-      allVertexAttribs.forEach((attribName)=> {
-        if (attribName === 'barycentricCoord') {
+      allVertexAttribs.forEach(attribName => {
+        if (attribName === "barycentricCoord") {
           return;
         }
-        if (attribName === 'tangent') {
+        if (attribName === "tangent") {
           return;
         }
-        if (typeof this._vertices[attribName].buffer !== 'undefined') {
+        if (typeof this._vertices[attribName].buffer !== "undefined") {
           return;
         }
         let vertexAttribArray = [];
         this._vertices[attribName].forEach((elem, index) => {
           let element = this._vertices[attribName][index];
-          Array.prototype.push.apply(vertexAttribArray, MathClassUtil.vectorToArray(element));
+          Array.prototype.push.apply(
+            vertexAttribArray,
+            MathClassUtil.vectorToArray(element)
+          );
         });
         this._vertices[attribName] = vertexAttribArray;
-
       });
 
       // for Tangent
       if (this._vertices.texcoord) {
-        this._calcTangent(vertexNum, positionElementNumPerVertex, texcoordElementNumPerVertex, primitiveType);
+        this._calcTangent(
+          vertexNum,
+          positionElementNumPerVertex,
+          texcoordElementNumPerVertex,
+          primitiveType
+        );
       }
 
       // for Raycast Picking
       this._calcArenbergInverseMatrices(primitiveType);
 
       // Normal Array to Float32Array
-      allVertexAttribs.forEach((attribName)=> {
-        if (typeof this._vertices[attribName].buffer === 'undefined') {
-          this._vertices[attribName] = new Float32Array(this._vertices[attribName]);
+      allVertexAttribs.forEach(attribName => {
+        if (typeof this._vertices[attribName].buffer === "undefined") {
+          this._vertices[attribName] = new Float32Array(
+            this._vertices[attribName]
+          );
         }
       });
 
-
-      for (let i=0; i<vertexNum; i++) {
-        this._AABB.addPositionWithArray(this._vertices.position, i * positionElementNumPerVertex);
+      for (let i = 0; i < vertexNum; i++) {
+        this._AABB.addPositionWithArray(
+          this._vertices.position,
+          i * positionElementNumPerVertex
+        );
       }
 
       this._AABB.updateAllInfo();
@@ -8911,17 +8974,23 @@ return mat4(
         let vertexAttribArray = [];
         this._vertices[attribName].forEach((elem, index) => {
           let element = vertices[attribName][index];
-          Array.prototype.push.apply(vertexAttribArray, MathClassUtil.vectorToArray(element));
+          Array.prototype.push.apply(
+            vertexAttribArray,
+            MathClassUtil.vectorToArray(element)
+          );
 
-          if (attribName === 'position' && !(skipUpdateAABB === true)) {
+          if (attribName === "position" && !(skipUpdateAABB === true)) {
             let componentN = this._vertices.components[attribName];
-            this._AABB.addPositionWithArray(vertexAttribArray, index * componentN);
+            this._AABB.addPositionWithArray(
+              vertexAttribArray,
+              index * componentN
+            );
           }
           this._vertices[attribName] = vertexAttribArray;
         });
       }
 
-      if(!(skipUpdateAABB === true)) {
+      if (!(skipUpdateAABB === true)) {
         this._AABB.updateAllInfo();
       }
 
@@ -8936,18 +9005,23 @@ return mat4(
         }
       }
       return true;
-
     }
 
     setUpVertexAttribs(gl, glslProgram, allVertexAttribs) {
       var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
 
       // setup vertex layouts
-      allVertexAttribs.forEach((attribName)=> {
+      allVertexAttribs.forEach(attribName => {
         if (optimizedVertexAttribs.indexOf(attribName) != -1) {
           gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
-          gl.vertexAttribPointer(glslProgram['vertexAttribute_' + attribName],
-            this._vertices.components[attribName], this._vertices.componentType[attribName], false, 0, 0);
+          gl.vertexAttribPointer(
+            glslProgram["vertexAttribute_" + attribName],
+            this._vertices.components[attribName],
+            this._vertices.componentType[attribName],
+            false,
+            0,
+            0
+          );
         }
       });
     }
@@ -8955,16 +9029,17 @@ return mat4(
     setUpEnableVertexAttribArrays(gl, glslProgram, allVertexAttribs) {
       var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
 
-      allVertexAttribs.forEach((attribName)=> {
+      allVertexAttribs.forEach(attribName => {
         if (optimizedVertexAttribs.indexOf(attribName) != -1) {
-          gl.enableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
+          gl.enableVertexAttribArray(
+            glslProgram["vertexAttribute_" + attribName]
+          );
         }
       });
     }
 
     setUpDisableAllVertexAttribArrays(gl, glslProgram) {
-
-      for (let i=0; i<8; i++) {
+      for (let i = 0; i < 8; i++) {
         gl.disableVertexAttribArray(i);
       }
     }
@@ -8972,14 +9047,14 @@ return mat4(
     setUpDisableVertexAttribArrays(gl, glslProgram, allVertexAttribs) {
       var optimizedVertexAttribs = glslProgram.optimizedVertexAttribs;
 
-      allVertexAttribs.forEach((attribName)=> {
+      allVertexAttribs.forEach(attribName => {
         if (optimizedVertexAttribs.indexOf(attribName) != -1) {
-          gl.disableVertexAttribArray(glslProgram['vertexAttribute_' + attribName]);
+          gl.disableVertexAttribArray(
+            glslProgram["vertexAttribute_" + attribName]
+          );
         }
       });
     }
-
-
 
     _getVAO() {
       return Geometry._vaoDic[this.toString()];
@@ -8987,9 +9062,16 @@ return mat4(
 
     _getAllVertexAttribs() {
       return this._allVertexAttribs(this._vertices);
-    } 
+    }
 
-    prepareGLSLProgram(expression, material, existCamera_f, lights, shaderClass = void 0, argShaderInstance = void 0) {
+    prepareGLSLProgram(
+      expression,
+      material,
+      existCamera_f,
+      lights,
+      shaderClass = void 0,
+      argShaderInstance = void 0
+    ) {
       let vertices = this._vertices;
 
       let _optimizedVertexAttribs = this._allVertexAttribs(vertices, material);
@@ -8999,13 +9081,26 @@ return mat4(
         shaderInstance = argShaderInstance;
       } else {
         if (shaderClass) {
-          shaderInstance = this._createShaderInstance(this._glBoostSystem, shaderClass);
+          shaderInstance = this._createShaderInstance(
+            this._glBoostSystem,
+            shaderClass
+          );
         } else {
-          shaderInstance = this._createShaderInstance(this._glBoostSystem, material.shaderClass);
-        }  
+          shaderInstance = this._createShaderInstance(
+            this._glBoostSystem,
+            material.shaderClass
+          );
+        }
       }
 
-      shaderInstance.getShaderProgram(expression, _optimizedVertexAttribs, existCamera_f, lights, material, this._extraDataForShader);
+      shaderInstance.getShaderProgram(
+        expression,
+        _optimizedVertexAttribs,
+        existCamera_f,
+        lights,
+        material,
+        this._extraDataForShader
+      );
 
       return shaderInstance;
     }
@@ -9025,7 +9120,7 @@ return mat4(
       let materials = null;
       if (this._materials.length > 0) {
         materials = this._materials;
-      } else if (mesh.material){
+      } else if (mesh.material) {
         materials = [mesh.material];
       } else {
         mesh.material = this._glBoostSystem._defaultMaterial;
@@ -9038,8 +9133,15 @@ return mat4(
       return this._indexStartOffsetArray[i];
     }
 
-    prepareToRender(expression, existCamera_f, lights, meshMaterial, mesh, shaderClass = void 0, argMaterials = void 0) {
-
+    prepareToRender(
+      expression,
+      existCamera_f,
+      lights,
+      meshMaterial,
+      mesh,
+      shaderClass = void 0,
+      argMaterials = void 0
+    ) {
       var vertices = this._vertices;
       var gl = this._glContext.gl;
 
@@ -9048,7 +9150,6 @@ return mat4(
       this._vertexN = vertices.position.length / vertices.components.position;
 
       var allVertexAttribs = this._allVertexAttribs(vertices);
-
 
       // create VAO
       if (Geometry._vaoDic[this.toString()]) ; else {
@@ -9059,7 +9160,7 @@ return mat4(
 
       let doAfter = false;
 
-      allVertexAttribs.forEach((attribName)=> {
+      allVertexAttribs.forEach(attribName => {
         // create VBO
         if (this._vboObj[attribName]) {
           gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
@@ -9068,36 +9169,47 @@ return mat4(
           this._vboObj[attribName] = vbo;
 
           gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
-  //        if (typeof this._vertices[attribName].buffer !== 'undefined') {
-          gl.bufferData(gl.ARRAY_BUFFER, this._vertices[attribName], this._performanceHint);
-  //        } else {
-  //          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._vertices[attribName]), this._performanceHint);
-  //        }
-        //gl.bindBuffer(gl.ARRAY_BUFFER, null);
+          //        if (typeof this._vertices[attribName].buffer !== 'undefined') {
+          gl.bufferData(
+            gl.ARRAY_BUFFER,
+            this._vertices[attribName],
+            this._performanceHint
+          );
+          //        } else {
+          //          gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this._vertices[attribName]), this._performanceHint);
+          //        }
+          //gl.bindBuffer(gl.ARRAY_BUFFER, null);
 
           doAfter = true;
         }
       });
 
       if (doAfter) {
-          
         if (Geometry._iboArrayDic[this.toString()]) {
-          gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, Geometry._iboArrayDic[this.toString()] );
+          gl.bindBuffer(
+            gl.ELEMENT_ARRAY_BUFFER,
+            Geometry._iboArrayDic[this.toString()]
+          );
         } else {
           if (this._indicesArray) {
             let indices = [];
-            for (let i=0; i<this._indicesArray.length; i++) {
-              if (i==0) {
+            for (let i = 0; i < this._indicesArray.length; i++) {
+              if (i == 0) {
                 this._indexStartOffsetArray[i] = 0;
               }
-              this._indexStartOffsetArray[i+1] = this._indexStartOffsetArray[i] + this._indicesArray[i].length;
-              //Array.prototype.push.apply(indices, this._indicesArray[i]);  
+              this._indexStartOffsetArray[i + 1] =
+                this._indexStartOffsetArray[i] + this._indicesArray[i].length;
+              //Array.prototype.push.apply(indices, this._indicesArray[i]);
               indices = indices.concat(this._indicesArray[i]);
             }
             // create Index Buffer
             var ibo = this._glContext.createBuffer(this);
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo );
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, glem.createUintArrayForElementIndex(gl, indices), gl.STATIC_DRAW);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
+            gl.bufferData(
+              gl.ELEMENT_ARRAY_BUFFER,
+              glem.createUintArrayForElementIndex(gl, indices),
+              gl.STATIC_DRAW
+            );
             Geometry._iboArrayDic[this.toString()] = ibo;
           }
         }
@@ -9110,7 +9222,7 @@ return mat4(
       }
       //let materials = this._getAppropriateMaterials(mesh);
 
-      for (let i=0; i<materials.length;i++) {
+      for (let i = 0; i < materials.length; i++) {
         let shaderInstance = null;
 
         /*
@@ -9120,16 +9232,36 @@ return mat4(
           shaderInstance = materials[i].shaderInstance;
         } else {
           */
-          if (materials[i].shaderInstance && materials[i].shaderInstance.constructor === FreeShader) {
-            shaderInstance = this.prepareGLSLProgram(expression, materials[i], existCamera_f, lights, void 0, materials[i].shaderInstance);
-          } else {
-            shaderInstance = this.prepareGLSLProgram(expression, materials[i], existCamera_f, lights, shaderClass);
-          }  
-  //      }
+        if (
+          materials[i].shaderInstance &&
+          materials[i].shaderInstance.constructor === FreeShader
+        ) {
+          shaderInstance = this.prepareGLSLProgram(
+            expression,
+            materials[i],
+            existCamera_f,
+            lights,
+            void 0,
+            materials[i].shaderInstance
+          );
+        } else {
+          shaderInstance = this.prepareGLSLProgram(
+            expression,
+            materials[i],
+            existCamera_f,
+            lights,
+            shaderClass
+          );
+        }
+        //      }
 
         this._setVertexNtoSingleMaterial(materials[i], i);
         shaderInstance.vao = Geometry._vaoDic[this.toString()];
-        this.setUpVertexAttribs(gl, shaderInstance._glslProgram, allVertexAttribs);
+        this.setUpVertexAttribs(
+          gl,
+          shaderInstance._glslProgram,
+          allVertexAttribs
+        );
 
         if (argMaterials === void 0) {
           materials[i].shaderInstance = shaderInstance;
@@ -9145,7 +9277,11 @@ return mat4(
     }
 
     _setUpVertexAttibsWrapper(glslProgram) {
-      this.setUpVertexAttribs(this._glContext.gl, glslProgram, this._getAllVertexAttribs());    
+      this.setUpVertexAttribs(
+        this._glContext.gl,
+        glslProgram,
+        this._getAllVertexAttribs()
+      );
     }
 
     draw(data) {
@@ -9156,31 +9292,29 @@ return mat4(
 
       const thisName = this.toString();
 
-      this._drawKicker.draw(
-        {
-          gl: gl,
-          glem: glem,
-          expression: data.expression,
-          lights: data.lights,
-          camera: data.camera,
-          mesh: data.mesh,
-          scene: data.scene,
-          renderPassIndex: data.renderPassIndex,
-          materials: materials,
-          vertices: this._vertices,
-          vaoDic: Geometry._vaoDic,
-          vboObj: this._vboObj,
-          iboArrayDic: Geometry._iboArrayDic,
-          geometry: this,
-          geometryName: thisName,
-          primitiveType: this._primitiveType,
-          vertexN: this._vertexN,
-          viewport: data.viewport,
-          isWebVRMode: data.isWebVRMode,
-          webvrFrameData: data.webvrFrameData,
-          forceThisMaterial: data.forceThisMaterial
-        });
-
+      this._drawKicker.draw({
+        gl: gl,
+        glem: glem,
+        expression: data.expression,
+        lights: data.lights,
+        camera: data.camera,
+        mesh: data.mesh,
+        scene: data.scene,
+        renderPassIndex: data.renderPassIndex,
+        materials: materials,
+        vertices: this._vertices,
+        vaoDic: Geometry._vaoDic,
+        vboObj: this._vboObj,
+        iboArrayDic: Geometry._iboArrayDic,
+        geometry: this,
+        geometryName: thisName,
+        primitiveType: this._primitiveType,
+        vertexN: this._vertexN,
+        viewport: data.viewport,
+        isWebVRMode: data.isWebVRMode,
+        webvrFrameData: data.webvrFrameData,
+        forceThisMaterial: data.forceThisMaterial
+      });
     }
 
     drawIntermediate() {}
@@ -9189,40 +9323,47 @@ return mat4(
       if (Array.isArray(geometrys)) {
         let typedArrayDic = {};
         let allVertexAttribs = this._allVertexAttribs(this._vertices);
-        allVertexAttribs.forEach((attribName)=> {
+        allVertexAttribs.forEach(attribName => {
           let thisLength = this._vertices[attribName].length;
 
           let allGeomLength = 0;
-          geometrys.forEach((geometry) => {
+          geometrys.forEach(geometry => {
             allGeomLength += geometry._vertices[attribName].length;
           });
-          typedArrayDic[attribName] = new Float32Array(thisLength + allGeomLength);
+          typedArrayDic[attribName] = new Float32Array(
+            thisLength + allGeomLength
+          );
         });
 
         let lastThisLengthDic = {};
-        allVertexAttribs.forEach((attribName)=> {
+        allVertexAttribs.forEach(attribName => {
           lastThisLengthDic[attribName] = 0;
         });
         geometrys.forEach((geometry, index) => {
           let typedSubArrayDic = {};
-          allVertexAttribs.forEach((attribName)=> {
+          allVertexAttribs.forEach(attribName => {
             let typedArray = typedArrayDic[attribName];
 
             if (index === 0) {
-              lastThisLengthDic[attribName] = geometrys[index]._vertices[attribName].length;
+              lastThisLengthDic[attribName] =
+                geometrys[index]._vertices[attribName].length;
             }
 
-            let end = (typeof geometrys[index+1] !== 'undefined') ? lastThisLengthDic[attribName]  + geometrys[index+1]._vertices[attribName].length : void 0;
+            let end =
+              typeof geometrys[index + 1] !== "undefined"
+                ? lastThisLengthDic[attribName] +
+                  geometrys[index + 1]._vertices[attribName].length
+                : void 0;
             typedSubArrayDic[attribName] = typedArray.subarray(0, end);
             lastThisLengthDic[attribName] = end;
           });
-          this.mergeInner(geometry, typedSubArrayDic, (index === 0));
+          this.mergeInner(geometry, typedSubArrayDic, index === 0);
         });
       } else {
         let geometry = geometrys;
         let typedArrayDic = {};
         let allVertexAttribs = this._allVertexAttribs(this._vertices);
-        allVertexAttribs.forEach((attribName)=> {
+        allVertexAttribs.forEach(attribName => {
           let thisLength = this._vertices[attribName].length;
           let geomLength = geometry._vertices[attribName].length;
 
@@ -9238,16 +9379,18 @@ return mat4(
      */
     mergeInner(geometry, typedArrayDic, isFirst = false) {
       let gl = this._glContext.gl;
-      let baseLen = this._vertices.position.length / this._vertices.components.position;
+      let baseLen =
+        this._vertices.position.length / this._vertices.components.position;
+
       if (this === geometry) {
-        console.assert('don\'t merge same geometry!');
+        console.assert("don't merge same geometry!");
       }
 
       let allVertexAttribs = this._allVertexAttribs(this._vertices);
 
-      allVertexAttribs.forEach((attribName)=> {
+      allVertexAttribs.forEach(attribName => {
         let thisLength = this._vertices[attribName].length;
-        let geomLength =  geometry._vertices[attribName].length;
+        let geomLength = geometry._vertices[attribName].length;
 
         let float32array = typedArrayDic[attribName];
 
@@ -9258,9 +9401,13 @@ return mat4(
 
         this._vertices[attribName] = float32array;
 
-        if (typeof this._vboObj[attribName] !== 'undefined') {
+        if (typeof this._vboObj[attribName] !== "undefined") {
           gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
-          gl.bufferData(gl.ARRAY_BUFFER, this._vertices[attribName], this._performanceHint);
+          gl.bufferData(
+            gl.ARRAY_BUFFER,
+            this._vertices[attribName],
+            this._performanceHint
+          );
           gl.bindBuffer(gl.ARRAY_BUFFER, null);
         }
       });
@@ -9282,40 +9429,47 @@ return mat4(
       if (Array.isArray(geometrys)) {
         let typedArrayDic = {};
         let allVertexAttribs = this._allVertexAttribs(this._vertices);
-        allVertexAttribs.forEach((attribName)=> {
+        allVertexAttribs.forEach(attribName => {
           let thisLength = this._vertices[attribName].length;
 
           let allGeomLength = 0;
-          geometrys.forEach((geometry) => {
+          geometrys.forEach(geometry => {
             allGeomLength += geometry._vertices[attribName].length;
           });
-          typedArrayDic[attribName] = new Float32Array(thisLength + allGeomLength);
+          typedArrayDic[attribName] = new Float32Array(
+            thisLength + allGeomLength
+          );
         });
 
         let lastThisLengthDic = {};
-        allVertexAttribs.forEach((attribName)=> {
+        allVertexAttribs.forEach(attribName => {
           lastThisLengthDic[attribName] = 0;
         });
         geometrys.forEach((geometry, index) => {
           let typedSubArrayDic = {};
-          allVertexAttribs.forEach((attribName)=> {
+          allVertexAttribs.forEach(attribName => {
             let typedArray = typedArrayDic[attribName];
 
             if (index === 0) {
-              lastThisLengthDic[attribName] = geometrys[index]._vertices[attribName].length;
+              lastThisLengthDic[attribName] =
+                geometrys[index]._vertices[attribName].length;
             }
 
-            let end = (typeof geometrys[index+1] !== 'undefined') ? lastThisLengthDic[attribName]  + geometrys[index+1]._vertices[attribName].length : void 0;
+            let end =
+              typeof geometrys[index + 1] !== "undefined"
+                ? lastThisLengthDic[attribName] +
+                  geometrys[index + 1]._vertices[attribName].length
+                : void 0;
             typedSubArrayDic[attribName] = typedArray.subarray(0, end);
             lastThisLengthDic[attribName] = end;
           });
-          this.mergeHarderInner(geometry, typedSubArrayDic, (index === 0));
+          this.mergeHarderInner(geometry, typedSubArrayDic, index === 0);
         });
       } else {
         let geometry = geometrys;
         let typedArrayDic = {};
         let allVertexAttribs = this._allVertexAttribs(this._vertices);
-        allVertexAttribs.forEach((attribName)=> {
+        allVertexAttribs.forEach(attribName => {
           let thisLength = this._vertices[attribName].length;
           let geomLength = geometry._vertices[attribName].length;
 
@@ -9332,16 +9486,17 @@ return mat4(
      */
     mergeHarderInner(geometry, typedArrayDic, isFirst = false) {
       let gl = this._glContext.gl;
-      let baseLen = this._vertices.position.length / this._vertices.components.position;
+      let baseLen =
+        this._vertices.position.length / this._vertices.components.position;
       if (this === geometry) {
-        console.assert('don\'t merge same geometry!');
+        console.assert("don't merge same geometry!");
       }
 
       let allVertexAttribs = this._allVertexAttribs(this._vertices);
 
-      allVertexAttribs.forEach((attribName)=> {
+      allVertexAttribs.forEach(attribName => {
         let thisLength = this._vertices[attribName].length;
-        let geomLength =  geometry._vertices[attribName].length;
+        let geomLength = geometry._vertices[attribName].length;
 
         let float32array = typedArrayDic[attribName];
 
@@ -9352,13 +9507,16 @@ return mat4(
 
         this._vertices[attribName] = float32array;
 
-        if (typeof this._vboObj[attribName] !== 'undefined') {
+        if (typeof this._vboObj[attribName] !== "undefined") {
           gl.bindBuffer(gl.ARRAY_BUFFER, this._vboObj[attribName]);
-          gl.bufferData(gl.ARRAY_BUFFER, this._vertices[attribName], this._performanceHint);
+          gl.bufferData(
+            gl.ARRAY_BUFFER,
+            this._vertices[attribName],
+            this._performanceHint
+          );
           gl.bindBuffer(gl.ARRAY_BUFFER, null);
         }
       });
-
 
       for (let i = 0; i < this._indicesArray.length; i++) {
         let len = geometry._indicesArray[i].length;
@@ -9367,12 +9525,14 @@ return mat4(
           this._indicesArray[i].push(baseLen + idx);
         }
         if (this._materials[i]) {
-          this._materials[i].setVertexN(this, this._materials[i].getVertexN(geometry));
+          this._materials[i].setVertexN(
+            this,
+            this._materials[i].getVertexN(geometry)
+          );
         }
       }
       this._vertexN += geometry._vertexN;
     }
-
 
     set materials(materials) {
       this._materials = materials;
@@ -9397,7 +9557,7 @@ return mat4(
     isTransparent(mesh) {
       let materials = this._getAppropriateMaterials(mesh);
       let isTransparent = false;
-      materials.forEach((material)=>{
+      materials.forEach(material => {
         if (material.isTransparent()) {
           isTransparent = true;
         }
@@ -9406,7 +9566,7 @@ return mat4(
     }
 
     get AABB() {
-      return this._AABB;//.clone();
+      return this._AABB; //.clone();
     }
 
     get rawAABB() {
@@ -9421,7 +9581,7 @@ return mat4(
       let gl = this._glContext.gl;
       let materials = this._getAppropriateMaterials(mesh);
       let count = 0;
-      for (let i=0; i<materials.length;i++) {
+      for (let i = 0; i < materials.length; i++) {
         let material = materials[i];
         if (this._primitiveType === gl.TRIANGLES) {
           if (this.isIndexed()) {
@@ -9455,16 +9615,26 @@ return mat4(
 
       const positionElementNumPerVertex = this._vertices.components.position;
       let incrementNum = 3; // gl.TRIANGLES
-      if (this._primitiveType === GLBoost$1.TRIANGLE_STRIP) { // gl.TRIANGLE_STRIP
+      if (this._primitiveType === GLBoost$1.TRIANGLE_STRIP) {
+        // gl.TRIANGLE_STRIP
         incrementNum = 1;
       }
       if (!this._indicesArray) {
-        for (let i=0; i<vertexNum; i++) {
+        for (let i = 0; i < vertexNum; i++) {
           const j = i * incrementNum;
           let pos0IndexBase = j * positionElementNumPerVertex;
           let pos1IndexBase = (j + 1) * positionElementNumPerVertex;
           let pos2IndexBase = (j + 2) * positionElementNumPerVertex;
-          const result = this._rayCastInner(origVec3, dirVec3, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable);
+          const result = this._rayCastInner(
+            origVec3,
+            dirVec3,
+            j,
+            pos0IndexBase,
+            pos1IndexBase,
+            pos2IndexBase,
+            isFrontFacePickable,
+            isBackFacePickable
+          );
           if (result === null) {
             continue;
           }
@@ -9475,18 +9645,29 @@ return mat4(
           }
         }
       } else {
-        for (let i=0; i<this._indicesArray.length; i++) {
+        for (let i = 0; i < this._indicesArray.length; i++) {
           let vertexIndices = this._indicesArray[i];
-          for (let j=0; j<vertexIndices.length; j++) {
+          for (let j = 0; j < vertexIndices.length; j++) {
             const k = j * incrementNum;
-            let pos0IndexBase = vertexIndices[k    ] * positionElementNumPerVertex;
-            let pos1IndexBase = vertexIndices[k + 1] * positionElementNumPerVertex;
-            let pos2IndexBase = vertexIndices[k + 2] * positionElementNumPerVertex;
+            let pos0IndexBase = vertexIndices[k] * positionElementNumPerVertex;
+            let pos1IndexBase =
+              vertexIndices[k + 1] * positionElementNumPerVertex;
+            let pos2IndexBase =
+              vertexIndices[k + 2] * positionElementNumPerVertex;
 
             if (vertexIndices[k + 2] === void 0) {
               break;
             }
-            const result = this._rayCastInner(origVec3, dirVec3, vertexIndices[k], pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable);
+            const result = this._rayCastInner(
+              origVec3,
+              dirVec3,
+              vertexIndices[k],
+              pos0IndexBase,
+              pos1IndexBase,
+              pos2IndexBase,
+              isFrontFacePickable,
+              isBackFacePickable
+            );
             if (result === null) {
               continue;
             }
@@ -9498,41 +9679,59 @@ return mat4(
           }
         }
       }
-    
+
       return [currentShortestIntersectedPosVec3, currentShortestT];
     }
 
-    _rayCastInner(origVec3, dirVec3, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, isFrontFacePickable, isBackFacePickable) {
+    _rayCastInner(
+      origVec3,
+      dirVec3,
+      i,
+      pos0IndexBase,
+      pos1IndexBase,
+      pos2IndexBase,
+      isFrontFacePickable,
+      isBackFacePickable,
+      dotThreshold = 0
+    ) {
       if (!this._vertices.arenberg3rdPosition[i]) {
         return null;
       }
 
       const faceNormal = this._vertices.faceNormal[i];
-      if (faceNormal.dotProduct(dirVec3) < 0 && !isFrontFacePickable) { // ---> <---
+      if (faceNormal.dotProduct(dirVec3) < dotThreshold && !isFrontFacePickable) {
+        // ---> <---
         return null;
       }
-      if (faceNormal.dotProduct(dirVec3) > 0 && !isBackFacePickable) { // ---> --->
+      if (faceNormal.dotProduct(dirVec3) > -dotThreshold && !isBackFacePickable) {
+        // ---> --->
         return null;
       }
-      
 
-      const vec3 = Vector3.subtract(origVec3, this._vertices.arenberg3rdPosition[i]);
-      const convertedOrigVec3 = this._vertices.inverseArenbergMatrix[i].multiplyVector(vec3);
-      const convertedDirVec3 = this._vertices.inverseArenbergMatrix[i].multiplyVector(dirVec3);
+      const vec3 = Vector3.subtract(
+        origVec3,
+        this._vertices.arenberg3rdPosition[i]
+      );
+      const convertedOrigVec3 = this._vertices.inverseArenbergMatrix[
+        i
+      ].multiplyVector(vec3);
+      const convertedDirVec3 = this._vertices.inverseArenbergMatrix[
+        i
+      ].multiplyVector(dirVec3);
 
-      if (convertedDirVec3.z >= -(1e-6) && convertedDirVec3.z <= (1e-6)) {
+      if (convertedDirVec3.z >= -1e-6 && convertedDirVec3.z <= 1e-6) {
         return null;
       }
 
       const t = -convertedOrigVec3.z / convertedDirVec3.z;
-      
-      if(t <= (1e-5)) {
+
+      if (t <= 1e-5) {
         return null;
       }
 
       const u = convertedOrigVec3.x + t * convertedDirVec3.x;
       const v = convertedOrigVec3.y + t * convertedDirVec3.y;
-      if (u < 0.0 || v < 0.0 || (u + v) > 1.0) {
+      if (u < 0.0 || v < 0.0 || u + v > 1.0) {
         return null;
       }
 
@@ -9556,7 +9755,6 @@ return mat4(
         this._vertices.position[pos2IndexBase + 2]
       );
 
-
       const pos0 = Vector3.multiply(pos0Vec3, u);
       const pos1 = Vector3.multiply(pos1Vec3, v);
       const pos2 = Vector3.multiply(pos2Vec3, fDat);
@@ -9566,45 +9764,65 @@ return mat4(
     }
 
     _calcArenbergInverseMatrices(primitiveType) {
-
       const positionElementNumPerVertex = this._vertices.components.position;
 
       let incrementNum = 3; // gl.TRIANGLES
-      if (primitiveType === GLBoost$1.TRIANGLE_STRIP) { // gl.TRIANGLE_STRIP
+      if (primitiveType === GLBoost$1.TRIANGLE_STRIP) {
+        // gl.TRIANGLE_STRIP
         incrementNum = 1;
       }
       this._vertices.inverseArenbergMatrix = [];
       this._vertices.arenberg3rdPosition = [];
       this._vertices.faceNormal = [];
       if (!this._indicesArray) {
-        for (let i=0; i<this._vertexN-2; i+=incrementNum) {
+        for (let i = 0; i < this._vertexN - 2; i += incrementNum) {
           let pos0IndexBase = i * positionElementNumPerVertex;
           let pos1IndexBase = (i + 1) * positionElementNumPerVertex;
           let pos2IndexBase = (i + 2) * positionElementNumPerVertex;
 
-          this._calcArenbergMatrixFor3Vertices(null, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
-
+          this._calcArenbergMatrixFor3Vertices(
+            null,
+            i,
+            pos0IndexBase,
+            pos1IndexBase,
+            pos2IndexBase,
+            incrementNum
+          );
         }
       } else {
-        for (let i=0; i<this._indicesArray.length; i++) {
+        for (let i = 0; i < this._indicesArray.length; i++) {
           let vertexIndices = this._indicesArray[i];
-          for (let j=0; j<vertexIndices.length-2; j+=incrementNum) {
-            let pos0IndexBase = vertexIndices[j    ] * positionElementNumPerVertex;
-            let pos1IndexBase = vertexIndices[j + 1] * positionElementNumPerVertex;
-            let pos2IndexBase = vertexIndices[j + 2] * positionElementNumPerVertex;
+          for (let j = 0; j < vertexIndices.length - 2; j += incrementNum) {
+            let pos0IndexBase = vertexIndices[j] * positionElementNumPerVertex;
+            let pos1IndexBase =
+              vertexIndices[j + 1] * positionElementNumPerVertex;
+            let pos2IndexBase =
+              vertexIndices[j + 2] * positionElementNumPerVertex;
 
             if (vertexIndices[j + 2] === void 0) {
               break;
             }
-            this._calcArenbergMatrixFor3Vertices(vertexIndices, j, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum);
-
+            this._calcArenbergMatrixFor3Vertices(
+              vertexIndices,
+              j,
+              pos0IndexBase,
+              pos1IndexBase,
+              pos2IndexBase,
+              incrementNum
+            );
           }
         }
       }
-
     }
 
-    _calcArenbergMatrixFor3Vertices(vertexIndices, i, pos0IndexBase, pos1IndexBase, pos2IndexBase, incrementNum) {
+    _calcArenbergMatrixFor3Vertices(
+      vertexIndices,
+      i,
+      pos0IndexBase,
+      pos1IndexBase,
+      pos2IndexBase,
+      incrementNum
+    ) {
       const pos0Vec3 = new Vector3(
         this._vertices.position[pos0IndexBase],
         this._vertices.position[pos0IndexBase + 1],
@@ -9643,29 +9861,35 @@ return mat4(
       nz *= da;
 
       const arenbergMatrix = new Matrix33(
-        pos0Vec3.x - pos2Vec3.x, pos1Vec3.x - pos2Vec3.x, nx - pos2Vec3.x,
-        pos0Vec3.y - pos2Vec3.y, pos1Vec3.y - pos2Vec3.y, ny - pos2Vec3.y,
-        pos0Vec3.z - pos2Vec3.z, pos1Vec3.z - pos2Vec3.z, nz - pos2Vec3.z
+        pos0Vec3.x - pos2Vec3.x,
+        pos1Vec3.x - pos2Vec3.x,
+        nx - pos2Vec3.x,
+        pos0Vec3.y - pos2Vec3.y,
+        pos1Vec3.y - pos2Vec3.y,
+        ny - pos2Vec3.y,
+        pos0Vec3.z - pos2Vec3.z,
+        pos1Vec3.z - pos2Vec3.z,
+        nz - pos2Vec3.z
       );
 
       const inverseArenbergMatrix = arenbergMatrix.invert();
 
-
-      let arenberg0IndexBase = (i    );
-      let arenberg1IndexBase = (i + 1);
-      let arenberg2IndexBase = (i + 2);
+      let arenberg0IndexBase = i;
+      let arenberg1IndexBase = i + 1;
+      let arenberg2IndexBase = i + 2;
       if (vertexIndices) {
         arenberg0IndexBase = vertexIndices[i];
         arenberg1IndexBase = vertexIndices[i + 1];
         arenberg2IndexBase = vertexIndices[i + 2];
       }
 
-  //    const triangleIdx = i/incrementNum;
-      this._vertices.inverseArenbergMatrix[arenberg0IndexBase] = inverseArenbergMatrix;
+      //    const triangleIdx = i/incrementNum;
+      this._vertices.inverseArenbergMatrix[
+        arenberg0IndexBase
+      ] = inverseArenbergMatrix;
       this._vertices.arenberg3rdPosition[arenberg0IndexBase] = pos2Vec3;
       this._vertices.faceNormal[arenberg0IndexBase] = new Vector3(nx, ny, nz);
     }
-
   }
   Geometry._vaoDic = {};
   Geometry._iboArrayDic = {};
@@ -11807,7 +12031,9 @@ albedo.rgb *= (1.0 - metallic);
       super(glBoostContext, toRegister);
 
       if (this.constructor === L_AbstractCamera) {
-        throw new TypeError('Cannot construct AbstractCamera instances directly.');
+        throw new TypeError(
+          "Cannot construct AbstractCamera instances directly."
+        );
       }
 
       this._translate = lookat.eye;
@@ -11816,7 +12042,6 @@ albedo.rgb *= (1.0 - metallic);
       this._up = lookat.up;
       this._upInner = lookat.up;
       this._centerInner = this._up.clone();
-
 
       this._cameraController = null;
 
@@ -11838,8 +12063,17 @@ albedo.rgb *= (1.0 - metallic);
       return this._cameraController;
     }
 
+    removeCameraController(controller) {
+      this._cameraController = void 0;
+      if (this._middleLevelCamera !== null) {
+        controller.removeCamera(this._middleLevelCamera);
+      } else {
+        controller.removeCamera(this);
+      }
+    }
+
     _affectedByCameraController() {
-      if (this._cameraController !== null) {
+      if (this._cameraController != null) {
         let results = this._cameraController.convert(this);
         this._translateInner = results[0];
         this._centerInner = results[1];
@@ -11868,7 +12102,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     _needUpdateView(withTryingResetOfCameraController = true) {
-      if (this._cameraController !== null && withTryingResetOfCameraController) {
+      if (this._cameraController != null && withTryingResetOfCameraController) {
         this._cameraController.tryReset();
       }
       this._dirtyView = true;
@@ -11877,7 +12111,11 @@ albedo.rgb *= (1.0 - metallic);
     lookAtRHMatrix() {
       if (this._dirtyView) {
         this._affectedByCameraController();
-        this._viewMatrix = L_AbstractCamera.lookAtRHMatrix(this.translateInner, this.centerInner, this.upInner);
+        this._viewMatrix = L_AbstractCamera.lookAtRHMatrix(
+          this.translateInner,
+          this.centerInner,
+          this.upInner
+        );
         this._dirtyView = false;
         return this._viewMatrix.clone();
       } else {
@@ -11886,15 +12124,28 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     static lookAtRHMatrix(eye, center, up) {
-
       var f = Vector3.normalize(Vector3.subtract(center, eye));
       var s = Vector3.normalize(Vector3.cross(f, up));
       var u = Vector3.cross(s, f);
 
-      return new Matrix44$1(s.x, s.y, s.z, -Vector3.dotProduct(s,eye),
-        u.x, u.y, u.z, -Vector3.dotProduct(u,eye),
-        -f.x, -f.y, -f.z, Vector3.dotProduct(f,eye),
-        0, 0, 0, 1);
+      return new Matrix44$1(
+        s.x,
+        s.y,
+        s.z,
+        -Vector3.dotProduct(s, eye),
+        u.x,
+        u.y,
+        u.z,
+        -Vector3.dotProduct(u, eye),
+        -f.x,
+        -f.y,
+        -f.z,
+        Vector3.dotProduct(f, eye),
+        0,
+        0,
+        0,
+        1
+      );
     }
 
     setAsMainCamera(scene) {
@@ -11973,21 +12224,21 @@ albedo.rgb *= (1.0 - metallic);
 
     get allInfoExceptInnerData() {
       const info = {};
-      
+
       info.translate = this.translate;
       info.center = this.center;
       info.up = this.up;
-      
+
       return info;
     }
 
     get allInfoAsInnerData() {
       const info = {};
-      
+
       info.translate = this.translateInner;
       info.center = this.centerInner;
       info.up = this.upInner;
-      
+
       return info;
     }
 
@@ -12009,12 +12260,16 @@ albedo.rgb *= (1.0 - metallic);
       if (typeof arg === "string") {
         json = JSON.parse(arg);
       }
-      for(let key in json) {
-        if(json.hasOwnProperty(key) && key in this) {
+      for (let key in json) {
+        if (json.hasOwnProperty(key) && key in this) {
           if (key === "quaternion") {
-            this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToQuaternion(json[key]));
+            this[key] = MathClassUtil.cloneOfMathObjects(
+              MathClassUtil.arrayToQuaternion(json[key])
+            );
           } else {
-            this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToVectorOrMatrix(json[key]));
+            this[key] = MathClassUtil.cloneOfMathObjects(
+              MathClassUtil.arrayToVectorOrMatrix(json[key])
+            );
           }
         }
       }
@@ -12063,7 +12318,12 @@ albedo.rgb *= (1.0 - metallic);
 
     projectionRHMatrix() {
       if (this._dirtyProjection) {
-        this._projectionMatrix = L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNearInner, this._zFarInner);
+        this._projectionMatrix = L_PerspectiveCamera.perspectiveRHMatrix(
+          this._fovy,
+          this._aspect,
+          this._zNearInner,
+          this._zFarInner
+        );
         this._dirtyProjection = false;
         return this._projectionMatrix.clone();
       } else {
@@ -12071,24 +12331,53 @@ albedo.rgb *= (1.0 - metallic);
       }
     }
 
-    static perspectiveRHMatrix(fovy        , aspect        , zNear        , zFar        ) {
-
-      var yscale = 1.0 / Math.tan(0.5*fovy*Math.PI/180);
+    static perspectiveRHMatrix(
+      fovy        ,
+      aspect        ,
+      zNear        ,
+      zFar        
+    ) {
+      var yscale = 1.0 / Math.tan((0.5 * fovy * Math.PI) / 180);
       var xscale = yscale / aspect;
 
       if (zFar) {
         return new Matrix44$1(
-          xscale, 0.0, 0.0, 0.0,
-          0.0, yscale, 0.0, 0.0,
-          0.0, 0.0, - (zFar + zNear) / (zFar - zNear), - (2.0 * zFar * zNear) / (zFar - zNear),
-          0.0, 0.0, -1.0, 0.0
+          xscale,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          yscale,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -(zFar + zNear) / (zFar - zNear),
+          -(2.0 * zFar * zNear) / (zFar - zNear),
+          0.0,
+          0.0,
+          -1.0,
+          0.0
         );
       } else {
         return new Matrix44$1(
-          xscale, 0.0, 0.0, 0.0,
-          0.0, yscale, 0.0, 0.0,
-          0.0, 0.0, -1,0, -2*zNear,
-          0.0, 0.0, -1.0, 0.0
+          xscale,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          yscale,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          -1,
+          0,
+          -2 * zNear,
+          0.0,
+          0.0,
+          -1.0,
+          0.0
         );
       }
 
@@ -12146,9 +12435,14 @@ albedo.rgb *= (1.0 - metallic);
 
     get left() {
       if (this._xscale != null) {
-        L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNearInner, this._zFarInner);
+        L_PerspectiveCamera.perspectiveRHMatrix(
+          this._fovy,
+          this._aspect,
+          this._zNearInner,
+          this._zFarInner
+        );
       }
-      return -this._zNear/this._xscale;
+      return -this._zNear / this._xscale;
     }
 
     get right() {
@@ -12159,11 +12453,22 @@ albedo.rgb *= (1.0 - metallic);
       return -this.bottom;
     }
 
+    set left(value) {}
+    set top(value) {}
+    set right(value) {}
+    set top(value) {}
+    set bottom(value) {}
+
     get bottom() {
       if (this._xscale != null) {
-        L_PerspectiveCamera.perspectiveRHMatrix(this._fovy, this._aspect, this._zNearInner, this._zFarInner);
+        L_PerspectiveCamera.perspectiveRHMatrix(
+          this._fovy,
+          this._aspect,
+          this._zNearInner,
+          this._zFarInner
+        );
       }
-      return this._zNear/this._yscale;
+      return this._zNear / this._yscale;
     }
 
     get allInfo() {
@@ -12189,7 +12494,7 @@ albedo.rgb *= (1.0 - metallic);
 
       return info;
     }
-    
+
     get allInfoAsInnerData() {
       const info = super.allInfoAsInnerData;
 
@@ -12621,7 +12926,9 @@ albedo.rgb *= (1.0 - metallic);
       super(glBoostContext, toRegister);
 
       if (this.constructor === M_AbstractCamera) {
-        throw new TypeError('Cannot construct M_AbstractCamera instances directly.');
+        throw new TypeError(
+          "Cannot construct M_AbstractCamera instances directly."
+        );
       }
 
       this._lowLevelCamera = null;
@@ -12639,6 +12946,10 @@ albedo.rgb *= (1.0 - metallic);
       return this._lowLevelCamera.cameraController;
     }
 
+    removeCameraController(controller) {
+      this._lowLevelCamera.removeCameraController(controller);
+    }
+
     _needUpdateView() {
       this._lowLevelCamera._needUpdateView();
       this._updateCountAsCameraView++;
@@ -12650,7 +12961,7 @@ albedo.rgb *= (1.0 - metallic);
 
     get latestViewStateInfoString() {
       var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-      tempString += '_updateCountAsCameraView_' + this._updateCountAsCameraView;
+      tempString += "_updateCountAsCameraView_" + this._updateCountAsCameraView;
 
       return tempString;
     }
@@ -12738,10 +13049,9 @@ albedo.rgb *= (1.0 - metallic);
     set allInfo(info) {
       this._lowLevelCamera.allInfo = info;
     }
-
   }
 
-  GLBoost$1['M_AbstractCamera'] = M_AbstractCamera;
+  GLBoost$1["M_AbstractCamera"] = M_AbstractCamera;
 
   class L_CameraController extends GLBoostObject {
     constructor(
@@ -13283,6 +13593,10 @@ albedo.rgb *= (1.0 - metallic);
       this._camaras.add(camera);
     }
 
+    removeCamera(camera) {
+      this._camaras.delete(camera);
+    }
+
     set target(object) {
       this._target = object;
       this.updateTargeting();
@@ -13389,15 +13703,17 @@ albedo.rgb *= (1.0 - metallic);
   GLBoost$1["L_CameraController"] = L_CameraController;
 
   class L_WalkThroughCameraController extends GLBoostObject {
-    constructor(glBoostContext, options = {
-      eventTargetDom: document,
-      horizontalSpeed: 1,
-      turnSpeed: 5,
-      mouseWheelSpeedScale: 0.3,
-      inverseVirticalRotating: false,
-      inverseHorizontalRotating: false
-    })
-    {
+    constructor(
+      glBoostContext,
+      options = {
+        eventTargetDom: document,
+        horizontalSpeed: 1,
+        turnSpeed: 5,
+        mouseWheelSpeedScale: 0.3,
+        inverseVirticalRotating: false,
+        inverseHorizontalRotating: false
+      }
+    ) {
       super(glBoostContext);
 
       this._camaras = new Set();
@@ -13407,18 +13723,18 @@ albedo.rgb *= (1.0 - metallic);
       this._turnSpeed = options.turnSpeed;
       this._mouseWheelSpeedScale = options.mouseWheelSpeedScale;
       this._inverseVirticalRotating = options.inverseVirticalRotating;
-      this._inverseHorizontalRotating = options.inverseHorizontalRotating; 
+      this._inverseHorizontalRotating = options.inverseHorizontalRotating;
 
       this.reset();
 
-      this._onKeydown = (e)=> {
+      this._onKeydown = e => {
         this._isKeyDown = true;
         this._lastKeyCode = e.keyCode;
 
         this.updateCamera();
       };
 
-      this._onKeyup = (e)=> {
+      this._onKeyup = e => {
         this._isKeyDown = false;
         this._lastKeyCode = null;
       };
@@ -13429,7 +13745,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     updateCamera() {
-      this._camaras.forEach(function (camera) {
+      this._camaras.forEach(function(camera) {
         camera._needUpdateView(false);
         camera._needUpdateProjection();
       });
@@ -13437,42 +13753,68 @@ albedo.rgb *= (1.0 - metallic);
 
     registerEventListeners(eventTargetDom = document) {
       if (eventTargetDom) {
-        document.addEventListener('keydown', this._onKeydown);
-        document.addEventListener('keyup', this._onKeyup);
+        document.addEventListener("keydown", this._onKeydown);
+        document.addEventListener("keyup", this._onKeyup);
 
-        if ('ontouchend' in document) {
-          eventTargetDom.addEventListener('touchstart', this._mouseDown.bind(this));
-          document.addEventListener('touchend', this._mouseUp.bind(this));
-          eventTargetDom.addEventListener('touchmove', this._mouseMove.bind(this));          
+        if ("ontouchend" in document) {
+          eventTargetDom.addEventListener(
+            "touchstart",
+            this._mouseDown.bind(this)
+          );
+          document.addEventListener("touchend", this._mouseUp.bind(this));
+          eventTargetDom.addEventListener(
+            "touchmove",
+            this._mouseMove.bind(this)
+          );
         }
-        if ('onmouseup' in document) {
-          eventTargetDom.addEventListener('mousedown', this._mouseDown.bind(this));
-          document.addEventListener('mouseup', this._mouseUp.bind(this));
-          eventTargetDom.addEventListener('mousemove', this._mouseMove.bind(this));          
+        if ("onmouseup" in document) {
+          eventTargetDom.addEventListener(
+            "mousedown",
+            this._mouseDown.bind(this)
+          );
+          document.addEventListener("mouseup", this._mouseUp.bind(this));
+          eventTargetDom.addEventListener(
+            "mousemove",
+            this._mouseMove.bind(this)
+          );
         }
         if (window.WheelEvent) {
-          eventTargetDom.addEventListener('wheel', this._mouseWheel.bind(this));
+          eventTargetDom.addEventListener("wheel", this._mouseWheel.bind(this));
         }
       }
     }
 
     unregisterEventListeners(eventTargetDom = document) {
       if (eventTargetDom) {
-        document.removeEventListener('keydown', this._onKeydown);
-        document.removeEventListener('keyup', this._onKeyup);
-        
-        if ('ontouchend' in document) {
-          eventTargetDom.removeEventListener('touchstart', this._mouseDown.bind(this));
-          document.removeEventListener('touchend', this._mouseUp.bind(this));
-          eventTargetDom.removeEventListener('touchmove', this._mouseMove).bind(this);          
+        document.removeEventListener("keydown", this._onKeydown);
+        document.removeEventListener("keyup", this._onKeyup);
+
+        if ("ontouchend" in document) {
+          eventTargetDom.removeEventListener(
+            "touchstart",
+            this._mouseDown.bind(this)
+          );
+          document.removeEventListener("touchend", this._mouseUp.bind(this));
+          eventTargetDom
+            .removeEventListener("touchmove", this._mouseMove)
+            .bind(this);
         }
-        if ('onmouseup' in document) {
-          eventTargetDom.removeEventListener('mousedown', this._mouseDown.bind(this));
-          document.removeEventListener('mouseup', this._mouseUp.bind(this));
-          eventTargetDom.removeEventListener('mousemove', this._mouseMove.bind(this));          
+        if ("onmouseup" in document) {
+          eventTargetDom.removeEventListener(
+            "mousedown",
+            this._mouseDown.bind(this)
+          );
+          document.removeEventListener("mouseup", this._mouseUp.bind(this));
+          eventTargetDom.removeEventListener(
+            "mousemove",
+            this._mouseMove.bind(this)
+          );
         }
         if (window.WheelEvent) {
-          eventTargetDom.removeEventListener('wheel', this._mouseWheel.bind(this));
+          eventTargetDom.removeEventListener(
+            "wheel",
+            this._mouseWheel.bind(this)
+          );
         }
       }
     }
@@ -13482,7 +13824,11 @@ albedo.rgb *= (1.0 - metallic);
         return;
       }
       const delta = e.wheelDelta * this._mouseWheelSpeedScale;
-      const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
+      const horizontalDir = new Vector3(
+        this._currentDir.x,
+        0,
+        this._currentDir.z
+      ).normalize();
       this._currentPos.add(Vector3.multiply(horizontalDir, delta));
       this._currentCenter.add(Vector3.multiply(horizontalDir, delta));
     }
@@ -13510,13 +13856,13 @@ albedo.rgb *= (1.0 - metallic);
       this._draggedMouseXOnCanvas = evt.clientX - rect.left;
       this._draggedMouseYOnCanvas = evt.clientY - rect.top;
 
-      this._deltaMouseXOnCanvas = this._draggedMouseXOnCanvas - this._clickedMouseXOnCanvas;
-      this._deltaMouseYOnCanvas = this._draggedMouseYOnCanvas - this._clickedMouseYOnCanvas;
+      this._deltaMouseXOnCanvas =
+        this._draggedMouseXOnCanvas - this._clickedMouseXOnCanvas;
+      this._deltaMouseYOnCanvas =
+        this._draggedMouseYOnCanvas - this._clickedMouseYOnCanvas;
 
-      
       this._isMouseDrag = true;
       this.updateCamera();
-
     }
 
     _mouseUp(evt) {
@@ -13526,12 +13872,9 @@ albedo.rgb *= (1.0 - metallic);
       let rect = evt.target.getBoundingClientRect();
       this._clickedMouseXOnCanvas = evt.clientX - rect.left;
       this._clickedMouseYOnCanvas = evt.clientY - rect.top;
-      
     }
 
-    tryReset() {
-
-    }
+    tryReset() {}
 
     reset() {
       this._isKeyDown = false;
@@ -13551,13 +13894,17 @@ albedo.rgb *= (1.0 - metallic);
       this._deltaX = 0;
       this._newDir = Vector3.zero();
 
-      this._camaras.forEach(function (camera) {
+      this._camaras.forEach(function(camera) {
         camera._needUpdateView(false);
       });
     }
 
     addCamera(camera) {
       this._camaras.add(camera);
+    }
+
+    removeCamera(camera) {
+      this._camaras.delete(camera);
     }
 
     convert(camera) {
@@ -13568,7 +13915,10 @@ albedo.rgb *= (1.0 - metallic);
         this._currentCenter = camera.center.clone();
       }
       if (this._currentDir === null) {
-        this._currentDir = Vector3.subtract(camera.center, camera.eye).normalize();
+        this._currentDir = Vector3.subtract(
+          camera.center,
+          camera.eye
+        ).normalize();
       }
 
       let newEyeToCenter = null;
@@ -13579,68 +13929,104 @@ albedo.rgb *= (1.0 - metallic);
       this._newDir.z = this._currentDir.z * (1 - t);
       this._newDir.normalize();
 
-      switch(this._lastKeyCode) {
+      switch (this._lastKeyCode) {
         case 87: // w key
         case 38: // arrow upper key
-        {
-          const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
-          this._currentPos.add(Vector3.multiply(horizontalDir, this._horizontalSpeed));
-          this._currentCenter.add(Vector3.multiply(horizontalDir, this._horizontalSpeed));
-        }
-        break;
+          {
+            const horizontalDir = new Vector3(
+              this._currentDir.x,
+              0,
+              this._currentDir.z
+            ).normalize();
+            this._currentPos.add(
+              Vector3.multiply(horizontalDir, this._horizontalSpeed)
+            );
+            this._currentCenter.add(
+              Vector3.multiply(horizontalDir, this._horizontalSpeed)
+            );
+          }
+          break;
         case 65: // a key
         case 37: // arrow left key
-        {
-          const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
-          const leftDir = Matrix33.rotateY(90).multiplyVector(horizontalDir);
-          this._currentPos.add(Vector3.multiply(leftDir, this._horizontalSpeed));
-          this._currentCenter.add(Vector3.multiply(leftDir, this._horizontalSpeed));
-        }
-      break;
+          {
+            const horizontalDir = new Vector3(
+              this._currentDir.x,
+              0,
+              this._currentDir.z
+            ).normalize();
+            const leftDir = Matrix33.rotateY(90).multiplyVector(horizontalDir);
+            this._currentPos.add(
+              Vector3.multiply(leftDir, this._horizontalSpeed)
+            );
+            this._currentCenter.add(
+              Vector3.multiply(leftDir, this._horizontalSpeed)
+            );
+          }
+          break;
         case 83: // s key
         case 40: // arrow down key
-        {
-          const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
-          this._currentPos.add(Vector3.multiply(horizontalDir, -this._horizontalSpeed));
-          this._currentCenter.add(Vector3.multiply(horizontalDir, -this._horizontalSpeed));
-        }
-        break;
+          {
+            const horizontalDir = new Vector3(
+              this._currentDir.x,
+              0,
+              this._currentDir.z
+            ).normalize();
+            this._currentPos.add(
+              Vector3.multiply(horizontalDir, -this._horizontalSpeed)
+            );
+            this._currentCenter.add(
+              Vector3.multiply(horizontalDir, -this._horizontalSpeed)
+            );
+          }
+          break;
         case 68: // d key
         case 39: // arrow right key
-        {
-          const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
-          const rightDir = Matrix33.rotateY(-90).multiplyVector(horizontalDir);
-          this._currentPos.add(Vector3.multiply(rightDir, this._horizontalSpeed));
-          this._currentCenter.add(Vector3.multiply(rightDir, this._horizontalSpeed));
-        }
-        break;
+          {
+            const horizontalDir = new Vector3(
+              this._currentDir.x,
+              0,
+              this._currentDir.z
+            ).normalize();
+            const rightDir = Matrix33.rotateY(-90).multiplyVector(horizontalDir);
+            this._currentPos.add(
+              Vector3.multiply(rightDir, this._horizontalSpeed)
+            );
+            this._currentCenter.add(
+              Vector3.multiply(rightDir, this._horizontalSpeed)
+            );
+          }
+          break;
         case 81: // q key
-        {
-          this._currentPos.add(Vector3.multiply(this._newDir, -this._horizontalSpeed));
-          this._currentCenter.add(Vector3.multiply(this._newDir, -this._horizontalSpeed));
-        }
-        break;
+          {
+            this._currentPos.add(
+              Vector3.multiply(this._newDir, -this._horizontalSpeed)
+            );
+            this._currentCenter.add(
+              Vector3.multiply(this._newDir, -this._horizontalSpeed)
+            );
+          }
+          break;
         case 69: // e key
-        {
-          this._currentPos.add(Vector3.multiply(this._newDir, this._horizontalSpeed));
-          this._currentCenter.add(Vector3.multiply(this._newDir, this._horizontalSpeed));
-        }
-        break;
+          {
+            this._currentPos.add(
+              Vector3.multiply(this._newDir, this._horizontalSpeed)
+            );
+            this._currentCenter.add(
+              Vector3.multiply(this._newDir, this._horizontalSpeed)
+            );
+          }
+          break;
         case 82: // r key
           this._currentPos.add(new Vector3(0, this._virticalSpeed, 0));
           this._currentCenter.add(new Vector3(0, this._virticalSpeed, 0));
-        break;
+          break;
         case 70: // f key
           this._currentPos.add(new Vector3(0, -this._virticalSpeed, 0));
           this._currentCenter.add(new Vector3(0, -this._virticalSpeed, 0));
-        break;
+          break;
       }
 
-
-
-
       if (this._isMouseDrag) {
-
         if (this._inverseHorizontalRotating) {
           this._deltaX = this._deltaMouseXOnCanvas * this._mouseXAdjustScale;
         } else {
@@ -13653,21 +14039,23 @@ albedo.rgb *= (1.0 - metallic);
         }
         this._deltaY = Math.max(-120, Math.min(50, this._deltaY));
 
+        this._currentDir = Matrix33.rotateY(this._deltaX).multiplyVector(
+          this._currentDir
+        );
 
-        this._currentDir = Matrix33.rotateY(this._deltaX).multiplyVector(this._currentDir);
-
-        newEyeToCenter = Matrix33.rotateY(this._deltaX).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
+        newEyeToCenter = Matrix33.rotateY(this._deltaX).multiplyVector(
+          Vector3.subtract(this._currentCenter, this._currentPos)
+        );
         newEyeToCenter.x = newEyeToCenter.x * (1 - t);
         newEyeToCenter.y = t;
         newEyeToCenter.z = newEyeToCenter.z * (1 - t);
         newEyeToCenter.normalize();
         this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
 
-
         this._clickedMouseXOnCanvas = this._draggedMouseXOnCanvas;
         this._clickedMouseYOnCanvas = this._draggedMouseYOnCanvas;
         this._deltaMouseXOnCanvas = 0;
-        this._deltaMouseYOnCanvas = 0; 
+        this._deltaMouseYOnCanvas = 0;
       }
 
       let newLeft = camera.left;
@@ -13675,17 +14063,25 @@ albedo.rgb *= (1.0 - metallic);
       let newTop = camera.top;
       let newBottom = camera.bottom;
 
-
-
-      return [this._currentPos, this._currentCenter, camera.up.clone(), camera.zNear, camera.zFar, newLeft, newRight, newTop, newBottom];
+      return [
+        this._currentPos,
+        this._currentCenter,
+        camera.up.clone(),
+        camera.zNear,
+        camera.zFar,
+        newLeft,
+        newRight,
+        newTop,
+        newBottom
+      ];
     }
 
     getDirection() {
-      return (this._currentCenter !== null) ? this._newDir.clone() : null;
+      return this._currentCenter !== null ? this._newDir.clone() : null;
     }
 
     set horizontalSpeed(value) {
-      this._horizontalSpeed = value; 
+      this._horizontalSpeed = value;
     }
 
     get horizontalSpeed() {
@@ -13693,7 +14089,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     set virticalSpeed(value) {
-      this._virticalSpeed = value; 
+      this._virticalSpeed = value;
     }
 
     get virticalSpeed() {
@@ -13729,19 +14125,23 @@ albedo.rgb *= (1.0 - metallic);
       if (typeof arg === "string") {
         json = JSON.parse(arg);
       }
-      for(let key in json) {
-        if(json.hasOwnProperty(key) && key in this) {
+      for (let key in json) {
+        if (json.hasOwnProperty(key) && key in this) {
           if (key === "quaternion") {
-            this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToQuaternion(json[key]));
+            this[key] = MathClassUtil.cloneOfMathObjects(
+              MathClassUtil.arrayToQuaternion(json[key])
+            );
           } else {
-            this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToVectorOrMatrix(json[key]));
+            this[key] = MathClassUtil.cloneOfMathObjects(
+              MathClassUtil.arrayToVectorOrMatrix(json[key])
+            );
           }
         }
       }
     }
   }
 
-  GLBoost$1['L_WalkThroughCameraController'] = L_WalkThroughCameraController;
+  GLBoost$1["L_WalkThroughCameraController"] = L_WalkThroughCameraController;
 
   class MutableTexture extends AbstractTexture {
     constructor(glBoostContext, width, height, level = 0,
@@ -15931,7 +16331,13 @@ albedo.rgb *= (1.0 - metallic);
       return this.geometry._getAppropriateMaterials(this);
     }
 
-    rayCast(arg1         , arg2        , camera     , viewport     ) {
+    rayCast(
+      arg1         ,
+      arg2        ,
+      camera     ,
+      viewport     ,
+      dotThreshold         = 0
+    ) {
       let origVecInLocal = null;
       let dirVecInLocal = null;
       if (arg1 instanceof Vector3 && arg2 instanceof Vector3) {
@@ -15996,7 +16402,8 @@ albedo.rgb *= (1.0 - metallic);
         origVecInLocal,
         dirVecInLocal,
         isFrontFacePickable,
-        isBackFacePickable
+        isBackFacePickable,
+        dotThreshold
       );
       let intersectPositionInWorld = null;
       if (result[0]) {
@@ -25755,4 +26162,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-396-gfcc1-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-399-g8a24-mod branch: develop';
