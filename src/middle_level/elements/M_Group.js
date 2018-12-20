@@ -713,7 +713,8 @@ export default class M_Group extends M_Element {
     arg2: number,
     camera: any,
     viewport: any,
-    ignoreInstanceNameList: Array<any>
+    ignoreInstanceNameList: Array<any>,
+    dotThrethold: number = 0
   ) {
     const meshes = this.searchElementsByType(M_Mesh);
     let currentShortestT = Number.MAX_VALUE;
@@ -734,9 +735,9 @@ export default class M_Group extends M_Element {
       }
       let result = null;
       if (arg1 instanceof Vector3 && arg2 instanceof Vector3) {
-        result = mesh.rayCast(arg1, arg2, camera);
+        result = mesh.rayCast(arg1, arg2, camera, dotThrethold);
       } else {
-        result = mesh.rayCast(arg1, arg2, camera, viewport);
+        result = mesh.rayCast(arg1, arg2, camera, viewport, dotThrethold);
       }
       if (result === null) {
         return [null, null];

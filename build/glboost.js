@@ -9609,7 +9609,13 @@ return mat4(
       return count;
     }
 
-    rayCast(origVec3, dirVec3, isFrontFacePickable, isBackFacePickable) {
+    rayCast(
+      origVec3,
+      dirVec3,
+      isFrontFacePickable,
+      isBackFacePickable,
+      dotThreshold
+    ) {
       let currentShortestT = Number.MAX_VALUE;
       let currentShortestIntersectedPosVec3 = null;
 
@@ -9633,7 +9639,8 @@ return mat4(
             pos1IndexBase,
             pos2IndexBase,
             isFrontFacePickable,
-            isBackFacePickable
+            isBackFacePickable,
+            dotThreshold
           );
           if (result === null) {
             continue;
@@ -9666,7 +9673,8 @@ return mat4(
               pos1IndexBase,
               pos2IndexBase,
               isFrontFacePickable,
-              isBackFacePickable
+              isBackFacePickable,
+              dotThreshold
             );
             if (result === null) {
               continue;
@@ -9692,7 +9700,7 @@ return mat4(
       pos2IndexBase,
       isFrontFacePickable,
       isBackFacePickable,
-      dotThreshold = 0
+      dotThreshold
     ) {
       if (!this._vertices.arenberg3rdPosition[i]) {
         return null;
@@ -17374,7 +17382,8 @@ albedo.rgb *= (1.0 - metallic);
       arg2        ,
       camera     ,
       viewport     ,
-      ignoreInstanceNameList            
+      ignoreInstanceNameList            ,
+      dotThrethold         = 0
     ) {
       const meshes = this.searchElementsByType(M_Mesh);
       let currentShortestT = Number.MAX_VALUE;
@@ -17395,9 +17404,9 @@ albedo.rgb *= (1.0 - metallic);
         }
         let result = null;
         if (arg1 instanceof Vector3 && arg2 instanceof Vector3) {
-          result = mesh.rayCast(arg1, arg2, camera);
+          result = mesh.rayCast(arg1, arg2, camera, dotThrethold);
         } else {
-          result = mesh.rayCast(arg1, arg2, camera, viewport);
+          result = mesh.rayCast(arg1, arg2, camera, viewport, dotThrethold);
         }
         if (result === null) {
           return [null, null];
@@ -26162,4 +26171,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-399-g8a24-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-400-g7b66-mod branch: develop';

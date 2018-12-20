@@ -304,7 +304,13 @@ export default class M_Mesh extends M_Element {
     return this.geometry._getAppropriateMaterials(this);
   }
 
-  rayCast(arg1: Vector3, arg2: number, camera: any, viewport: any) {
+  rayCast(
+    arg1: Vector3,
+    arg2: number,
+    camera: any,
+    viewport: any,
+    dotThreshold: number = 0
+  ) {
     let origVecInLocal = null;
     let dirVecInLocal = null;
     if (arg1 instanceof Vector3 && arg2 instanceof Vector3) {
@@ -369,7 +375,8 @@ export default class M_Mesh extends M_Element {
       origVecInLocal,
       dirVecInLocal,
       isFrontFacePickable,
-      isBackFacePickable
+      isBackFacePickable,
+      dotThreshold
     );
     let intersectPositionInWorld = null;
     if (result[0]) {
