@@ -183,10 +183,10 @@ export default class TransformComponent extends Component {
   }
 
   get quaternion() {
-    return this.guaternionInner.clone();
+    return this.quaternionInner.clone();
   }
 
-  get guaternionInner(): Quaternion {
+  get quaternionInner(): Quaternion {
     if (this._is_quaternion_updated) {
       return this._quaternion;
     } else if (!this._is_quaternion_updated) {
