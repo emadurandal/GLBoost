@@ -25956,6 +25956,11 @@ albedo.rgb *= (1.0 - metallic);
 
       if (json.extensions && json.extensions.Effekseer) {
         const ext = json.extensions.Effekseer;
+
+        let effekseerBasePath = json.asset.extras.basePath;
+        if (effekseerBasePath == null) {
+          effekseerBasePath = ext.basePath;
+        }
         for (let effect of ext.effects) {
           const group = rootGroup.searchElement(effect.nodeName, {
             type: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME,
@@ -25963,7 +25968,7 @@ albedo.rgb *= (1.0 - metallic);
           });
           const effekseerElm = glBoostContext.createEffekseerElement();
           const promise = effekseerElm.load(
-            json.asset.extras.basePath + effect.efkName + ".efk",
+            effekseerBasePath + effect.efkName + ".efk",
             true,
             true
           );
@@ -26171,4 +26176,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-400-g7b66-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-402-g1e3f-mod branch: develop';

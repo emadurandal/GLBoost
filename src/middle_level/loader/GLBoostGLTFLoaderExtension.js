@@ -135,6 +135,11 @@ export default class GLBoostGLTFLoaderExtension {
 
     if (json.extensions && json.extensions.Effekseer) {
       const ext = json.extensions.Effekseer;
+
+      let effekseerBasePath = json.asset.extras.basePath;
+      if (effekseerBasePath == null) {
+        effekseerBasePath = ext.basePath;
+      }
       for (let effect of ext.effects) {
         const group = rootGroup.searchElement(effect.nodeName, {
           type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME,
@@ -142,7 +147,7 @@ export default class GLBoostGLTFLoaderExtension {
         });
         const effekseerElm = glBoostContext.createEffekseerElement();
         const promise = effekseerElm.load(
-          json.asset.extras.basePath + effect.efkName + ".efk",
+          effekseerBasePath + effect.efkName + ".efk",
           true,
           true
         );
