@@ -756,7 +756,8 @@ export default class Geometry extends GLBoostObject {
       viewport: data.viewport,
       isWebVRMode: data.isWebVRMode,
       webvrFrameData: data.webvrFrameData,
-      forceThisMaterial: data.forceThisMaterial
+      forceThisMaterial: data.forceThisMaterial,
+      isOutlineMode: data.isOutlineMode
     });
   }
 

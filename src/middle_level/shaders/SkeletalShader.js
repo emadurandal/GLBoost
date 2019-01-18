@@ -1,34 +1,34 @@
 // @flow
 
-import GLBoost from '../../globals';
-import Shader from '../../low_level/shaders/Shader';
+import GLBoost from "../../globals";
+import Shader from "../../low_level/shaders/Shader";
 
 export default class SkeletalShaderSource {
-
   VSDefine_SkeletalShaderSource(in_, out_, f, lights, material, extraData) {
-    var shaderText = '';
+    var shaderText = "";
     shaderText += `${in_} vec4 aVertex_joint;\n`;
     shaderText += `${in_} vec4 aVertex_weight;\n`;
 
     if (!GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
-      shaderText += 'uniform mat4 skinTransformMatrices[' + extraData.jointN  + '];\n';
-    } else if (GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1){
-      shaderText += 'uniform vec4 quatArray[' + extraData.jointN  + '];\n';
-      shaderText += 'uniform vec4 transArray[' + extraData.jointN  + '];\n';
+      shaderText +=
+        "uniform mat4 skinTransformMatrices[" + extraData.jointN + "];\n";
+    } else if (GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1) {
+      shaderText += "uniform vec4 quatArray[" + extraData.jointN + "];\n";
+      shaderText += "uniform vec4 transArray[" + extraData.jointN + "];\n";
       //    shaderText += 'uniform vec2 quatArray[' + extraData.jointN  + '];\n';
-
     } else if (GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
       // `OneVec4` Version [Begin]
-      shaderText += 'uniform vec4 quatTranslationArray[' + extraData.jointN  + '];\n';
-      shaderText += 'uniform vec3 translationScale;\n';
+      shaderText +=
+        "uniform vec4 quatTranslationArray[" + extraData.jointN + "];\n";
+      shaderText += "uniform vec3 translationScale;\n";
       // `OneVec4` Version [End]
     }
-    
+
     return shaderText;
   }
 
   VSMethodDefine_SkeletalShaderSource(f, lights, material, extraData) {
-    let shaderText = '';
+    let shaderText = "";
     shaderText += `
     mat3 toNormalMatrix(mat4 m) {
       float a00 = m[0][0], a01 = m[0][1], a02 = m[0][2], a03 = m[0][3],
@@ -275,27 +275,39 @@ return mat4(
   }
 
   /**
-   * 
+   *
    */
-  VSPreProcess_SkeletalShaderSource(existCamera_f, f, lights, material, extraData): string {
-    let shaderText = '';
+  VSPreProcess_SkeletalShaderSource(
+    existCamera_f,
+    f,
+    lights,
+    material,
+    extraData
+  ): string {
+    let shaderText = "";
 
-    shaderText += 'vec4 weightVec = aVertex_weight;\n'; // DO NOT normalize as vec4!
+    shaderText += "vec4 weightVec = aVertex_weight;\n"; // DO NOT normalize as vec4!
 
     if (!GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
-      shaderText += 'mat4 skinMat = weightVec.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
-      shaderText += 'skinMat += weightVec.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
-      shaderText += 'skinMat += weightVec.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
-      shaderText += 'skinMat += weightVec.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
+      shaderText +=
+        "mat4 skinMat = weightVec.x * skinTransformMatrices[int(aVertex_joint.x)];\n";
+      shaderText +=
+        "skinMat += weightVec.y * skinTransformMatrices[int(aVertex_joint.y)];\n";
+      shaderText +=
+        "skinMat += weightVec.z * skinTransformMatrices[int(aVertex_joint.z)];\n";
+      shaderText +=
+        "skinMat += weightVec.w * skinTransformMatrices[int(aVertex_joint.w)];\n";
     } else if (GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1) {
-
       // `Quaterion (Vec4) Transform(Vec3)` Version
-      shaderText += 'mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.x)], transArray[int(aVertex_joint.x)]);\n';
-      shaderText += 'skinMat += weightVec.y * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.y)], transArray[int(aVertex_joint.y)]);\n';
-      shaderText += 'skinMat += weightVec.z * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.z)], transArray[int(aVertex_joint.z)]);\n';
-      shaderText += 'skinMat += weightVec.w * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.w)], transArray[int(aVertex_joint.w)]);\n';
+      shaderText +=
+        "mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.x)], transArray[int(aVertex_joint.x)]);\n";
+      shaderText +=
+        "skinMat += weightVec.y * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.y)], transArray[int(aVertex_joint.y)]);\n";
+      shaderText +=
+        "skinMat += weightVec.z * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.z)], transArray[int(aVertex_joint.z)]);\n";
+      shaderText +=
+        "skinMat += weightVec.w * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.w)], transArray[int(aVertex_joint.w)]);\n";
     } else if (GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
-
       // `OneVec4` Version
       shaderText += `vec2 criteria = vec2(4096.0, 4096.0);\n`;
       shaderText += `mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransform(
@@ -310,65 +322,118 @@ return mat4(
       shaderText += `skinMat += weightVec.w * createMatrixFromQuaternionTransform(
         unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.w)].xy, criteria.x),
         unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.w)].zw, criteria.y).xyz*translationScale);\n`;
-    
     }
 
+    if (Shader._exist(f, GLBoost.NORMAL)) {
+      shaderText += "  float border = AABBLengthCenterToCorner * 0.01;\n";
+      //shaderText += "  float border = 2.0;\n";
+      shaderText +=
+        "  position_local.xyz = position_local.xyz + normalize(normal_local)*border * float(objectIds.z);\n";
+    }
     // Calc the following...
     // * position_world
     // * normal_world
     // * normalMatrix
     // * tangent_world
-    shaderText += 'position_world = skinMat * position_local;\n';    
+    shaderText += "position_world = skinMat * position_local;\n";
     if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += 'mat3 normalMatrix = toNormalMatrix(skinMat);\n';
-      shaderText += 'normal_world = normalize(normalMatrix * normal_local);\n';
+      shaderText += "mat3 normalMatrix = toNormalMatrix(skinMat);\n";
+      shaderText += "normal_world = normalize(normalMatrix * normal_local);\n";
+      shaderText +=
+        "  normal_world += normal_world * -2.0 * float(objectIds.z);\n";
+
       if (Shader._exist(f, GLBoost.TANGENT)) {
-        shaderText += 'tangent_world = normalize(normalMatrix * tangent_local);\n';
+        shaderText +=
+          "tangent_world = normalize(normalMatrix * tangent_local);\n";
       }
     }
     // So, you should not recompute the items in the list above. Check the isSkinning flag to avoid recalculation.
-    shaderText += 'isSkinning = true;\n';
-
+    shaderText += "isSkinning = true;\n";
 
     return shaderText;
   }
 
-  prepare_SkeletalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+  prepare_SkeletalShaderSource(
+    gl,
+    shaderProgram,
+    expression,
+    vertexAttribs,
+    existCamera_f,
+    lights,
+    material,
+    extraData
+  ) {
     let vertexAttribsAsResult = [];
 
-    vertexAttribs.forEach((attribName)=>{
-      if (attribName === 'joint' || attribName === 'weight') {
+    vertexAttribs.forEach(attribName => {
+      if (attribName === "joint" || attribName === "weight") {
         vertexAttribsAsResult.push(attribName);
-        shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-        gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+        shaderProgram["vertexAttribute_" + attribName] = gl.getAttribLocation(
+          shaderProgram,
+          "aVertex_" + attribName
+        );
+        gl.enableVertexAttribArray(
+          shaderProgram["vertexAttribute_" + attribName]
+        );
       }
     });
 
     if (!GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
-      let skinTransformMatricesUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'skinTransformMatrices');
-      material.setUniform(shaderProgram, 'uniform_skinTransformMatrices', skinTransformMatricesUniformLocation);
-      material._semanticsDic['JOINTMATRIX'] = 'skinTransformMatrices';
+      let skinTransformMatricesUniformLocation = this._glContext.getUniformLocation(
+        shaderProgram,
+        "skinTransformMatrices"
+      );
+      material.setUniform(
+        shaderProgram,
+        "uniform_skinTransformMatrices",
+        skinTransformMatricesUniformLocation
+      );
+      material._semanticsDic["JOINTMATRIX"] = "skinTransformMatrices";
     } else if (GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1) {
-      
-      let quatArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'quatArray');
-      material.setUniform(shaderProgram, 'uniform_quatArray', quatArrayUniformLocation);
-      material._semanticsDic['JOINT_QUATERNION'] = 'quatArray';
-      let transArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'transArray');
-      material.setUniform(shaderProgram, 'uniform_transArray', transArrayUniformLocation);
-      material._semanticsDic['JOINT_TRANSLATION'] = 'transArray';
-      
+      let quatArrayUniformLocation = this._glContext.getUniformLocation(
+        shaderProgram,
+        "quatArray"
+      );
+      material.setUniform(
+        shaderProgram,
+        "uniform_quatArray",
+        quatArrayUniformLocation
+      );
+      material._semanticsDic["JOINT_QUATERNION"] = "quatArray";
+      let transArrayUniformLocation = this._glContext.getUniformLocation(
+        shaderProgram,
+        "transArray"
+      );
+      material.setUniform(
+        shaderProgram,
+        "uniform_transArray",
+        transArrayUniformLocation
+      );
+      material._semanticsDic["JOINT_TRANSLATION"] = "transArray";
     } else if (GLBoost.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
-      
       // `OneVec4` Version [Begin]
-      let quatArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'quatTranslationArray');
-      material.setUniform(shaderProgram, 'uniform_quatTranslationArray', quatArrayUniformLocation);
-      material._semanticsDic['JOINT_QUATTRANSLATION'] = 'quatTranslationArray';
-      let transArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'translationScale');
-      material.setUniform(shaderProgram, 'uniform_translationScale', transArrayUniformLocation);
+      let quatArrayUniformLocation = this._glContext.getUniformLocation(
+        shaderProgram,
+        "quatTranslationArray"
+      );
+      material.setUniform(
+        shaderProgram,
+        "uniform_quatTranslationArray",
+        quatArrayUniformLocation
+      );
+      material._semanticsDic["JOINT_QUATTRANSLATION"] = "quatTranslationArray";
+      let transArrayUniformLocation = this._glContext.getUniformLocation(
+        shaderProgram,
+        "translationScale"
+      );
+      material.setUniform(
+        shaderProgram,
+        "uniform_translationScale",
+        transArrayUniformLocation
+      );
       // `OneVec4` Version [End]
-      
     }
-    
+
     /*
     // とりあえず単位行列で初期化
     let identityMatrices = [];

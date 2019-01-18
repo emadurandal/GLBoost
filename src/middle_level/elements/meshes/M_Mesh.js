@@ -16,7 +16,8 @@ export default class M_Mesh extends M_Element {
   _opacity: number;
   _gizmos: Array<M_Mesh>;
   _geometry: any;
-  _outlineGizmo: any;
+  //_outlineGizmo: any;
+  _isOutlineVisible: boolean;
   _material: M_Mesh;
   _glBoostSystem: GLBoostSystem;
   bindShapeMatrix: Matrix44;
@@ -35,6 +36,7 @@ export default class M_Mesh extends M_Element {
     this._outlineGizmo = null;
     this._isPickable = true;
     this._isTransparentForce = false;
+    this._isOutlineVisible = false;
   }
 
   prepareToRender(expression: any, existCamera_f: any, lights: any) {
@@ -67,7 +69,8 @@ export default class M_Mesh extends M_Element {
       viewport: data.viewport,
       isWebVRMode: data.isWebVRMode,
       webvrFrameData: data.webvrFrameData,
-      forceThisMaterial: data.forceThisMaterial
+      forceThisMaterial: data.forceThisMaterial,
+      isOutlineMode: data.isOutlineMode
     });
   }
 
@@ -388,30 +391,15 @@ export default class M_Mesh extends M_Element {
   }
 
   get gizmos() {
-    if (this.isOutlineVisible && this.className === "M_Mesh") {
-      return this._gizmos.concat([this._outlineGizmo]);
-    } else {
-      return this._gizmos;
-    }
+    return this._gizmos;
   }
 
   set isOutlineVisible(flg: boolean) {
-    if (flg && this._outlineGizmo === null && this.className === "M_Mesh") {
-      this._outlineGizmo = this._glBoostSystem._glBoostContext.createOutlineGizmo(
-        this
-      );
-    }
-
-    if (this._outlineGizmo) {
-      this._outlineGizmo.isVisible = flg;
-    }
+    this._isOutlineVisible = flg;
   }
 
   get isOutlineVisible() {
-    if (this._outlineGizmo === null) {
-      return false;
-    }
-    return this._outlineGizmo.isVisible;
+    return this._isOutlineVisible;
   }
 
   set isVisible(flg: boolean) {

@@ -202,6 +202,7 @@ export default class DrawKickerWorld {
     const isWebVRMode = data.isWebVRMode;
     const webvrFrameData = data.webvrFrameData;
     const forceThisMaterial = data.forceThisMaterial;
+    const isOutlineMode = data.isOutlineMode ? true : false;
 
     var isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
 
@@ -209,13 +210,6 @@ export default class DrawKickerWorld {
 
     for (let i = 0; i < originalMaterials.length; i++) {
       let material = originalMaterials[i];
-      let isOutlineVisible = false;
-      if (forceThisMaterial) {
-        material = forceThisMaterial;
-        if (forceThisMaterial.userFlavorName === "OutlineGizmoMaterial") {
-          isOutlineVisible = true;
-        }
-      }
       if (!material.isVisible) {
         continue;
       }
@@ -229,6 +223,20 @@ export default class DrawKickerWorld {
         ];
       if (renderpassSpecificMaterial) {
         material = renderpassSpecificMaterial;
+      }
+
+      if (forceThisMaterial) {
+        forceThisMaterial._vertexNofGeometries = material._vertexNofGeometries;
+        forceThisMaterial.shaderInstance = material.shaderInstance;
+        forceThisMaterial._semanticsDic = material._semanticsDic;
+        forceThisMaterial._shaderParametersForShaderInstance =
+          material._shaderParametersForShaderInstance;
+        forceThisMaterial._shaderUniformLocationsOfExpressions =
+          material._shaderUniformLocationsOfExpressions;
+        material = forceThisMaterial;
+        //        material.baseColor = forceThisMaterial.baseColor;
+        //        material.states = forceThisMaterial.states;
+        //        material.globalStatesUsage = forceThisMaterial.globalStatesUsage;
       }
 
       if (!material.shaderInstance) {
@@ -261,7 +269,7 @@ export default class DrawKickerWorld {
         material.getUniform(glslProgram, "uniform_objectIdsAndOutlineFlag"),
         mesh.objectIndex,
         0,
-        isOutlineVisible,
+        isOutlineMode,
         true
       );
 
