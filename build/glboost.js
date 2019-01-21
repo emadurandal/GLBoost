@@ -7278,6 +7278,7 @@
       const isWebVRMode = data.isWebVRMode;
       const webvrFrameData = data.webvrFrameData;
       const forceThisMaterial = data.forceThisMaterial;
+      const isOutlineMode = data.isOutlineMode ? true : false;
 
       var isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
 
@@ -7285,13 +7286,6 @@
 
       for (let i = 0; i < originalMaterials.length; i++) {
         let material = originalMaterials[i];
-        let isOutlineVisible = false;
-        if (forceThisMaterial) {
-          material = forceThisMaterial;
-          if (forceThisMaterial.userFlavorName === "OutlineGizmoMaterial") {
-            isOutlineVisible = true;
-          }
-        }
         if (!material.isVisible) {
           continue;
         }
@@ -7305,6 +7299,20 @@
           ];
         if (renderpassSpecificMaterial) {
           material = renderpassSpecificMaterial;
+        }
+
+        if (forceThisMaterial) {
+          forceThisMaterial._vertexNofGeometries = material._vertexNofGeometries;
+          forceThisMaterial.shaderInstance = material.shaderInstance;
+          forceThisMaterial._semanticsDic = material._semanticsDic;
+          forceThisMaterial._shaderParametersForShaderInstance =
+            material._shaderParametersForShaderInstance;
+          forceThisMaterial._shaderUniformLocationsOfExpressions =
+            material._shaderUniformLocationsOfExpressions;
+          material = forceThisMaterial;
+          //        material.baseColor = forceThisMaterial.baseColor;
+          //        material.states = forceThisMaterial.states;
+          //        material.globalStatesUsage = forceThisMaterial.globalStatesUsage;
         }
 
         if (!material.shaderInstance) {
@@ -7337,7 +7345,7 @@
           material.getUniform(glslProgram, "uniform_objectIdsAndOutlineFlag"),
           mesh.objectIndex,
           0,
-          isOutlineVisible,
+          isOutlineMode,
           true
         );
 
@@ -7655,31 +7663,31 @@
   //      
 
   class SkeletalShaderSource {
-
     VSDefine_SkeletalShaderSource(in_, out_, f, lights, material, extraData) {
-      var shaderText = '';
+      var shaderText = "";
       shaderText += `${in_} vec4 aVertex_joint;\n`;
       shaderText += `${in_} vec4 aVertex_weight;\n`;
 
       if (!GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
-        shaderText += 'uniform mat4 skinTransformMatrices[' + extraData.jointN  + '];\n';
-      } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1){
-        shaderText += 'uniform vec4 quatArray[' + extraData.jointN  + '];\n';
-        shaderText += 'uniform vec4 transArray[' + extraData.jointN  + '];\n';
+        shaderText +=
+          "uniform mat4 skinTransformMatrices[" + extraData.jointN + "];\n";
+      } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1) {
+        shaderText += "uniform vec4 quatArray[" + extraData.jointN + "];\n";
+        shaderText += "uniform vec4 transArray[" + extraData.jointN + "];\n";
         //    shaderText += 'uniform vec2 quatArray[' + extraData.jointN  + '];\n';
-
       } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
         // `OneVec4` Version [Begin]
-        shaderText += 'uniform vec4 quatTranslationArray[' + extraData.jointN  + '];\n';
-        shaderText += 'uniform vec3 translationScale;\n';
+        shaderText +=
+          "uniform vec4 quatTranslationArray[" + extraData.jointN + "];\n";
+        shaderText += "uniform vec3 translationScale;\n";
         // `OneVec4` Version [End]
       }
-      
+
       return shaderText;
     }
 
     VSMethodDefine_SkeletalShaderSource(f, lights, material, extraData) {
-      let shaderText = '';
+      let shaderText = "";
       shaderText += `
     mat3 toNormalMatrix(mat4 m) {
       float a00 = m[0][0], a01 = m[0][1], a02 = m[0][2], a03 = m[0][3],
@@ -7926,27 +7934,39 @@ return mat4(
     }
 
     /**
-     * 
+     *
      */
-    VSPreProcess_SkeletalShaderSource(existCamera_f, f, lights, material, extraData)         {
-      let shaderText = '';
+    VSPreProcess_SkeletalShaderSource(
+      existCamera_f,
+      f,
+      lights,
+      material,
+      extraData
+    )         {
+      let shaderText = "";
 
-      shaderText += 'vec4 weightVec = aVertex_weight;\n'; // DO NOT normalize as vec4!
+      shaderText += "vec4 weightVec = aVertex_weight;\n"; // DO NOT normalize as vec4!
 
       if (!GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
-        shaderText += 'mat4 skinMat = weightVec.x * skinTransformMatrices[int(aVertex_joint.x)];\n';
-        shaderText += 'skinMat += weightVec.y * skinTransformMatrices[int(aVertex_joint.y)];\n';
-        shaderText += 'skinMat += weightVec.z * skinTransformMatrices[int(aVertex_joint.z)];\n';
-        shaderText += 'skinMat += weightVec.w * skinTransformMatrices[int(aVertex_joint.w)];\n';
+        shaderText +=
+          "mat4 skinMat = weightVec.x * skinTransformMatrices[int(aVertex_joint.x)];\n";
+        shaderText +=
+          "skinMat += weightVec.y * skinTransformMatrices[int(aVertex_joint.y)];\n";
+        shaderText +=
+          "skinMat += weightVec.z * skinTransformMatrices[int(aVertex_joint.z)];\n";
+        shaderText +=
+          "skinMat += weightVec.w * skinTransformMatrices[int(aVertex_joint.w)];\n";
       } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1) {
-
         // `Quaterion (Vec4) Transform(Vec3)` Version
-        shaderText += 'mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.x)], transArray[int(aVertex_joint.x)]);\n';
-        shaderText += 'skinMat += weightVec.y * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.y)], transArray[int(aVertex_joint.y)]);\n';
-        shaderText += 'skinMat += weightVec.z * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.z)], transArray[int(aVertex_joint.z)]);\n';
-        shaderText += 'skinMat += weightVec.w * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.w)], transArray[int(aVertex_joint.w)]);\n';
+        shaderText +=
+          "mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.x)], transArray[int(aVertex_joint.x)]);\n";
+        shaderText +=
+          "skinMat += weightVec.y * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.y)], transArray[int(aVertex_joint.y)]);\n";
+        shaderText +=
+          "skinMat += weightVec.z * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.z)], transArray[int(aVertex_joint.z)]);\n";
+        shaderText +=
+          "skinMat += weightVec.w * createMatrixFromQuaternionTransformUniformScale(quatArray[int(aVertex_joint.w)], transArray[int(aVertex_joint.w)]);\n";
       } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
-
         // `OneVec4` Version
         shaderText += `vec2 criteria = vec2(4096.0, 4096.0);\n`;
         shaderText += `mat4 skinMat = weightVec.x * createMatrixFromQuaternionTransform(
@@ -7961,65 +7981,118 @@ return mat4(
         shaderText += `skinMat += weightVec.w * createMatrixFromQuaternionTransform(
         unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.w)].xy, criteria.x),
         unpackedVec2ToNormalizedVec4(quatTranslationArray[int(aVertex_joint.w)].zw, criteria.y).xyz*translationScale);\n`;
-      
       }
 
+      if (Shader._exist(f, GLBoost$1.NORMAL)) {
+        shaderText += "  float border = AABBLengthCenterToCorner * 0.01;\n";
+        //shaderText += "  float border = 2.0;\n";
+        shaderText +=
+          "  position_local.xyz = position_local.xyz + normalize(normal_local)*border * float(objectIds.z);\n";
+      }
       // Calc the following...
       // * position_world
       // * normal_world
       // * normalMatrix
       // * tangent_world
-      shaderText += 'position_world = skinMat * position_local;\n';    
+      shaderText += "position_world = skinMat * position_local;\n";
       if (Shader._exist(f, GLBoost$1.NORMAL)) {
-        shaderText += 'mat3 normalMatrix = toNormalMatrix(skinMat);\n';
-        shaderText += 'normal_world = normalize(normalMatrix * normal_local);\n';
+        shaderText += "mat3 normalMatrix = toNormalMatrix(skinMat);\n";
+        shaderText += "normal_world = normalize(normalMatrix * normal_local);\n";
+        shaderText +=
+          "  normal_world += normal_world * -2.0 * float(objectIds.z);\n";
+
         if (Shader._exist(f, GLBoost$1.TANGENT)) {
-          shaderText += 'tangent_world = normalize(normalMatrix * tangent_local);\n';
+          shaderText +=
+            "tangent_world = normalize(normalMatrix * tangent_local);\n";
         }
       }
       // So, you should not recompute the items in the list above. Check the isSkinning flag to avoid recalculation.
-      shaderText += 'isSkinning = true;\n';
-
+      shaderText += "isSkinning = true;\n";
 
       return shaderText;
     }
 
-    prepare_SkeletalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
+    prepare_SkeletalShaderSource(
+      gl,
+      shaderProgram,
+      expression,
+      vertexAttribs,
+      existCamera_f,
+      lights,
+      material,
+      extraData
+    ) {
       let vertexAttribsAsResult = [];
 
-      vertexAttribs.forEach((attribName)=>{
-        if (attribName === 'joint' || attribName === 'weight') {
+      vertexAttribs.forEach(attribName => {
+        if (attribName === "joint" || attribName === "weight") {
           vertexAttribsAsResult.push(attribName);
-          shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-          gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+          shaderProgram["vertexAttribute_" + attribName] = gl.getAttribLocation(
+            shaderProgram,
+            "aVertex_" + attribName
+          );
+          gl.enableVertexAttribArray(
+            shaderProgram["vertexAttribute_" + attribName]
+          );
         }
       });
 
       if (!GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL) {
-        let skinTransformMatricesUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'skinTransformMatrices');
-        material.setUniform(shaderProgram, 'uniform_skinTransformMatrices', skinTransformMatricesUniformLocation);
-        material._semanticsDic['JOINTMATRIX'] = 'skinTransformMatrices';
+        let skinTransformMatricesUniformLocation = this._glContext.getUniformLocation(
+          shaderProgram,
+          "skinTransformMatrices"
+        );
+        material.setUniform(
+          shaderProgram,
+          "uniform_skinTransformMatrices",
+          skinTransformMatricesUniformLocation
+        );
+        material._semanticsDic["JOINTMATRIX"] = "skinTransformMatrices";
       } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL === 1) {
-        
-        let quatArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'quatArray');
-        material.setUniform(shaderProgram, 'uniform_quatArray', quatArrayUniformLocation);
-        material._semanticsDic['JOINT_QUATERNION'] = 'quatArray';
-        let transArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'transArray');
-        material.setUniform(shaderProgram, 'uniform_transArray', transArrayUniformLocation);
-        material._semanticsDic['JOINT_TRANSLATION'] = 'transArray';
-        
+        let quatArrayUniformLocation = this._glContext.getUniformLocation(
+          shaderProgram,
+          "quatArray"
+        );
+        material.setUniform(
+          shaderProgram,
+          "uniform_quatArray",
+          quatArrayUniformLocation
+        );
+        material._semanticsDic["JOINT_QUATERNION"] = "quatArray";
+        let transArrayUniformLocation = this._glContext.getUniformLocation(
+          shaderProgram,
+          "transArray"
+        );
+        material.setUniform(
+          shaderProgram,
+          "uniform_transArray",
+          transArrayUniformLocation
+        );
+        material._semanticsDic["JOINT_TRANSLATION"] = "transArray";
       } else if (GLBoost$1.VALUE_SKELETAL_SHADER_OPITIMIZATION_LEVEL > 1) {
-        
         // `OneVec4` Version [Begin]
-        let quatArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'quatTranslationArray');
-        material.setUniform(shaderProgram, 'uniform_quatTranslationArray', quatArrayUniformLocation);
-        material._semanticsDic['JOINT_QUATTRANSLATION'] = 'quatTranslationArray';
-        let transArrayUniformLocation = this._glContext.getUniformLocation(shaderProgram, 'translationScale');
-        material.setUniform(shaderProgram, 'uniform_translationScale', transArrayUniformLocation);
+        let quatArrayUniformLocation = this._glContext.getUniformLocation(
+          shaderProgram,
+          "quatTranslationArray"
+        );
+        material.setUniform(
+          shaderProgram,
+          "uniform_quatTranslationArray",
+          quatArrayUniformLocation
+        );
+        material._semanticsDic["JOINT_QUATTRANSLATION"] = "quatTranslationArray";
+        let transArrayUniformLocation = this._glContext.getUniformLocation(
+          shaderProgram,
+          "translationScale"
+        );
+        material.setUniform(
+          shaderProgram,
+          "uniform_translationScale",
+          transArrayUniformLocation
+        );
         // `OneVec4` Version [End]
-        
       }
-      
+
       /*
       // とりあえず単位行列で初期化
       let identityMatrices = [];
@@ -8043,98 +8116,129 @@ return mat4(
     // this is the instance of the corresponding shader class.
 
     VSDefine_VertexWorldShaderSource(in_, out_, f, lights, material, extraData) {
-      let shaderText = '';
+      let shaderText = "";
 
       if (Shader._exist(f, GLBoost.NORMAL)) {
         shaderText += `${out_} vec3 v_normal_world;\n`;
-        
+
         if (Shader._exist(f, GLBoost.TANGENT)) {
           if (material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL)) {
             shaderText += `${out_} vec3 v_tangent_world;\n`;
-            shaderText += `${out_} vec3 v_binormal_world;\n`;  
+            shaderText += `${out_} vec3 v_binormal_world;\n`;
           }
         }
       }
-      shaderText +=      'uniform mat4 worldMatrix;\n';
-      shaderText +=      'uniform mat4 viewMatrix;\n';
-      shaderText +=      'uniform mat4 projectionMatrix;\n';
-      shaderText +=      'uniform mat3 normalMatrix;\n';
-      shaderText +=      'uniform highp ivec3 objectIds;\n';
-      shaderText +=      'uniform float AABBLengthCenterToCorner;\n';
+      shaderText += "uniform mat4 worldMatrix;\n";
+      shaderText += "uniform mat4 viewMatrix;\n";
+      shaderText += "uniform mat4 projectionMatrix;\n";
+      shaderText += "uniform mat3 normalMatrix;\n";
+      shaderText += "uniform highp ivec3 objectIds;\n";
+      shaderText += "uniform float AABBLengthCenterToCorner;\n";
 
       shaderText += `${out_} vec3 v_position_world;\n`;
 
       return shaderText;
     }
 
-    VSPreProcess_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
-      var shaderText = '';
-      shaderText += '  vec4 position_world;\n';
-      shaderText += '  vec3 normal_world;\n';
-      shaderText += '  vec3 tangent_world;\n';
+    VSPreProcess_VertexWorldShaderSource(
+      existCamera_f,
+      f,
+      lights,
+      material,
+      extraData
+    ) {
+      var shaderText = "";
+      shaderText += "  vec4 position_world;\n";
+      shaderText += "  vec3 normal_world;\n";
+      shaderText += "  vec3 tangent_world;\n";
       return shaderText;
     }
 
-    VSTransform_VertexWorldShaderSource(existCamera_f, f, lights, material, extraData) {
-      var shaderText = '';
+    VSTransform_VertexWorldShaderSource(
+      existCamera_f,
+      f,
+      lights,
+      material,
+      extraData
+    ) {
+      var shaderText = "";
 
       // calc Projection * View * World matrix
-      shaderText += '  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n';
+      shaderText +=
+        "  mat4 pvwMatrix = projectionMatrix * viewMatrix * worldMatrix;\n";
       if (Shader._exist(f, GLBoost.NORMAL)) {
-  //      shaderText += '  vec4 position_proj =  pvwMatrix * position_local;\n';
-  //      shaderText += '  float borderWidth = 1000.0 / position_proj.w;\n';
-        shaderText += '  float borderWidth = AABBLengthCenterToCorner * 0.01;\n';
-        shaderText += '  position_local.xyz = position_local.xyz + normalize(normal_local)*borderWidth * float(objectIds.z);\n';
+        //      shaderText += '  vec4 position_proj =  pvwMatrix * position_local;\n';
+        //      shaderText += '  float borderWidth = 1000.0 / position_proj.w;\n';
+        shaderText += "  float borderWidth = AABBLengthCenterToCorner * 0.01;\n";
+        shaderText +=
+          "  position_local.xyz = position_local.xyz + normalize(normal_local)*borderWidth * float(objectIds.z);\n";
       }
-      
+
       // Calculate only when No skinning. If skinning, these have already been calculated by SkeletalShader.
-      shaderText += '  if (!isSkinning) {\n';
-      shaderText += '    position_world = worldMatrix * position_local;\n';
+      shaderText += "  if (!isSkinning) {\n";
+      shaderText += "    position_world = worldMatrix * position_local;\n";
       if (Shader._exist(f, GLBoost.NORMAL)) {
-        shaderText += '  normal_world = normalMatrix * normal_local;\n';
+        shaderText += "  normal_world = normalMatrix * normal_local;\n";
       }
-      shaderText += '  }\n';
+      shaderText +=
+        "  normal_world += normal_world * -2.0 * float(objectIds.z);\n";
+
+      shaderText += "  }\n";
 
       // calc vertex position in world space
-      shaderText += '  v_position_world = position_world.xyz;\n';
+      shaderText += "  v_position_world = position_world.xyz;\n";
 
-      let normalTexture = material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL);
+      let normalTexture = material.getTextureFromPurpose(
+        GLBoost.TEXTURE_PURPOSE_NORMAL
+      );
 
       // Send normal, tangent, binormal vectors in world space to the rasterizer
       if (Shader._exist(f, GLBoost.NORMAL)) {
         // calc Normal vector in world space
-        shaderText += '  v_normal_world = normal_world;\n';
-        if (Shader._exist(f, GLBoost.TANGENT) && !material.isFlatShading && normalTexture) {
+        shaderText += "  v_normal_world = normal_world;\n";
+        if (
+          Shader._exist(f, GLBoost.TANGENT) &&
+          !material.isFlatShading &&
+          normalTexture
+        ) {
           // calc BiNormal vector and Tangent vector in world space
-          
+
           {
             // Calculate only when No skinning. If skinning, it has already been calculated by SkeletalShader.
-            shaderText += '  if (!isSkinning) {\n';
-            shaderText += '    tangent_world = normalMatrix * tangent_local;\n';
-            shaderText += '  }\n';
+            shaderText += "  if (!isSkinning) {\n";
+            shaderText += "    tangent_world = normalMatrix * tangent_local;\n";
+            shaderText += "  }\n";
           }
 
-          shaderText += '  v_binormal_world = cross(normal_world, tangent_world);\n';
-          shaderText += '  v_tangent_world = cross(v_binormal_world, normal_world);\n';
+          shaderText +=
+            "  v_binormal_world = cross(normal_world, tangent_world);\n";
+          shaderText +=
+            "  v_tangent_world = cross(v_binormal_world, normal_world);\n";
 
+          // shaderText +=
+          //   "  position_local.xyz *= normalize(binormal_world)*borderWidth * float(objectIds.z);\n";
+          // shaderText +=
+          //   "  position_local.xyz *= normalize(tangent_world)*borderWidth * float(objectIds.z);\n";
         }
       }
 
       // Calc vertex positions in clip coordinate space.
       // (These will be converted in Normalized Device Coordinates by divided gl_Posiiton.w in after stage.)
-      shaderText += '  gl_Position =  pvwMatrix * position_local;\n';
+      shaderText += "  gl_Position =  pvwMatrix * position_local;\n";
 
       return shaderText;
     }
 
     FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
-      let shaderText = '';
+      let shaderText = "";
 
       shaderText += `uniform highp ivec3 objectIds;\n`;
       shaderText += `uniform vec3 viewPosition_world;\n`;
 
-      let lightNumExceptAmbient = lights.filter((light)=>{return !light.isTypeAmbient();}).length;    
-      if(lightNumExceptAmbient > 0) {
+      let lightNumExceptAmbient = lights.filter(light => {
+        return !light.isTypeAmbient();
+      }).length;
+      if (lightNumExceptAmbient > 0) {
         shaderText += `uniform vec4 lightDiffuse[${lightNumExceptAmbient}];\n`;
         shaderText += `uniform vec3 lightSpotInfo[${lightNumExceptAmbient}];\n`;
         shaderText += `uniform vec3 lightPosition_world[${lightNumExceptAmbient}];\n`;
@@ -8143,7 +8247,10 @@ return mat4(
 
       if (Shader._exist(f, GLBoost.NORMAL)) {
         shaderText += `${in_} vec3 v_normal_world;\n`;
-        if (Shader._exist(f, GLBoost.TANGENT) && material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL)) {
+        if (
+          Shader._exist(f, GLBoost.TANGENT) &&
+          material.getTextureFromPurpose(GLBoost.TEXTURE_PURPOSE_NORMAL)
+        ) {
           shaderText += `${in_} vec3 v_tangent_world;\n`;
           shaderText += `${in_} vec3 v_binormal_world;\n`;
         }
@@ -8154,59 +8261,124 @@ return mat4(
       return shaderText;
     }
 
-
     FSShade_VertexWorldShaderSource(f, gl, lights) {
-      var shaderText = '';
+      var shaderText = "";
       return shaderText;
     }
 
-    prepare_VertexWorldShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
-
+    prepare_VertexWorldShaderSource(
+      gl,
+      shaderProgram,
+      expression,
+      vertexAttribs,
+      existCamera_f,
+      lights,
+      material,
+      extraData
+    ) {
       var vertexAttribsAsResult = [];
 
-      vertexAttribs.forEach((attribName)=>{
-        if (attribName === 'position' || attribName === 'normal' || attribName === 'tangent') {
-          shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-          if (shaderProgram['vertexAttribute_' + attribName] !== -1) {
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
+      vertexAttribs.forEach(attribName => {
+        if (
+          attribName === "position" ||
+          attribName === "normal" ||
+          attribName === "tangent"
+        ) {
+          shaderProgram["vertexAttribute_" + attribName] = gl.getAttribLocation(
+            shaderProgram,
+            "aVertex_" + attribName
+          );
+          if (shaderProgram["vertexAttribute_" + attribName] !== -1) {
+            gl.enableVertexAttribArray(
+              shaderProgram["vertexAttribute_" + attribName]
+            );
             vertexAttribsAsResult.push(attribName);
           }
         }
       });
 
-      material.setUniform(shaderProgram, 'uniform_objectIdsAndOutlineFlag', this._glContext.getUniformLocation(shaderProgram, 'objectIds'));
+      material.setUniform(
+        shaderProgram,
+        "uniform_objectIdsAndOutlineFlag",
+        this._glContext.getUniformLocation(shaderProgram, "objectIds")
+      );
 
-      material.setUniform(shaderProgram, 'uniform_worldMatrix', this._glContext.getUniformLocation(shaderProgram, 'worldMatrix'));
-      material._semanticsDic['WORLD'] = 'worldMatrix';
-      material.setUniform(shaderProgram, 'uniform_normalMatrix', this._glContext.getUniformLocation(shaderProgram, 'normalMatrix'));
-      material._semanticsDic['MODELVIEWINVERSETRANSPOSE'] = 'normalMatrix';
+      material.setUniform(
+        shaderProgram,
+        "uniform_worldMatrix",
+        this._glContext.getUniformLocation(shaderProgram, "worldMatrix")
+      );
+      material._semanticsDic["WORLD"] = "worldMatrix";
+      material.setUniform(
+        shaderProgram,
+        "uniform_normalMatrix",
+        this._glContext.getUniformLocation(shaderProgram, "normalMatrix")
+      );
+      material._semanticsDic["MODELVIEWINVERSETRANSPOSE"] = "normalMatrix";
       if (existCamera_f) {
-        material.setUniform(shaderProgram, 'uniform_viewMatrix', this._glContext.getUniformLocation(shaderProgram, 'viewMatrix'));
-        material._semanticsDic['VIEW'] = 'viewMatrix';
-        material.setUniform(shaderProgram, 'uniform_projectionMatrix', this._glContext.getUniformLocation(shaderProgram, 'projectionMatrix'));
-        material._semanticsDic['PROJECTION'] = 'projectionMatrix';
+        material.setUniform(
+          shaderProgram,
+          "uniform_viewMatrix",
+          this._glContext.getUniformLocation(shaderProgram, "viewMatrix")
+        );
+        material._semanticsDic["VIEW"] = "viewMatrix";
+        material.setUniform(
+          shaderProgram,
+          "uniform_projectionMatrix",
+          this._glContext.getUniformLocation(shaderProgram, "projectionMatrix")
+        );
+        material._semanticsDic["PROJECTION"] = "projectionMatrix";
       }
 
-      material.setUniform(shaderProgram, 'uniform_viewPosition', this._glContext.getUniformLocation(shaderProgram, 'viewPosition_world'));
+      material.setUniform(
+        shaderProgram,
+        "uniform_viewPosition",
+        this._glContext.getUniformLocation(shaderProgram, "viewPosition_world")
+      );
 
-      for(let i=0; i<lights.length; i++) {
-        material.setUniform(shaderProgram, 'uniform_lightPosition_'+i, this._glContext.getUniformLocation(shaderProgram, `lightPosition_world[${i}]`));
-        material.setUniform(shaderProgram, 'uniform_lightDirection_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDirection_world[${i}]`));
-        material.setUniform(shaderProgram, 'uniform_lightDiffuse_'+i, this._glContext.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`));
-        material.setUniform(shaderProgram, 'uniform_lightSpotInfo_'+i, this._glContext.getUniformLocation(shaderProgram, `lightSpotInfo[${i}]`));
+      for (let i = 0; i < lights.length; i++) {
+        material.setUniform(
+          shaderProgram,
+          "uniform_lightPosition_" + i,
+          this._glContext.getUniformLocation(
+            shaderProgram,
+            `lightPosition_world[${i}]`
+          )
+        );
+        material.setUniform(
+          shaderProgram,
+          "uniform_lightDirection_" + i,
+          this._glContext.getUniformLocation(
+            shaderProgram,
+            `lightDirection_world[${i}]`
+          )
+        );
+        material.setUniform(
+          shaderProgram,
+          "uniform_lightDiffuse_" + i,
+          this._glContext.getUniformLocation(shaderProgram, `lightDiffuse[${i}]`)
+        );
+        material.setUniform(
+          shaderProgram,
+          "uniform_lightSpotInfo_" + i,
+          this._glContext.getUniformLocation(shaderProgram, `lightSpotInfo[${i}]`)
+        );
       }
 
-      material.setUniform(shaderProgram, 'uniform_AABBLengthCenterToCorner', this._glContext.getUniformLocation(shaderProgram, 'AABBLengthCenterToCorner'));
+      material.setUniform(
+        shaderProgram,
+        "uniform_AABBLengthCenterToCorner",
+        this._glContext.getUniformLocation(
+          shaderProgram,
+          "AABBLengthCenterToCorner"
+        )
+      );
 
       return vertexAttribsAsResult;
     }
-    
   }
 
-
-
-
-  GLBoost['VertexWorldShaderSource'] = VertexWorldShaderSource;
+  GLBoost["VertexWorldShaderSource"] = VertexWorldShaderSource;
 
   class AABB {
 
@@ -9313,7 +9485,8 @@ return mat4(
         viewport: data.viewport,
         isWebVRMode: data.isWebVRMode,
         webvrFrameData: data.webvrFrameData,
-        forceThisMaterial: data.forceThisMaterial
+        forceThisMaterial: data.forceThisMaterial,
+        isOutlineMode: data.isOutlineMode
       });
     }
 
@@ -10814,7 +10987,7 @@ return mat4(
     // this is the instance of the corresponding shader class.
 
     VSDefine_DecalShaderSource(in_, out_, f) {
-      var shaderText = '';
+      var shaderText = "";
       if (Shader._exist(f, GLBoost$1.COLOR)) {
         shaderText += `${in_} vec4 aVertex_color;\n`;
         shaderText += `${out_} vec4 color;\n`;
@@ -10827,18 +11000,18 @@ return mat4(
     }
 
     VSTransform_DecalShaderSource(existCamera_f, f) {
-      var shaderText = '';
+      var shaderText = "";
       if (Shader._exist(f, GLBoost$1.COLOR)) {
-        shaderText += '  color = aVertex_color;\n';
+        shaderText += "  color = aVertex_color;\n";
       }
       if (Shader._exist(f, GLBoost$1.TEXCOORD)) {
-        shaderText += '  texcoord = aVertex_texcoord;\n';
+        shaderText += "  texcoord = aVertex_texcoord;\n";
       }
       return shaderText;
     }
 
     FSDefine_DecalShaderSource(in_, f, lights, material, extraData) {
-      var shaderText = '';
+      var shaderText = "";
       if (Shader._exist(f, GLBoost$1.COLOR)) {
         shaderText += `${in_} vec4 color;\n`;
       }
@@ -10846,21 +11019,23 @@ return mat4(
         shaderText += `${in_} vec2 texcoord;\n\n`;
       }
       if (material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE)) {
-        shaderText += 'uniform sampler2D uTexture;\n';
+        shaderText += "uniform sampler2D uTexture;\n";
       }
-      let normalTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_NORMAL);
+      let normalTexture = material.getTextureFromPurpose(
+        GLBoost$1.TEXTURE_PURPOSE_NORMAL
+      );
       if (normalTexture) {
         shaderText += `uniform highp sampler2D uNormalTexture;\n`;
       }
-      shaderText += 'uniform vec4 materialBaseColor;\n';
-      shaderText += 'uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n';
-      shaderText += 'uniform vec2 uAlphaTestParameters;\n';
-      
+      shaderText += "uniform vec4 materialBaseColor;\n";
+      shaderText += "uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n";
+      shaderText += "uniform vec2 uAlphaTestParameters;\n";
+      shaderText += "uniform highp ivec3 objectIds;\n";
       return shaderText;
     }
 
     FSMethodDefine_DecalShaderSource(f, lights, material, extraData) {
-      let shaderText = '';
+      let shaderText = "";
 
       shaderText += this._multiplyAlphaToColorOfTexel();
 
@@ -10868,18 +11043,23 @@ return mat4(
     }
 
     FSShade_DecalShaderSource(f, gl, lights, material, extraData) {
-      var shaderText = '';
+      var shaderText = "";
 
       shaderText += Shader._getNormalStr(gl, material, f);
-      
+
       var textureFunc = Shader._texture_func(gl);
       if (Shader._exist(f, GLBoost$1.COLOR)) {
-        shaderText += '  rt0 *= color;\n';
+        shaderText += "  rt0 *= color;\n";
       }
-      shaderText += '    rt0 *= materialBaseColor;\n';
-      if (Shader._exist(f, GLBoost$1.TEXCOORD) && material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE)) {
+      shaderText += "    rt0 *= materialBaseColor;\n";
+      if (
+        Shader._exist(f, GLBoost$1.TEXCOORD) &&
+        material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE)
+      ) {
         shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
       }
+
+      shaderText += "  normal_world += -2.0 * float(objectIds.z);\n";
 
       //shaderText += '    float shadowRatio = 0.0;\n';
 
@@ -10889,53 +11069,94 @@ return mat4(
     }
 
     FSFinalize_DecalShaderSource(f, gl, lights, material, extraData) {
-      let shaderText = '';
+      let shaderText = "";
       shaderText += `
                      if (uAlphaTestParameters.x > 0.5 && rt0.a < uAlphaTestParameters.y) {
                        discard;
                      }
+
+                    if (float(objectIds.z) > 0.0) {
+                      rt0.rgba += vec4(0.0, 1.0, 0.0, 1.0);
+                    }
     `;
 
       return shaderText;
     }
 
-    prepare_DecalShaderSource(gl, shaderProgram, expression, vertexAttribs, existCamera_f, lights, material, extraData) {
-
+    prepare_DecalShaderSource(
+      gl,
+      shaderProgram,
+      expression,
+      vertexAttribs,
+      existCamera_f,
+      lights,
+      material,
+      extraData
+    ) {
       var vertexAttribsAsResult = [];
-      vertexAttribs.forEach((attribName)=>{
-        if (attribName === 'color' || attribName === 'texcoord') {
-          shaderProgram['vertexAttribute_' + attribName] = gl.getAttribLocation(shaderProgram, 'aVertex_' + attribName);
-          if (shaderProgram['vertexAttribute_' + attribName] !== -1) {
-            gl.enableVertexAttribArray(shaderProgram['vertexAttribute_' + attribName]);
-            vertexAttribsAsResult.push(attribName);  
+      vertexAttribs.forEach(attribName => {
+        if (attribName === "color" || attribName === "texcoord") {
+          shaderProgram["vertexAttribute_" + attribName] = gl.getAttribLocation(
+            shaderProgram,
+            "aVertex_" + attribName
+          );
+          if (shaderProgram["vertexAttribute_" + attribName] !== -1) {
+            gl.enableVertexAttribArray(
+              shaderProgram["vertexAttribute_" + attribName]
+            );
+            vertexAttribsAsResult.push(attribName);
           }
         }
       });
 
-      material.setUniform(shaderProgram, 'uniform_materialBaseColor', this._glContext.getUniformLocation(shaderProgram, 'materialBaseColor'));
+      material.setUniform(
+        shaderProgram,
+        "uniform_materialBaseColor",
+        this._glContext.getUniformLocation(shaderProgram, "materialBaseColor")
+      );
 
-      let diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
+      let diffuseTexture = material.getTextureFromPurpose(
+        GLBoost$1.TEXTURE_PURPOSE_DIFFUSE
+      );
       if (!diffuseTexture) {
         diffuseTexture = this._glBoostSystem._glBoostContext.defaultDummyTexture;
       }
 
       if (diffuseTexture.toMultiplyAlphaToColorPreviously) {
-        let uIsTextureToMultiplyAlphaToColorPreviously = this._glContext.getUniformLocation(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously');
-        material.setUniform(shaderProgram, 'uIsTextureToMultiplyAlphaToColorPreviously', uIsTextureToMultiplyAlphaToColorPreviously);
+        let uIsTextureToMultiplyAlphaToColorPreviously = this._glContext.getUniformLocation(
+          shaderProgram,
+          "uIsTextureToMultiplyAlphaToColorPreviously"
+        );
+        material.setUniform(
+          shaderProgram,
+          "uIsTextureToMultiplyAlphaToColorPreviously",
+          uIsTextureToMultiplyAlphaToColorPreviously
+        );
       }
-      material.setUniform(shaderProgram, 'uniform_alphaTestParameters', this._glContext.getUniformLocation(shaderProgram, 'uAlphaTestParameters'));
+      material.setUniform(
+        shaderProgram,
+        "uniform_alphaTestParameters",
+        this._glContext.getUniformLocation(shaderProgram, "uAlphaTestParameters")
+      );
 
-      material.registerTextureUnitToUniform(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE, shaderProgram, 'uTexture'); 
-      
-      material.registerTextureUnitToUniform(GLBoost$1.TEXTURE_PURPOSE_NORMAL, shaderProgram, 'uNormalTexture'); 
-      
+      material.registerTextureUnitToUniform(
+        GLBoost$1.TEXTURE_PURPOSE_DIFFUSE,
+        shaderProgram,
+        "uTexture"
+      );
+
+      material.registerTextureUnitToUniform(
+        GLBoost$1.TEXTURE_PURPOSE_NORMAL,
+        shaderProgram,
+        "uNormalTexture"
+      );
+
       return vertexAttribsAsResult;
     }
   }
 
   class DecalShader extends WireframeShader {
     constructor(glBoostContext) {
-
       super(glBoostContext);
 
       DecalShader.mixin(VertexWorldShadowShaderSource);
@@ -10948,26 +11169,47 @@ return mat4(
       super.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
 
       let baseColor = null;
-      if (material.className.indexOf('ClassicMaterial') !== -1) {
+      if (material.className.indexOf("ClassicMaterial") !== -1) {
         baseColor = material.baseColor;
       } else {
         baseColor = new Vector4$1(1.0, 1.0, 1.0, 1.0);
       }
-      this._glContext.uniform4f(material.getUniform(glslProgram, 'uniform_materialBaseColor'), baseColor.x, baseColor.y, baseColor.z, baseColor.w, true);
+      this._glContext.uniform4f(
+        material.getUniform(glslProgram, "uniform_materialBaseColor"),
+        baseColor.x,
+        baseColor.y,
+        baseColor.z,
+        baseColor.w,
+        true
+      );
 
-      let diffuseTexture = material.getTextureFromPurpose(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE);
+      let diffuseTexture = material.getTextureFromPurpose(
+        GLBoost$1.TEXTURE_PURPOSE_DIFFUSE
+      );
       if (diffuseTexture) {
-  //      material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
-        material.updateTextureInfo(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE, 'uTexture'); 
-        this._glContext.uniform1i(material.getUniform(glslProgram, 'uIsTextureToMultiplyAlphaToColorPreviously'), diffuseTexture.toMultiplyAlphaToColorPreviously, true);
+        //      material.uniformTextureSamplerDic['uTexture'].textureName = diffuseTexture.userFlavorName;
+        material.updateTextureInfo(GLBoost$1.TEXTURE_PURPOSE_DIFFUSE, "uTexture");
+        this._glContext.uniform1i(
+          material.getUniform(
+            glslProgram,
+            "uIsTextureToMultiplyAlphaToColorPreviously"
+          ),
+          diffuseTexture.toMultiplyAlphaToColorPreviously,
+          true
+        );
       }
-      
+
       const alphaCutoff = material.alphaCutoff;
       const isAlphaTestEnable = material.isAlphaTest;
-      this._glContext.uniform2f(material.getUniform(glslProgram, 'uniform_alphaTestParameters'), isAlphaTestEnable ? 1.0 : 0.0, alphaCutoff, true);
+      this._glContext.uniform2f(
+        material.getUniform(glslProgram, "uniform_alphaTestParameters"),
+        isAlphaTestEnable ? 1.0 : 0.0,
+        alphaCutoff,
+        true
+      );
 
       // For Shadow
-      for (let i=0; i<lights.length; i++) {
+      for (let i = 0; i < lights.length; i++) {
         if (lights[i].camera && lights[i].camera.texture) {
           const index = i + material.getTextureNumAttachedShader();
           lights[i].camera.texture.textureUnitIndex = index;
@@ -10975,29 +11217,60 @@ return mat4(
           let cameraMatrix = lights[i].camera.lookAtRHMatrix();
           let viewMatrix = cameraMatrix.clone();
           let projectionMatrix = lights[i].camera.projectionRHMatrix();
-          this._glContext.uniformMatrix4fv(material.getUniform(glslProgram, 'uniform_depthPVMatrix_'+i), false, Matrix44$1.multiply(projectionMatrix, viewMatrix).flatten(), true);
+          this._glContext.uniformMatrix4fv(
+            material.getUniform(glslProgram, "uniform_depthPVMatrix_" + i),
+            false,
+            Matrix44$1.multiply(projectionMatrix, viewMatrix).flatten(),
+            true
+          );
         }
 
         if (lights[i].camera && lights[i].camera.texture) {
-          this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isShadowCasting' + i), 1, true);
+          this._glContext.uniform1i(
+            material.getUniform(glslProgram, "uniform_isShadowCasting" + i),
+            1,
+            true
+          );
         } else {
-          this._glContext.uniform1i(material.getUniform(glslProgram, 'uniform_isShadowCasting' + i), 0, true);
+          this._glContext.uniform1i(
+            material.getUniform(glslProgram, "uniform_isShadowCasting" + i),
+            0,
+            true
+          );
         }
 
         if (lights[i].camera && lights[i].camera.texture) {
-          let uniformLocation = material.getUniform(glslProgram, 'uniform_DepthTextureSampler_' + i);
+          let uniformLocation = material.getUniform(
+            glslProgram,
+            "uniform_DepthTextureSampler_" + i
+          );
           let index = lights[i].camera.texture.textureUnitIndex;
           //const index = i + material.getTextureNumAttachedShader();
-
 
           this._glContext.uniform1i(uniformLocation, index, true);
         }
       }
     }
 
-    setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights) {
-      super.setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights);
-      for (let i=0; i<lights.length; i++) {
+    setUniformsAsTearDown(
+      gl,
+      glslProgram,
+      scene,
+      material,
+      camera,
+      mesh,
+      lights
+    ) {
+      super.setUniformsAsTearDown(
+        gl,
+        glslProgram,
+        scene,
+        material,
+        camera,
+        mesh,
+        lights
+      );
+      for (let i = 0; i < lights.length; i++) {
         if (lights[i].camera && lights[i].camera.texture) ;
       }
     }
@@ -11011,7 +11284,7 @@ return mat4(
     }
   }
 
-  GLBoost$1['DecalShader'] = DecalShader;
+  GLBoost$1["DecalShader"] = DecalShader;
 
   class L_AbstractMaterial extends GLBoostObject {
     constructor(glBoostContext) {
@@ -16051,7 +16324,8 @@ albedo.rgb *= (1.0 - metallic);
                      
                            
                    
-                       
+    //_outlineGizmo: any;
+                               
                       
                                   
                               
@@ -16070,6 +16344,7 @@ albedo.rgb *= (1.0 - metallic);
       this._outlineGizmo = null;
       this._isPickable = true;
       this._isTransparentForce = false;
+      this._isOutlineVisible = false;
     }
 
     prepareToRender(expression     , existCamera_f     , lights     ) {
@@ -16102,7 +16377,8 @@ albedo.rgb *= (1.0 - metallic);
         viewport: data.viewport,
         isWebVRMode: data.isWebVRMode,
         webvrFrameData: data.webvrFrameData,
-        forceThisMaterial: data.forceThisMaterial
+        forceThisMaterial: data.forceThisMaterial,
+        isOutlineMode: data.isOutlineMode
       });
     }
 
@@ -16423,30 +16699,15 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     get gizmos() {
-      if (this.isOutlineVisible && this.className === "M_Mesh") {
-        return this._gizmos.concat([this._outlineGizmo]);
-      } else {
-        return this._gizmos;
-      }
+      return this._gizmos;
     }
 
     set isOutlineVisible(flg         ) {
-      if (flg && this._outlineGizmo === null && this.className === "M_Mesh") {
-        this._outlineGizmo = this._glBoostSystem._glBoostContext.createOutlineGizmo(
-          this
-        );
-      }
-
-      if (this._outlineGizmo) {
-        this._outlineGizmo.isVisible = flg;
-      }
+      this._isOutlineVisible = flg;
     }
 
     get isOutlineVisible() {
-      if (this._outlineGizmo === null) {
-        return false;
-      }
-      return this._outlineGizmo.isVisible;
+      return this._isOutlineVisible;
     }
 
     set isVisible(flg         ) {
@@ -17827,7 +18088,6 @@ albedo.rgb *= (1.0 - metallic);
   }
 
   class RenderPass extends GLBoostObject {
-
     constructor(glBoostContext) {
       super(glBoostContext);
 
@@ -17837,11 +18097,12 @@ albedo.rgb *= (1.0 - metallic);
       this._postGizmos = [];
       this._opacityMeshes = [];
       this._transparentMeshes = [];
+      this._outlineModeMeshes = [];
       this._effekseerElements = [];
       this._transparentMeshesAsManualOrder = null;
       this._drawBuffers = [this._glContext.gl.NONE];
       this._clearColor = null; // webgl default is [0, 0, 0, 0]
-      this._clearDepth = null;  // webgl default is 1.0
+      this._clearDepth = null; // webgl default is 1.0
       this._colorMask = null; // webgl defalult is [true, true, true, true]
       this._renderTargetColorTextures = [];
       this._renderTargetDepthTexture = [];
@@ -17867,8 +18128,7 @@ albedo.rgb *= (1.0 - metallic);
 
       this._doPreRender = true;
       this._doPostRender = true;
-      this._tag = '';
-
+      this._tag = "";
     }
 
     set tag(name) {
@@ -17929,19 +18189,20 @@ albedo.rgb *= (1.0 - metallic);
 
     specifyRenderTargetTextures(renderTargetTextures) {
       var gl = this._glContext.gl;
-      
-      var colorRenderTargetTextures = renderTargetTextures.filter((renderTargetTexture)=>{
-        if (renderTargetTexture.colorAttachment) {
-          return true;
-        } else {
-          return false;
-        }
-      });
 
+      var colorRenderTargetTextures = renderTargetTextures.filter(
+        renderTargetTexture => {
+          if (renderTargetTexture.colorAttachment) {
+            return true;
+          } else {
+            return false;
+          }
+        }
+      );
 
       if (colorRenderTargetTextures.length > 0) {
         this._drawBuffers = [];
-        colorRenderTargetTextures.forEach((texture)=>{
+        colorRenderTargetTextures.forEach(texture => {
           var attachment = texture.colorAttachment;
           this._drawBuffers.push(attachment);
         });
@@ -17950,22 +18211,25 @@ albedo.rgb *= (1.0 - metallic);
         this._drawBuffers = [gl.NONE];
       }
 
-      var depthRenderTargetTextures = renderTargetTextures.filter((renderTargetTexture)=>{
-        if (renderTargetTexture.depthAttachment) {
-          return true;
-        } else {
-          return false;
+      var depthRenderTargetTextures = renderTargetTextures.filter(
+        renderTargetTexture => {
+          if (renderTargetTexture.depthAttachment) {
+            return true;
+          } else {
+            return false;
+          }
         }
-      });
+      );
 
       this._renderTargetDepthTexture = depthRenderTargetTextures[0];
 
       this._isRenderTargetAttachedTextures = true;
-
     }
 
     get buffersToDraw() {
-      return this.isRenderTargetAttachedTextures ? this._drawBuffers : [this._glContext.gl.BACK];
+      return this.isRenderTargetAttachedTextures
+        ? this._drawBuffers
+        : [this._glContext.gl.BACK];
     }
 
     set isRenderTargetAttachedTextures(flg) {
@@ -18005,7 +18269,7 @@ albedo.rgb *= (1.0 - metallic);
         width = this._renderTargetDepthTexture.width;
         height = this._renderTargetDepthTexture.height;
       }
-      if (typeof width !== 'undefined' && typeof height !== 'undefined') {
+      if (typeof width !== "undefined" && typeof height !== "undefined") {
         this._viewport = new Vector4$1(0, 0, width, height);
         return true;
       } else {
@@ -18047,7 +18311,6 @@ albedo.rgb *= (1.0 - metallic);
 
     setWebGLStatesAssignDictionaries(dictionaries) {
       this._webglStatesAssignDictionaries = dictionaries;
-
     }
 
     setShaderParametersAssignDictionaries(dictionaries) {
@@ -18105,7 +18368,6 @@ albedo.rgb *= (1.0 - metallic);
         return;
       }
 
-
       for (let dic of this._shaderParametersAssignDictionaries) {
         for (let mesh of this._meshes) {
           let materials = mesh.getAppropriateMaterials();
@@ -18132,15 +18394,18 @@ albedo.rgb *= (1.0 - metallic);
         }
       }
       */
-      for (let i=0; i<this._backupShaderParametersOfMaterials.length; i++) {
+      for (let i = 0; i < this._backupShaderParametersOfMaterials.length; i++) {
         for (let mesh of this._meshes) {
           let materials = mesh.getAppropriateMaterials();
-          for (let j=0; j<materials.length; j++) {
-            materials[j].shaderParameters = this._backupShaderParametersOfMaterials[i].shaderParameters;
+          for (let j = 0; j < materials.length; j++) {
+            materials[
+              j
+            ].shaderParameters = this._backupShaderParametersOfMaterials[
+              i
+            ].shaderParameters;
           }
         }
       }
-
     }
 
     _assignShaders(existCamera_f, lights, assumeThatAllMaterialsAreSame = true) {
@@ -18159,27 +18424,35 @@ albedo.rgb *= (1.0 - metallic);
                 backupShaderInstance: material.shaderInstance
               });
 
-              if (this._newShaderInstance &&  material.shaderClass.name !== this._oldShaderClass.name) {
+              if (
+                this._newShaderInstance &&
+                material.shaderClass.name !== this._oldShaderClass.name
+              ) {
                 this._newShaderInstance.readyForDiscard();
                 this._newShaderInstance = void 0;
-  //              material.shaderInstance.readyForDiscard();
-  //              material.shaderInstance = void 0;
+                //              material.shaderInstance.readyForDiscard();
+                //              material.shaderInstance = void 0;
               }
 
               if (!this._newShaderInstance) {
-  //              let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
-  //              this._newShaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
-                let glslProgram = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, existCamera_f, lights, dic.shaderClass);
+                //              let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
+                //              this._newShaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
+                let glslProgram = obj.geometry.prepareGLSLProgram(
+                  this.expression,
+                  material,
+                  existCamera_f,
+                  lights,
+                  dic.shaderClass
+                );
                 this._oldShaderClass = material.shaderClass;
                 this._newShaderInstance = material.shaderInstance;
               }
 
-  //            material.shaderInstance = this._newShaderInstance;
+              //            material.shaderInstance = this._newShaderInstance;
             });
           }
         }
       }
-
     }
 
     _restoreShaders(existCamera_f, lights) {
@@ -18188,28 +18461,28 @@ albedo.rgb *= (1.0 - metallic);
       }
 
       for (let dic of this._backupShadersOfInstances) {
-        dic.instance.getAppropriateMaterials().forEach((material,index)=>{
-  //        material.shaderClass = (dic.backupShaderClass);
-  //        material.shaderInstance = dic.backupShaderInstance;
+        dic.instance.getAppropriateMaterials().forEach((material, index) => {
+          //        material.shaderClass = (dic.backupShaderClass);
+          //        material.shaderInstance = dic.backupShaderInstance;
 
-  //        if (typeof this._backupShaderClassDic[dic.backupShaderClass.name] === 'undefined') {
+          //        if (typeof this._backupShaderClassDic[dic.backupShaderClass.name] === 'undefined') {
           let shaderInstance = dic.backupShaderInstance;
 
-
-          if(!shaderInstance) {
-  //          let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
-  //          shaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
-            material.shaderInstance = obj.geometry.prepareGLSLProgramAndSetVertexNtoMaterial(this.expression, material, existCamera_f, lights, dic.shaderClass);
-            
+          if (!shaderInstance) {
+            //          let materials = obj.geometry.prepareToRender(this.expression, existCamera_f, lights, null, obj, dic.shaderClass);
+            //          shaderInstance = materials.filter((mat)=>{return mat.instanceName === material.instanceName})[0].shaderInstance;
+            material.shaderInstance = obj.geometry.prepareGLSLProgram(
+              this.expression,
+              material,
+              existCamera_f,
+              lights,
+              dic.shaderClass
+            );
           }
 
-  //        material.shaderInstance = shaderInstance;// this._backupShaderClassDic[dic.backupShaderClass.name];
-
-
+          //        material.shaderInstance = shaderInstance;// this._backupShaderClassDic[dic.backupShaderClass.name];
         });
-
       }
-
     }
 
     clearAssignShaders() {
@@ -18275,15 +18548,15 @@ albedo.rgb *= (1.0 - metallic);
       }
 
       // collect gizmos
-      let collectGizmos = (elem)=> {
+      let collectGizmos = elem => {
         if (elem instanceof M_Group) {
           var children = elem.getChildren();
-          children.forEach((child)=> {
+          children.forEach(child => {
             collectGizmos(child);
           });
-        } 
+        }
         if (elem.gizmos) {
-          elem.gizmos.filter((gizmo)=>{
+          elem.gizmos.filter(gizmo => {
             if (gizmo.isPreDraw) {
               this._preGizmos.push(gizmo);
             } else {
@@ -18298,32 +18571,31 @@ albedo.rgb *= (1.0 - metallic);
 
       this._opacityMeshes = [];
       this._transparentMeshes = [];
-      this._meshes.forEach((mesh)=>{
+      this._skeletalMeshes = [];
+      this._meshes.forEach(mesh => {
         if (mesh.isTransparent) {
           this._transparentMeshes.push(mesh);
         } else {
           this._opacityMeshes.push(mesh);
         }
-      });
-
-      this._skeletalMeshes = [];    
-      this._meshes.forEach((mesh)=>{
-        if (mesh.instanceName.indexOf('SkeletalMesh') !== -1) {
+        if (mesh.instanceName.indexOf("SkeletalMesh") !== -1) {
           this._skeletalMeshes.push(mesh);
+        }
+        if (mesh.isOutlineVisible) {
+          this._outlineModeMeshes.push(mesh);
         }
       });
 
       if (this._scene) {
         this._effekseerElements = collectElements(this._scene, EffekseerElement$1);
-      } 
+      }
 
       if (this._scene) {
         this._scene.prepareToRender(expression);
       }
 
-
       // Setting RenderPass Specific Shader
-      var camera = this.scene.getMainCamera(this);    
+      var camera = this.scene.getMainCamera(this);
       let lights = this.scene.lightsExceptAmbient;
       for (let dic of this._shaderAssignDictionaries) {
         for (let obj of dic.instances) {
@@ -18332,14 +18604,30 @@ albedo.rgb *= (1.0 - metallic);
             let newMaterial = this._glBoostSystem._glBoostContext.createClassicMaterial();
             newMaterial._textureDic = Object.assign({}, material._textureDic);
             newMaterial._texturePurposeDic = material._texturePurposeDic.concat();
-            newMaterial._textureContributionRateDic = Object.assign({}, material._textureContributionRateDic);
-             
+            newMaterial._textureContributionRateDic = Object.assign(
+              {},
+              material._textureContributionRateDic
+            );
+
             //newMaterial._originalMaterial = material;
             renderSpecificMaterials.push(newMaterial);
           });
-          let materials = obj.geometry.prepareToRender(this.expression, camera ? true : false, lights, null, obj, dic.shaderClass, renderSpecificMaterials);
+          let materials = obj.geometry.prepareToRender(
+            this.expression,
+            camera ? true : false,
+            lights,
+            null,
+            obj,
+            dic.shaderClass,
+            renderSpecificMaterials
+          );
           obj.getAppropriateMaterials().forEach((material, index) => {
-            material['renderpassSpecificMaterial_' + this.instanceName + '_material_' + index] = materials[index];
+            material[
+              "renderpassSpecificMaterial_" +
+                this.instanceName +
+                "_material_" +
+                index
+            ] = materials[index];
           });
         }
       }
@@ -18350,17 +18638,15 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     sortTransparentMeshes(camera) {
-
-      this._transparentMeshes.forEach((mesh)=> {
+      this._transparentMeshes.forEach(mesh => {
         mesh.calcTransformedDepth(camera);
       });
 
-      this._transparentMeshes.sort(function(a,b){
-        if( a.transformedDepth < b.transformedDepth ) return -1;
-        if( a.transformedDepth > b.transformedDepth ) return 1;
+      this._transparentMeshes.sort(function(a, b) {
+        if (a.transformedDepth < b.transformedDepth) return -1;
+        if (a.transformedDepth > b.transformedDepth) return 1;
         return 0;
       });
-
     }
 
     set isEnableToDraw(flg) {
@@ -18369,6 +18655,10 @@ albedo.rgb *= (1.0 - metallic);
 
     get isEnableToDraw() {
       return this._isEnableToDraw;
+    }
+
+    get outlineModeMeshes() {
+      return this._outlineModeMeshes;
     }
 
     preRender(existCamera_f, lights) {
@@ -18381,8 +18671,8 @@ albedo.rgb *= (1.0 - metallic);
       }
 
       this._assignWebGLStates();
-     // this._assignShaderParameters();
-  //    this._assignShaders(existCamera_f, lights);
+      // this._assignShaderParameters();
+      //    this._assignShaders(existCamera_f, lights);
       // And call functions registered by user.
     }
 
@@ -18394,7 +18684,7 @@ albedo.rgb *= (1.0 - metallic);
       if (this._customFunctionWhenPostRender) {
         this._customFunctionWhenPostRender();
       }
-  //    this._restoreShaders(existCamera_f, lights);
+      //    this._restoreShaders(existCamera_f, lights);
       this._restoreWebGLStates();
       //this._restoreShaderParameters();
       // And call functions registered by user.
@@ -18407,7 +18697,6 @@ albedo.rgb *= (1.0 - metallic);
     get transparentMeshesAsManualOrder() {
       return this._transparentMeshesAsManualOrder;
     }
-
   }
 
   //      
@@ -18425,7 +18714,12 @@ albedo.rgb *= (1.0 - metallic);
       const gl = glContext.gl;
 
       if (_clearColor) {
-        gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
+        gl.clearColor(
+          _clearColor.red,
+          _clearColor.green,
+          _clearColor.blue,
+          _clearColor.alpha
+        );
       }
 
       this.__logger = Logger.getInstance();
@@ -18441,22 +18735,31 @@ albedo.rgb *= (1.0 - metallic);
       this.__isReadyForWebVR = false;
       this.__animationFrameObject = window;
       this.__effekseerElements = [];
-    }
 
+      this._outlineMaterial = new ClassicMaterial$1(this._glBoostSystem);
+      this._outlineMaterial.baseColor = new Vector4$1(0, 1, 0, 1);
+      this._outlineMaterial.states.enable = [2884]; // gl.CULL_FACE
+      this._outlineMaterial.states.functions.cullFace = [1028]; // gl.front
+      this._outlineMaterial.states.functions.depthMask = [true]; // Write depth value
+      //this._outlineMaterial.shaderClass = GLBoost.PhongShader;
+      this._outlineMaterial.globalStatesUsage =
+        GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
+    }
 
     /**
      * update things of elements of the expression.
      * @param expression a instance of Expression class
      */
     update(expression            ) {
-      
       let skeletalMeshes = [];
       let effekseerElements = [];
       // gather scenes as unique
       for (let renderPass of expression.renderPasses) {
         skeletalMeshes = skeletalMeshes.concat(renderPass._skeletalMeshes);
-  //      effekseerElements = effekseerElements.concat(renderPass._effekseerElements);
-        effekseerElements = effekseerElements.concat(renderPass.scene.searchElementsByType(EffekseerElement$1));
+        //      effekseerElements = effekseerElements.concat(renderPass._effekseerElements);
+        effekseerElements = effekseerElements.concat(
+          renderPass.scene.searchElementsByType(EffekseerElement$1)
+        );
         renderPass.scene.updateAmountOfAmbientLightsIntensity();
         let camera = renderPass.scene.getMainCamera();
         for (let effekseerElement of effekseerElements) {
@@ -18474,15 +18777,17 @@ albedo.rgb *= (1.0 - metallic);
         }, []);
       };
       skeletalMeshes = unique(skeletalMeshes);
-      
+
       for (let mesh of skeletalMeshes) {
         mesh.geometry.update(mesh);
       }
 
-      if (typeof effekseer !== "undefined" && this.__effekseerElements.length > 0) {
+      if (
+        typeof effekseer !== "undefined" &&
+        this.__effekseerElements.length > 0
+      ) {
         effekseer.update();
       }
-
     }
 
     /**
@@ -18490,12 +18795,29 @@ albedo.rgb *= (1.0 - metallic);
      * @param expression a instance of Expression class
      */
     draw(expression            ) {
-      let renderPassTag = '';
-      expression.renderPasses.forEach((renderPass, index)=>{
+      let renderPassTag = "";
+
+      if (this._outlineMaterial.shaderInstance == null) {
+        const mesh = expression.renderPasses[0].meshes[0];
+        if (mesh != null) {
+          this._outlineMaterial.shaderInstance = mesh.geometry.prepareGLSLProgram(
+            expression,
+            this._outlineMaterial,
+            true,
+            [],
+            this._outlineMaterial.shaderClass
+          );
+        }
+      }
+
+      expression.renderPasses.forEach((renderPass, index) => {
         if (!renderPass.isEnableToDraw || !renderPass.scene) {
           return;
         }
-        if (GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING && GLBoost.valueOfGLBoostConstants[GLBoost.LOG_TYPE_PERFORMANCE] !== false) {
+        if (
+          GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING &&
+          GLBoost.valueOfGLBoostConstants[GLBoost.LOG_TYPE_PERFORMANCE] !== false
+        ) {
           renderPass._startUnixTime = performance.now();
         }
 
@@ -18508,12 +18830,11 @@ albedo.rgb *= (1.0 - metallic);
 
         let lights = renderPass.scene.lightsExceptAmbient;
 
-        renderPass.preRender(camera ? true:false, lights);
+        renderPass.preRender(camera ? true : false, lights);
 
         var glContext = this._glContext;
         var gl = glContext.gl;
         var glem = GLExtensionsManager.getInstance(this._glContext);
-
 
         // set render target buffers for each RenderPass.
         /*
@@ -18533,13 +18854,24 @@ albedo.rgb *= (1.0 - metallic);
 
         let viewport = null;
         if (renderPass.viewport) {
-          viewport = [renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w];
+          viewport = [
+            renderPass.viewport.x,
+            renderPass.viewport.y,
+            renderPass.viewport.z,
+            renderPass.viewport.w
+          ];
         } else {
           if (this.isWebVRMode) {
             viewport = [0, 0, glContext.canvasWidth, glContext.canvasHeight];
           } else if (camera) {
-            let deltaWidth = glContext.canvasHeight*camera.aspect - glContext.canvasWidth;
-            viewport = [-deltaWidth/2, 0, glContext.canvasHeight*camera.aspect, glContext.canvasHeight];
+            let deltaWidth =
+              glContext.canvasHeight * camera.aspect - glContext.canvasWidth;
+            viewport = [
+              -deltaWidth / 2,
+              0,
+              glContext.canvasHeight * camera.aspect,
+              glContext.canvasHeight
+            ];
           } else {
             viewport = [0, 0, glContext.canvasWidth, glContext.canvasHeight];
           }
@@ -18555,16 +18887,27 @@ albedo.rgb *= (1.0 - metallic);
           if (this.__webvrDisplay.stageParameters) {
             this.__webvrFrameData.sittingToStandingTransform = this.__webvrDisplay.stageParameters.sittingToStandingTransform;
           } else {
-            this.__webvrFrameData.sittingToStandingTransform = Matrix44$1.translate(this.__defaultUserSittingPositionInVR).flatten();
+            this.__webvrFrameData.sittingToStandingTransform = Matrix44$1.translate(
+              this.__defaultUserSittingPositionInVR
+            ).flatten();
           }
         }
 
         // draw pre gizmos
-        this._drawGizmos(renderPass.preGizmos, expression, lights, camera, renderPass, index, viewport, true);
+        this._drawGizmos(
+          renderPass.preGizmos,
+          expression,
+          lights,
+          camera,
+          renderPass,
+          index,
+          viewport,
+          true
+        );
 
         // draw opacity meshes.
         const opacityMeshes = renderPass.opacityMeshes;
-        opacityMeshes.forEach((mesh)=> {
+        opacityMeshes.forEach(mesh => {
           if (mesh.isVisible) {
             mesh.draw({
               expression: expression,
@@ -18583,9 +18926,11 @@ albedo.rgb *= (1.0 - metallic);
           renderPass.sortTransparentMeshes(camera);
         }
         // draw transparent meshes.
-        const transparentMeshes = (renderPass.transparentMeshesAsManualOrder) ? renderPass.transparentMeshesAsManualOrder : renderPass.transparentMeshes;
+        const transparentMeshes = renderPass.transparentMeshesAsManualOrder
+          ? renderPass.transparentMeshesAsManualOrder
+          : renderPass.transparentMeshes;
 
-        transparentMeshes.forEach((mesh)=> {
+        transparentMeshes.forEach(mesh => {
           //console.log(mesh.userFlavorName);
           if (mesh.isVisible && mesh.isTransparent) {
             mesh.draw({
@@ -18600,37 +18945,111 @@ albedo.rgb *= (1.0 - metallic);
             });
           }
         });
-        
+
+        this._drawOutlineMeshes(
+          expression,
+          lights,
+          camera,
+          renderPass,
+          index,
+          viewport
+        );
+
+        // draw Outline of meshes
+
         // draw post gizmos
-        this._drawGizmos(renderPass.postGizmos, expression, lights, camera, renderPass, index, viewport, false);
+        this._drawGizmos(
+          renderPass.postGizmos,
+          expression,
+          lights,
+          camera,
+          renderPass,
+          index,
+          viewport,
+          false
+        );
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-  //      glem.drawBuffers(gl, [gl.BACK]);
+        //      glem.drawBuffers(gl, [gl.BACK]);
 
-        if (typeof effekseer !== "undefined" && this.__effekseerElements.length > 0 && camera != null) {
+        if (
+          typeof effekseer !== "undefined" &&
+          this.__effekseerElements.length > 0 &&
+          camera != null
+        ) {
           const projection = camera.projectionRHMatrix().m;
-          const viewing = camera.lookAtRHMatrix().multiply(camera.inverseWorldMatrixWithoutMySelf).m; 
+          const viewing = camera
+            .lookAtRHMatrix()
+            .multiply(camera.inverseWorldMatrixWithoutMySelf).m;
           effekseer.setProjectionMatrix(projection);
           effekseer.setCameraMatrix(viewing);
           effekseer.draw();
         }
 
-        renderPass.postRender(camera ? true:false, lights);
+        renderPass.postRender(camera ? true : false, lights);
 
         renderPass._endUnixTime = performance.now();
       });
-      if (GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING && GLBoost.valueOfGLBoostConstants[GLBoost.LOG_TYPE_PERFORMANCE] !== false) {
-        expression.renderPasses.forEach((renderPass, index)=>{
-          this.__logger.out(GLBoost.LOG_LEVEL_INFO, GLBoost.LOG_TYPE_PERFORMANCE, false, `RenderPass[${index}]: ${renderPass._endUnixTime - renderPass._startUnixTime}`);
+      if (
+        GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING &&
+        GLBoost.valueOfGLBoostConstants[GLBoost.LOG_TYPE_PERFORMANCE] !== false
+      ) {
+        expression.renderPasses.forEach((renderPass, index) => {
+          this.__logger.out(
+            GLBoost.LOG_LEVEL_INFO,
+            GLBoost.LOG_TYPE_PERFORMANCE,
+            false,
+            `RenderPass[${index}]: ${renderPass._endUnixTime -
+            renderPass._startUnixTime}`
+          );
         });
       }
     }
 
-    _drawGizmos(gizmos, expression, lights, camera, renderPass, index, viewport, isDepthTest) {
-      const globalStatesUsageBackup = this._glBoostSystem._glBoostContext.globalStatesUsage;
-      this._glBoostSystem._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
+    _drawOutlineMeshes(expression, lights, camera, renderPass, index, viewport) {
+      const globalStatesUsageBackup = this._glBoostSystem._glBoostContext
+        .globalStatesUsage;
+      this._glBoostSystem._glBoostContext.globalStatesUsage =
+        GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
+
+      const meshes = renderPass.outlineModeMeshes;
+      meshes.forEach(mesh => {
+        if (mesh.isOutlineVisible) {
+          mesh.AABBInWorld.updateAllInfo();
+          mesh.draw({
+            expression: expression,
+            lights: lights,
+            camera: camera,
+            renderPass: renderPass,
+            renderPassIndex: index,
+            viewport: viewport,
+            isWebVRMode: this.isWebVRMode,
+            webvrFrameData: this.__webvrFrameData,
+            forceThisMaterial: this._outlineMaterial,
+            isOutlineMode: true
+          });
+        }
+      });
+      this._glBoostSystem._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
+      this._glBoostSystem._glBoostContext.restoreGlobalStatesToDefault();
+    }
+
+    _drawGizmos(
+      gizmos,
+      expression,
+      lights,
+      camera,
+      renderPass,
+      index,
+      viewport,
+      isDepthTest
+    ) {
+      const globalStatesUsageBackup = this._glBoostSystem._glBoostContext
+        .globalStatesUsage;
+      this._glBoostSystem._glBoostContext.globalStatesUsage =
+        GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
       this._glBoostSystem._glBoostContext.currentGlobalStates = [
-        3042, // gl.BLEND
+        3042 // gl.BLEND
       ];
       if (isDepthTest) {
         this._glBoostSystem._glBoostContext.currentGlobalStates.push(2929); // gl.DEPTH_TEST
@@ -18654,7 +19073,6 @@ albedo.rgb *= (1.0 - metallic);
 
       this._glBoostSystem._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
       this._glBoostSystem._glBoostContext.restoreGlobalStatesToDefault();
-
     }
 
     _clearBuffer(gl, renderPass) {
@@ -18677,9 +19095,9 @@ albedo.rgb *= (1.0 - metallic);
           gl.clear(gl.DEPTH_BUFFER_BIT);
         }
       } else if (clearColor || clearDepth) {
-        gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
       } else if (clearColor) {
-        gl.clear( gl.COLOR_BUFFER_BIT );
+        gl.clear(gl.COLOR_BUFFER_BIT);
       }
     }
 
@@ -18689,17 +19107,17 @@ albedo.rgb *= (1.0 - metallic);
      * @param depth_flg true: clear depth, false: don't clear depth
      * @param stencil_flg  true: clear stencil, false: don't clear stencil
      */
-    clearCanvas( color_flg         , depth_flg         , stencil_flg          ) {
+    clearCanvas(color_flg         , depth_flg         , stencil_flg         ) {
       const gl = this._glContext.gl;
 
       var bufferBits = 0;
 
-      if ( color_flg === void 0 || color_flg ) bufferBits |= gl.COLOR_BUFFER_BIT;
-      if ( depth_flg === void 0 || depth_flg ) bufferBits |= gl.DEPTH_BUFFER_BIT;
-      if ( stencil_flg === void 0 || stencil_flg ) bufferBits |= gl.STENCIL_BUFFER_BIT;
+      if (color_flg === void 0 || color_flg) bufferBits |= gl.COLOR_BUFFER_BIT;
+      if (depth_flg === void 0 || depth_flg) bufferBits |= gl.DEPTH_BUFFER_BIT;
+      if (stencil_flg === void 0 || stencil_flg)
+        bufferBits |= gl.STENCIL_BUFFER_BIT;
 
-      gl.clear( bufferBits );
-
+      gl.clear(bufferBits);
     }
 
     /**
@@ -18709,7 +19127,6 @@ albedo.rgb *= (1.0 - metallic);
     get glContext()               {
       return this._glContext.gl;
     }
-
 
     /**
      * resize canvas and viewport.
@@ -18728,16 +19145,18 @@ albedo.rgb *= (1.0 - metallic);
       args.splice(0, 0, time);
       renderLoopFunc.apply(renderLoopFunc, args);
 
-      this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame((_time)=>{
-        this.doRenderLoop(renderLoopFunc, _time, args[1]);
-        if (this.__requestedToEnterWebVR) {
-          this.__isWebVRMode = true;
-        }
-      }, time);
+      this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame(
+        _time => {
+          this.doRenderLoop(renderLoopFunc, _time, args[1]);
+          if (this.__requestedToEnterWebVR) {
+            this.__isWebVRMode = true;
+          }
+        },
+        time
+      );
     }
 
     doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args) {
-
       if (beforeCallback) {
         beforeCallback.apply(beforeCallback, args);
       }
@@ -18754,12 +19173,19 @@ albedo.rgb *= (1.0 - metallic);
         this.__webvrDisplay.submitFrame();
       }
 
-      this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame(()=>{
-        this.doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args);
-        if (this.__requestedToEnterWebVR) {
-          this.__isWebVRMode = true;
+      this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame(
+        () => {
+          this.doConvenientRenderLoop(
+            expression,
+            beforeCallback,
+            afterCallback,
+            ...args
+          );
+          if (this.__requestedToEnterWebVR) {
+            this.__isWebVRMode = true;
+          }
         }
-      });
+      );
     }
 
     stopRenderLoop() {
@@ -18767,17 +19193,19 @@ albedo.rgb *= (1.0 - metallic);
       this.__animationFrameId = -1;
     }
 
-
-
     // WebVR
-    async enterWebVR(initialUserSittingPositionIfStageParametersDoNotExist, minRenderWidth = null, minRenderHeight = null) {
+    async enterWebVR(
+      initialUserSittingPositionIfStageParametersDoNotExist,
+      minRenderWidth = null,
+      minRenderHeight = null
+    ) {
       if (initialUserSittingPositionIfStageParametersDoNotExist) {
         this.__defaultUserSittingPositionInVR = initialUserSittingPositionIfStageParametersDoNotExist;
       }
       this.__minRenderWidthFromUser = minRenderWidth;
       this.__minRenderHeightFromUser = minRenderHeight;
 
-      return new Promise((resolve, reject)=> {
+      return new Promise((resolve, reject) => {
         if (!this.__webvrDisplay.isPresenting) {
           this.__animationFrameObject = this.__webvrDisplay;
           const leftEye = this.__webvrDisplay.getEyeParameters("left");
@@ -18786,32 +19214,47 @@ albedo.rgb *= (1.0 - metallic);
           this.__canvasWidthBackup = this._glContext.canvasWidth;
           this.__canvasHeightBackup = this._glContext.canvaHeight;
 
-          if (this.__minRenderWidthFromUser > leftEye.renderWidth && this.__minRenderHeightFromUser > rightEye.renderWidth) {
-            this.resize(this.__minRenderWidthFromUser * 2, this.__minRenderHeightFromUser);
+          if (
+            this.__minRenderWidthFromUser > leftEye.renderWidth &&
+            this.__minRenderHeightFromUser > rightEye.renderWidth
+          ) {
+            this.resize(
+              this.__minRenderWidthFromUser * 2,
+              this.__minRenderHeightFromUser
+            );
           } else {
-            this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
+            this.resize(
+              Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2,
+              Math.max(leftEye.renderHeight, rightEye.renderHeight)
+            );
           }
-          this.__webvrDisplay.requestPresent([{source: this._glContext.canvas}]).then(() => {
-            //this.__switchAnimationFrameFunctions(this.__webvrDisplay);
-            this.__requestedToEnterWebVR = true;
-            resolve();
-          }).catch(() => {
-            console.error('Failed to requestPresent. Please check your VR Setting, or something wrong with your VR system?');
-            reject();
-          });
+          this.__webvrDisplay
+            .requestPresent([{ source: this._glContext.canvas }])
+            .then(() => {
+              //this.__switchAnimationFrameFunctions(this.__webvrDisplay);
+              this.__requestedToEnterWebVR = true;
+              resolve();
+            })
+            .catch(() => {
+              console.error(
+                "Failed to requestPresent. Please check your VR Setting, or something wrong with your VR system?"
+              );
+              reject();
+            });
         }
       });
     }
 
     async readyForWebVR(requestButtonDom) {
-      if ( window.VRFrameData ) {
+      if (window.VRFrameData) {
         this.__webvrFrameData = new window.VRFrameData();
       }
 
-      return new Promise((resolve, reject)=> {
-        if ( navigator.getVRDisplays ) {
-          navigator.getVRDisplays()
-            .then((vrDisplays)=>{
+      return new Promise((resolve, reject) => {
+        if (navigator.getVRDisplays) {
+          navigator
+            .getVRDisplays()
+            .then(vrDisplays => {
               if (vrDisplays.length > 0) {
                 const webvrDisplay = vrDisplays[vrDisplays.length - 1];
                 webvrDisplay.depthNear = 0.01;
@@ -18821,11 +19264,11 @@ albedo.rgb *= (1.0 - metallic);
                   this.__webvrDisplay = webvrDisplay;
 
                   if (requestButtonDom) {
-                    requestButtonDom.style.display = 'block';
+                    requestButtonDom.style.display = "block";
                   } else {
                     const paragrach = document.createElement("p");
                     const anchor = document.createElement("a");
-                    anchor.setAttribute("id", 'enter-vr');
+                    anchor.setAttribute("id", "enter-vr");
                     const enterVr = document.createTextNode("Enter VR");
 
                     anchor.appendChild(enterVr);
@@ -18833,7 +19276,7 @@ albedo.rgb *= (1.0 - metallic);
 
                     const canvas = this.glContext.canvas;
                     canvas.parent.insertBefore(paragrach, canvas);
-                    window.addEventListener('click', this.enterWebVR.bind(this));
+                    window.addEventListener("click", this.enterWebVR.bind(this));
                   }
 
                   this.__isReadyForWebVR = true;
@@ -18843,16 +19286,22 @@ albedo.rgb *= (1.0 - metallic);
                   reject();
                 }
               } else {
-                console.error('Failed to get VR Display. Please check your VR Setting, or something wrong with your VR system?');
+                console.error(
+                  "Failed to get VR Display. Please check your VR Setting, or something wrong with your VR system?"
+                );
                 reject();
               }
             })
-            .catch(()=>{
-              console.error('Failed to get VR Displays. Please check your VR Setting.');
+            .catch(() => {
+              console.error(
+                "Failed to get VR Displays. Please check your VR Setting."
+              );
               reject();
             });
         } else {
-          console.error('Your browser does not support WebVR. Or it is disabled. Check again.');
+          console.error(
+            "Your browser does not support WebVR. Or it is disabled. Check again."
+          );
           reject();
         }
       });
@@ -18867,7 +19316,6 @@ albedo.rgb *= (1.0 - metallic);
       this.__isReadyForWebVR = false;
       this.__animationFrameObject = window;
     }
-
 
     async disableWebVR() {
       this.__isWebVRMode = false;
@@ -26176,4 +26624,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-402-g1e3f-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-404-gb409-mod branch: develop';
