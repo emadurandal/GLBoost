@@ -1083,14 +1083,12 @@
   GLBoost$1['Logger'] = Logger;
 
   class GLContext {
-
     constructor(canvas, initParameter, gl, width, height) {
-
-      if (typeof gl !== 'undefined' && gl !== null) {
+      if (typeof gl !== "undefined" && gl !== null) {
         this.impl = new GLContextWebGL1Impl(canvas, initParameter, this, gl);
         this._canvasWidth = width;
         this._canvasHeight = height;
-        GLContext._instances['nocanvas'] = this;
+        GLContext._instances["nocanvas"] = this;
       } else {
         if (GLContext._instances[canvas.id] instanceof GLContext) {
           return GLContext._instances[canvas.id];
@@ -1112,20 +1110,26 @@
 
       this._logger = Logger.getInstance();
 
-      this._glErrorTypes = ['INVALID_ENUM', 'INVALID_VALUE', 'INVALID_OPERATION', 'INVALID_FRAMEBUFFER_OPERATION',
-      'OUT_OF_MEMORY', 'CONTEXT_LOST_WEBGL'];
+      this._glErrorTypes = [
+        "INVALID_ENUM",
+        "INVALID_VALUE",
+        "INVALID_OPERATION",
+        "INVALID_FRAMEBUFFER_OPERATION",
+        "OUT_OF_MEMORY",
+        "CONTEXT_LOST_WEBGL"
+      ];
       this._glErrorMessages = [
-        'An unacceptable value has been specified for an enumerated argument. The command is ignored and the error flag is set.',
-        'A numeric argument is out of range. The command is ignored and the error flag is set.',
-        'The specified command is not allowed for the current state. The command is ignored and the error flag is set.',
-        'The currently bound framebuffer is not framebuffer complete when trying to render to or to read from it.',
-        'Not enough memory is left to execute the command.',
-        'If the WebGL context is lost, this error is returned on the first call to getError. Afterwards and until the context has been restored, it returns gl.NO_ERROR.'
-      ]; 
+        "An unacceptable value has been specified for an enumerated argument. The command is ignored and the error flag is set.",
+        "A numeric argument is out of range. The command is ignored and the error flag is set.",
+        "The specified command is not allowed for the current state. The command is ignored and the error flag is set.",
+        "The currently bound framebuffer is not framebuffer complete when trying to render to or to read from it.",
+        "Not enough memory is left to execute the command.",
+        "If the WebGL context is lost, this error is returned on the first call to getError. Afterwards and until the context has been restored, it returns gl.NO_ERROR."
+      ];
     }
 
     static getInstance(canvas, initParameter, gl, width, height) {
-      if (typeof canvas === 'string') {
+      if (typeof canvas === "string") {
         canvas = window.document.querySelector(canvas);
       }
       return new GLContext(canvas, initParameter, gl, width, height);
@@ -1143,7 +1147,7 @@
       if (this.impl.canvas) {
         return this.impl.canvas.id;
       } else {
-        return 'nocanvas';
+        return "nocanvas";
       }
     }
 
@@ -1159,9 +1163,15 @@
       let gl = this.impl.gl;
       let errorCode = gl.getError();
       if (errorCode !== 0) {
-        this.glErrorTypes.forEach((errorType, i)=>{
+        this.glErrorTypes.forEach((errorType, i) => {
           if (gl[errorType] === errorCode) {
-            this._logger.out(GLBoost$1.LOG_LEVEL_ERROR, GLBoost$1.LOG_TYPE_GL, false, errorCode, this._glErrorMessages[i]);
+            this._logger.out(
+              GLBoost$1.LOG_LEVEL_ERROR,
+              GLBoost$1.LOG_TYPE_GL,
+              false,
+              errorCode,
+              this._glErrorMessages[i]
+            );
           }
         });
       }
@@ -1253,13 +1263,13 @@
     }
 
     useProgram(program) {
-  //    if (!program) {
-        this.gl.useProgram(program);
-        this._currentProgramInuse = program;
+      //    if (!program) {
+      this.gl.useProgram(program);
+      this._currentProgramInuse = program;
 
-        this.checkGLError();
-        this._glslProgramsLatestUsageCount++;
-  /*
+      this.checkGLError();
+      this._glslProgramsLatestUsageCount++;
+      /*
         return;
       }
 
@@ -1285,14 +1295,17 @@
     }
 
     deleteAllPrograms() {
-      let programObjs = this._monitor.getWebGLResources('WebGLProgram');
+      let programObjs = this._monitor.getWebGLResources("WebGLProgram");
       for (let programObj of programObjs) {
         this.deleteProgram(programObj[0], programObj[1]);
       }
     }
 
     getUniformLocation(glslProgram, uniformVariableName) {
-      let uniformLocation = this.gl.getUniformLocation(glslProgram, uniformVariableName);
+      let uniformLocation = this.gl.getUniformLocation(
+        glslProgram,
+        uniformVariableName
+      );
       this.checkGLError();
       if (uniformLocation) {
         uniformLocation.glslProgram = glslProgram;
@@ -1305,8 +1318,10 @@
     _setUniformValues(uniformFuncStr, args, forceUpdate) {
       let uniformLocation = args[0];
       if (!uniformLocation) {
-        MiscUtil.consoleLog(GLBoost$1.LOG_OMISSION_PROCESSING,
-          'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation is falsy (undefined or something)');
+        MiscUtil.consoleLog(
+          GLBoost$1.LOG_OMISSION_PROCESSING,
+          "LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation is falsy (undefined or something)"
+        );
 
         return;
       }
@@ -1317,9 +1332,8 @@
         return;
       }
 
-
-  //    this.gl[uniformFuncStr].apply(this.gl, args);
-  /*
+      //    this.gl[uniformFuncStr].apply(this.gl, args);
+      /*
       if (uniformLocation.glslProgram.glslProgramsSelfUsageCount < this._glslProgramsLatestUsageCount) {
         MiscUtil.consoleLog(GLBoost.LOG_OMISSION_PROCESSING,
           'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation.glslProgram is not in use.');
@@ -1327,13 +1341,18 @@
         return;
       }
   */
-      if (this._currentProgramInuse.createdAt !== uniformLocation.glslProgram.createdAt) {
-         console.error('missmatch!');
+      if (
+        this._currentProgramInuse.createdAt !==
+        uniformLocation.glslProgram.createdAt
+      ) {
+        console.error("missmatch!");
         return;
       }
 
-      
-      if (uniformLocation.glslProgramUsageCountWhenLastSet < this._glslProgramsLatestUsageCount) {
+      if (
+        uniformLocation.glslProgramUsageCountWhenLastSet <
+        this._glslProgramsLatestUsageCount
+      ) {
         // Since I have never sent a uniform value to glslProgram which is currently in use, update it.
         this.gl[uniformFuncStr].apply(this.gl, args);
         args[0].setValue = args;
@@ -1342,55 +1361,76 @@
         return;
       }
 
-      MiscUtil.consoleLog(GLBoost$1.LOG_OMISSION_PROCESSING,
-        'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation.glslProgram is not in use.');
+      MiscUtil.consoleLog(
+        GLBoost$1.LOG_OMISSION_PROCESSING,
+        "LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation.glslProgram is not in use."
+      );
     }
 
     // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
     uniformMatrix4fv(uniformLocation, toTranspose, matrix44, forceUpdate) {
-      this._setUniformValues('uniformMatrix4fv', [uniformLocation, toTranspose, matrix44], forceUpdate);
+      this._setUniformValues(
+        "uniformMatrix4fv",
+        [uniformLocation, toTranspose, matrix44],
+        forceUpdate
+      );
     }
 
     // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
     uniform4f(uniformLocation, x, y, z, w, forceUpdate) {
-      this._setUniformValues('uniform4f', [uniformLocation, x, y, z, w], forceUpdate);
+      this._setUniformValues(
+        "uniform4f",
+        [uniformLocation, x, y, z, w],
+        forceUpdate
+      );
     }
 
     // Set forceUpdate to true if there is no way to check whether the values (x, y, z) change from the previous states or not.
     uniform3f(uniformLocation, x, y, z, forceUpdate) {
-      this._setUniformValues('uniform3f', [uniformLocation, x, y, z], forceUpdate);
+      this._setUniformValues(
+        "uniform3f",
+        [uniformLocation, x, y, z],
+        forceUpdate
+      );
     }
 
     // Set forceUpdate to true if there is no way to check whether the values (x, y) change from the previous states or not.
     uniform2f(uniformLocation, x, y, forceUpdate) {
-      this._setUniformValues('uniform2f', [uniformLocation, x, y], forceUpdate);
+      this._setUniformValues("uniform2f", [uniformLocation, x, y], forceUpdate);
     }
 
     // Set forceUpdate to true if there is no way to check whether the value x changes from the previous state or not.
     uniform1f(uniformLocation, x, forceUpdate) {
-      this._setUniformValues('uniform1f', [uniformLocation, x], forceUpdate);
+      this._setUniformValues("uniform1f", [uniformLocation, x], forceUpdate);
     }
 
     // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
     uniform4i(uniformLocation, x, y, z, w, forceUpdate) {
-      this._setUniformValues('uniform4i', [uniformLocation, x, y, z, w], forceUpdate);
+      this._setUniformValues(
+        "uniform4i",
+        [uniformLocation, x, y, z, w],
+        forceUpdate
+      );
     }
 
     // Set forceUpdate to true if there is no way to check whether the values (x, y, z) change from the previous states or not.
     uniform3i(uniformLocation, x, y, z, forceUpdate) {
-      this._setUniformValues('uniform3i', [uniformLocation, x, y, z], forceUpdate);
+      this._setUniformValues(
+        "uniform3i",
+        [uniformLocation, x, y, z],
+        forceUpdate
+      );
     }
 
     // Set forceUpdate to true if there is no way to check whether the values (x, y) change from the previous states or not.
     uniform2i(uniformLocation, x, y, forceUpdate) {
-      this._setUniformValues('uniform2i', [uniformLocation, x, y], forceUpdate);
+      this._setUniformValues("uniform2i", [uniformLocation, x, y], forceUpdate);
     }
 
     // Set forceUpdate to true if there is no way to check whether the value x changes from the previous state or not.
     uniform1i(uniformLocation, x, forceUpdate) {
-      this._setUniformValues('uniform1i', [uniformLocation, x], forceUpdate);
+      this._setUniformValues("uniform1i", [uniformLocation, x], forceUpdate);
     }
-
 
     createTexture(glBoostObject) {
       var glResource = this.gl.createTexture();
@@ -1435,7 +1475,6 @@
     get glslProgramsLatestUsageCount() {
       return this._glslProgramsLatestUsageCount;
     }
-
   }
   GLContext._instances = new Object();
 
@@ -7341,11 +7380,12 @@
           }
         }
 
-        material._glContext.uniform3i(
+        material._glContext.uniform4i(
           material.getUniform(glslProgram, "uniform_objectIdsAndOutlineFlag"),
           mesh.objectIndex,
           0,
           isOutlineMode,
+          mesh.outlineWidth,
           true
         );
 
@@ -7984,7 +8024,8 @@ return mat4(
       }
 
       if (Shader._exist(f, GLBoost$1.NORMAL)) {
-        shaderText += "  float border = AABBLengthCenterToCorner * 0.01;\n";
+        shaderText +=
+          "  float border = AABBLengthCenterToCorner * float(objectIds.w) / 10000.0;\n";
         //shaderText += "  float border = 2.0;\n";
         shaderText +=
           "  position_local.xyz = position_local.xyz + normalize(normal_local)*border * float(objectIds.z);\n";
@@ -8132,7 +8173,7 @@ return mat4(
       shaderText += "uniform mat4 viewMatrix;\n";
       shaderText += "uniform mat4 projectionMatrix;\n";
       shaderText += "uniform mat3 normalMatrix;\n";
-      shaderText += "uniform highp ivec3 objectIds;\n";
+      shaderText += "uniform highp ivec4 objectIds;\n";
       shaderText += "uniform float AABBLengthCenterToCorner;\n";
 
       shaderText += `${out_} vec3 v_position_world;\n`;
@@ -8169,7 +8210,8 @@ return mat4(
       if (Shader._exist(f, GLBoost.NORMAL)) {
         //      shaderText += '  vec4 position_proj =  pvwMatrix * position_local;\n';
         //      shaderText += '  float borderWidth = 1000.0 / position_proj.w;\n';
-        shaderText += "  float borderWidth = AABBLengthCenterToCorner * 0.01;\n";
+        shaderText +=
+          "  float borderWidth = AABBLengthCenterToCorner * float(objectIds.w) / 10000.0;\n";
         shaderText +=
           "  position_local.xyz = position_local.xyz + normalize(normal_local)*borderWidth * float(objectIds.z);\n";
       }
@@ -8232,7 +8274,7 @@ return mat4(
     FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
       let shaderText = "";
 
-      shaderText += `uniform highp ivec3 objectIds;\n`;
+      shaderText += `uniform highp ivec4 objectIds;\n`;
       shaderText += `uniform vec3 viewPosition_world;\n`;
 
       let lightNumExceptAmbient = lights.filter(light => {
@@ -11030,7 +11072,8 @@ return mat4(
       shaderText += "uniform vec4 materialBaseColor;\n";
       shaderText += "uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n";
       shaderText += "uniform vec2 uAlphaTestParameters;\n";
-      shaderText += "uniform highp ivec3 objectIds;\n";
+      shaderText += "uniform highp ivec4 objectIds;\n";
+      shaderText += "uniform highp vec4 uOutlineColor;\n";
       return shaderText;
     }
 
@@ -11076,7 +11119,7 @@ return mat4(
                      }
 
                     if (float(objectIds.z) > 0.0) {
-                      rt0.rgba += vec4(0.0, 1.0, 0.0, 1.0);
+                      rt0.rgba = uOutlineColor;
                     }
     `;
 
@@ -11137,6 +11180,12 @@ return mat4(
         shaderProgram,
         "uniform_alphaTestParameters",
         this._glContext.getUniformLocation(shaderProgram, "uAlphaTestParameters")
+      );
+
+      material.setUniform(
+        shaderProgram,
+        "uniform_outlineColor",
+        this._glContext.getUniformLocation(shaderProgram, "uOutlineColor")
       );
 
       material.registerTextureUnitToUniform(
@@ -11205,6 +11254,15 @@ return mat4(
         material.getUniform(glslProgram, "uniform_alphaTestParameters"),
         isAlphaTestEnable ? 1.0 : 0.0,
         alphaCutoff,
+        true
+      );
+
+      this._glContext.uniform4f(
+        material.getUniform(glslProgram, "uniform_outlineColor"),
+        mesh.outlineColor.x,
+        mesh.outlineColor.y,
+        mesh.outlineColor.z,
+        mesh.outlineColor.w,
         true
       );
 
@@ -16324,8 +16382,9 @@ albedo.rgb *= (1.0 - metallic);
                      
                            
                    
-    //_outlineGizmo: any;
                                
+                          
+                           
                       
                                   
                               
@@ -16345,6 +16404,8 @@ albedo.rgb *= (1.0 - metallic);
       this._isPickable = true;
       this._isTransparentForce = false;
       this._isOutlineVisible = false;
+      this._outlineWidth = 100;
+      this._outlineColor = new Vector4$1(0, 1, 0, 1);
     }
 
     prepareToRender(expression     , existCamera_f     , lights     ) {
@@ -16708,6 +16769,22 @@ albedo.rgb *= (1.0 - metallic);
 
     get isOutlineVisible() {
       return this._isOutlineVisible;
+    }
+
+    get outlineWidth() {
+      return this._outlineWidth;
+    }
+
+    set outlineWidth(val        ) {
+      this._outlineWidth = val;
+    }
+
+    get outlineColor() {
+      return this._outlineColor;
+    }
+
+    set outlineColor(vec         ) {
+      this._outlineColor = vec;
     }
 
     set isVisible(flg         ) {
@@ -26624,4 +26701,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-404-gb409-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-405-ge5eee-mod branch: develop';

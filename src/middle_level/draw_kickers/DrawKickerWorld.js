@@ -265,11 +265,12 @@ export default class DrawKickerWorld {
         }
       }
 
-      material._glContext.uniform3i(
+      material._glContext.uniform4i(
         material.getUniform(glslProgram, "uniform_objectIdsAndOutlineFlag"),
         mesh.objectIndex,
         0,
         isOutlineMode,
+        mesh.outlineWidth,
         true
       );
 

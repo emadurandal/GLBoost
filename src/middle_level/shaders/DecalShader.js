@@ -53,7 +53,8 @@ export class DecalShaderSource {
     shaderText += "uniform vec4 materialBaseColor;\n";
     shaderText += "uniform int uIsTextureToMultiplyAlphaToColorPreviously;\n";
     shaderText += "uniform vec2 uAlphaTestParameters;\n";
-    shaderText += "uniform highp ivec3 objectIds;\n";
+    shaderText += "uniform highp ivec4 objectIds;\n";
+    shaderText += "uniform highp vec4 uOutlineColor;\n";
     return shaderText;
   }
 
@@ -99,7 +100,7 @@ export class DecalShaderSource {
                      }
 
                     if (float(objectIds.z) > 0.0) {
-                      rt0.rgba += vec4(0.0, 1.0, 0.0, 1.0);
+                      rt0.rgba = uOutlineColor;
                     }
     `;
 
@@ -160,6 +161,12 @@ export class DecalShaderSource {
       shaderProgram,
       "uniform_alphaTestParameters",
       this._glContext.getUniformLocation(shaderProgram, "uAlphaTestParameters")
+    );
+
+    material.setUniform(
+      shaderProgram,
+      "uniform_outlineColor",
+      this._glContext.getUniformLocation(shaderProgram, "uOutlineColor")
     );
 
     material.registerTextureUnitToUniform(
@@ -228,6 +235,15 @@ export default class DecalShader extends WireframeShader {
       material.getUniform(glslProgram, "uniform_alphaTestParameters"),
       isAlphaTestEnable ? 1.0 : 0.0,
       alphaCutoff,
+      true
+    );
+
+    this._glContext.uniform4f(
+      material.getUniform(glslProgram, "uniform_outlineColor"),
+      mesh.outlineColor.x,
+      mesh.outlineColor.y,
+      mesh.outlineColor.z,
+      mesh.outlineColor.w,
       true
     );
 

@@ -325,7 +325,8 @@ return mat4(
     }
 
     if (Shader._exist(f, GLBoost.NORMAL)) {
-      shaderText += "  float border = AABBLengthCenterToCorner * 0.01;\n";
+      shaderText +=
+        "  float border = AABBLengthCenterToCorner * float(objectIds.w) / 10000.0;\n";
       //shaderText += "  float border = 2.0;\n";
       shaderText +=
         "  position_local.xyz = position_local.xyz + normalize(normal_local)*border * float(objectIds.z);\n";

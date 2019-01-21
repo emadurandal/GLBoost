@@ -16,8 +16,9 @@ export default class M_Mesh extends M_Element {
   _opacity: number;
   _gizmos: Array<M_Mesh>;
   _geometry: any;
-  //_outlineGizmo: any;
   _isOutlineVisible: boolean;
+  _outlineWidth: number;
+  _outlineColor: Vector4;
   _material: M_Mesh;
   _glBoostSystem: GLBoostSystem;
   bindShapeMatrix: Matrix44;
@@ -37,6 +38,8 @@ export default class M_Mesh extends M_Element {
     this._isPickable = true;
     this._isTransparentForce = false;
     this._isOutlineVisible = false;
+    this._outlineWidth = 100;
+    this._outlineColor = new Vector4(0, 1, 0, 1);
   }
 
   prepareToRender(expression: any, existCamera_f: any, lights: any) {
@@ -400,6 +403,22 @@ export default class M_Mesh extends M_Element {
 
   get isOutlineVisible() {
     return this._isOutlineVisible;
+  }
+
+  get outlineWidth() {
+    return this._outlineWidth;
+  }
+
+  set outlineWidth(val: number) {
+    this._outlineWidth = val;
+  }
+
+  get outlineColor() {
+    return this._outlineColor;
+  }
+
+  set outlineColor(vec: Vector4) {
+    this._outlineColor = vec;
   }
 
   set isVisible(flg: boolean) {

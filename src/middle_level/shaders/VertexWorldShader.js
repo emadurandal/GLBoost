@@ -22,7 +22,7 @@ export default class VertexWorldShaderSource {
     shaderText += "uniform mat4 viewMatrix;\n";
     shaderText += "uniform mat4 projectionMatrix;\n";
     shaderText += "uniform mat3 normalMatrix;\n";
-    shaderText += "uniform highp ivec3 objectIds;\n";
+    shaderText += "uniform highp ivec4 objectIds;\n";
     shaderText += "uniform float AABBLengthCenterToCorner;\n";
 
     shaderText += `${out_} vec3 v_position_world;\n`;
@@ -59,7 +59,8 @@ export default class VertexWorldShaderSource {
     if (Shader._exist(f, GLBoost.NORMAL)) {
       //      shaderText += '  vec4 position_proj =  pvwMatrix * position_local;\n';
       //      shaderText += '  float borderWidth = 1000.0 / position_proj.w;\n';
-      shaderText += "  float borderWidth = AABBLengthCenterToCorner * 0.01;\n";
+      shaderText +=
+        "  float borderWidth = AABBLengthCenterToCorner * float(objectIds.w) / 10000.0;\n";
       shaderText +=
         "  position_local.xyz = position_local.xyz + normalize(normal_local)*borderWidth * float(objectIds.z);\n";
     }
@@ -122,7 +123,7 @@ export default class VertexWorldShaderSource {
   FSDefine_VertexWorldShaderSource(in_, f, lights, material, extraData) {
     let shaderText = "";
 
-    shaderText += `uniform highp ivec3 objectIds;\n`;
+    shaderText += `uniform highp ivec4 objectIds;\n`;
     shaderText += `uniform vec3 viewPosition_world;\n`;
 
     let lightNumExceptAmbient = lights.filter(light => {
