@@ -11102,8 +11102,10 @@ return mat4(
         shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
       }
 
-      shaderText += "  normal_world += -2.0 * float(objectIds.z);\n";
-
+      if (Shader._exist(f, GLBoost$1.NORMAL)) {
+        shaderText +=
+          "  normal_world += normal_world * -2.0 * float(objectIds.z);\n";
+      }
       //shaderText += '    float shadowRatio = 0.0;\n';
 
       //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
@@ -14720,20 +14722,20 @@ albedo.rgb *= (1.0 - metallic);
 
       this._isTextureReady = false;
       this._texture = null;
-      if (typeof userFlavorName === 'undefined' || userFlavorName === null) {
+      if (typeof userFlavorName === "undefined" || userFlavorName === null) {
         this.userFlavorName = this._instanceName;
       } else {
         this.userFlavorName = userFlavorName;
       }
 
-      this._parameters = (parameters) ? parameters : {};
+      this._parameters = parameters ? parameters : {};
 
-      if (typeof src === 'undefined' || src === null) ; else if (typeof src === 'string') {
-          this.generateTextureFromUri(src);
+      if (typeof src === "undefined" || src === null) ; else if (typeof src === "string") {
+        this.generateTextureFromUri(src);
       } else if (src instanceof Image) {
-          this.generateTextureFromImage(src);
+        this.generateTextureFromImage(src);
       } else {
-          this._generateTextureFromImageData(src);
+        this._generateTextureFromImageData(src);
       }
     }
 
@@ -14748,12 +14750,12 @@ albedo.rgb *= (1.0 - metallic);
 
       let ret = null;
       switch (paramNumber) {
-        case GLBoost$1['UNPACK_FLIP_Y_WEBGL']:
-        case GLBoost$1['UNPACK_PREMULTIPLY_ALPHA_WEBGL']:
-        case GLBoost$1['TEXTURE_MAG_FILTER']:
-        case GLBoost$1['TEXTURE_MIN_FILTER']:
-        case GLBoost$1['TEXTURE_WRAP_S']:
-        case GLBoost$1['TEXTURE_WRAP_T']:
+        case GLBoost$1["UNPACK_FLIP_Y_WEBGL"]:
+        case GLBoost$1["UNPACK_PREMULTIPLY_ALPHA_WEBGL"]:
+        case GLBoost$1["TEXTURE_MAG_FILTER"]:
+        case GLBoost$1["TEXTURE_MIN_FILTER"]:
+        case GLBoost$1["TEXTURE_WRAP_S"]:
+        case GLBoost$1["TEXTURE_WRAP_T"]:
           if (isParametersExist && params[paramName]) {
             ret = params[paramName];
           }
@@ -14763,11 +14765,14 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     _getParamWithAlternative(paramNumber, alternative) {
-      return MiscUtil.getTheValueOrAlternative(this._getParameter(paramNumber), alternative);
+      return MiscUtil.getTheValueOrAlternative(
+        this._getParameter(paramNumber),
+        alternative
+      );
     }
 
     generateTextureFromUri(imageUri, isKeepBound = false) {
-      return new Promise((resolve, reject)=> {
+      return new Promise((resolve, reject) => {
         let isNode = DataUtil.isNode();
         if (isNode) {
           let getPixels = require("get-pixels");
@@ -14782,18 +14787,22 @@ albedo.rgb *= (1.0 - metallic);
             this._width = pixels.shape[0];
             this._height = pixels.shape[1];
 
-            let texture = this._generateTextureInnerWithArrayBufferView(pixels.data, this._width, this._height, isKeepBound);
+            let texture = this._generateTextureInnerWithArrayBufferView(
+              pixels.data,
+              this._width,
+              this._height,
+              isKeepBound
+            );
 
             this._texture = texture;
             this._isTextureReady = true;
 
             resolve();
           });
-
         } else {
           this._img = new Image();
           if (!imageUri.match(/^data:/)) {
-            this._img.crossOrigin = 'Anonymous';
+            this._img.crossOrigin = "Anonymous";
           }
           this._img.onload = () => {
             let imgCanvas = this._getResizedCanvas(this._img);
@@ -26701,4 +26710,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-405-ge5eee-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-406-g7cb1-mod branch: develop';

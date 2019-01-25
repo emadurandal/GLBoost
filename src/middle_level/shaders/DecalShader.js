@@ -83,8 +83,10 @@ export class DecalShaderSource {
       shaderText += `  rt0 *= multiplyAlphaToColorOfTexel(uTexture, texcoord, uIsTextureToMultiplyAlphaToColorPreviously);\n`;
     }
 
-    shaderText += "  normal_world += -2.0 * float(objectIds.z);\n";
-
+    if (Shader._exist(f, GLBoost.NORMAL)) {
+      shaderText +=
+        "  normal_world += normal_world * -2.0 * float(objectIds.z);\n";
+    }
     //shaderText += '    float shadowRatio = 0.0;\n';
 
     //shaderText += '    rt0 = vec4(1.0, 0.0, 0.0, 1.0);\n';
