@@ -104,7 +104,7 @@ export default class L_CameraController extends GLBoostObject {
     };
 
     this._onMouseMove = evt => {
-      MiscUtil.preventDefaultForDesktopOnly(evt);
+      evt.preventDefault();
       evt.stopPropagation();
 
       if (this._isKeyUp) {
@@ -236,12 +236,16 @@ export default class L_CameraController extends GLBoostObject {
       if ("ontouchend" in document) {
         eventTargetDom.addEventListener("touchstart", this._onMouseDown);
         eventTargetDom.addEventListener("touchend", this._onMouseUp);
-        eventTargetDom.addEventListener("touchmove", this._onMouseMove);
+        eventTargetDom.addEventListener("touchmove", this._onMouseMove, {
+          passive: false
+        });
       }
       if ("onmouseup" in document) {
         eventTargetDom.addEventListener("mousedown", this._onMouseDown);
         eventTargetDom.addEventListener("mouseup", this._onMouseUp);
-        eventTargetDom.addEventListener("mousemove", this._onMouseMove);
+        eventTargetDom.addEventListener("mousemove", this._onMouseMove, {
+          passive: false
+        });
       }
       if (window.WheelEvent) {
         eventTargetDom.addEventListener("wheel", this._onMouseWheel);
@@ -256,12 +260,16 @@ export default class L_CameraController extends GLBoostObject {
       if ("ontouchend" in document) {
         eventTargetDom.removeEventListener("touchstart", this._onMouseDown);
         eventTargetDom.removeEventListener("touchend", this._onMouseUp);
-        eventTargetDom.removeEventListener("touchmove", this._onMouseMove);
+        eventTargetDom.removeEventListener("touchmove", this._onMouseMove, {
+          passive: false
+        });
       }
       if ("onmouseup" in document) {
         eventTargetDom.removeEventListener("mousedown", this._onMouseDown);
         eventTargetDom.removeEventListener("mouseup", this._onMouseUp);
-        eventTargetDom.removeEventListener("mousemove", this._onMouseMove);
+        eventTargetDom.removeEventListener("mousemove", this._onMouseMove, {
+          passive: false
+        });
       }
       if (window.WheelEvent) {
         eventTargetDom.removeEventListener("wheel", this._onMouseWheel);

@@ -1,5 +1,5 @@
-version: 0.0.4-406-g7cb1-mod
+version: 0.0.4-407-gd2b4-mod
 branch: develop
-f9b208f4e7be845a4f0b0bd6f163dc153b04c40a14bbdd59ac8a98407b64a5e8 ./build/glboost.js
-76250968246f5f064c8971db8a77ec26376e6c59e2b62be68abfe62ca0b2e173 ./build/glboost.min.js
-257b66a705da77287857a47779f9e1b12a9ed55c4587eac4521e3c3dd0313f6f ./build/glboost.min.js.map
+9c723af30bdaa207af59a3a71666914e8b6ab8d2befaf0af37faa893dbfd24f0 ./build/glboost.js
+2bab41a13f40eef04e085dcc8faeba55e3a3da8580888b73bc00c747560ddd30 ./build/glboost.min.js
+590cba15f128738ab6ae3d8d49b126fd41d11e3828b51c63c29004266975286d ./build/glboost.min.js.map
