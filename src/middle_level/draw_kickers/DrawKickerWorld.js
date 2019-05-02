@@ -1,10 +1,10 @@
-import M_PointLight from '../elements/lights/M_PointLight';
+import M_PointLight from "../elements/lights/M_PointLight";
 //import M_DirectionalLight from '../elements/lights/M_DirectionalLight';
-import Vector3 from '../../low_level/math/Vector3';
-import Vector4 from '../../low_level/math/Vector4';
-import Matrix44 from '../../low_level/math/Matrix44';
-import Matrix33 from '../../low_level/math/Matrix33';
-import Shader from '../../low_level/shaders/Shader';
+import Vector3 from "../../low_level/math/Vector3";
+import Vector4 from "../../low_level/math/Vector4";
+import Matrix44 from "../../low_level/math/Matrix44";
+import Matrix33 from "../../low_level/math/Matrix33";
+import Shader from "../../low_level/shaders/Shader";
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -12,7 +12,9 @@ let singletonEnforcer = Symbol();
 export default class DrawKickerWorld {
   constructor(enforcer) {
     if (enforcer !== singletonEnforcer) {
-      throw new Error('This is a Singleton class. get the instance using \'getInstance\' static method.');
+      throw new Error(
+        "This is a Singleton class. get the instance using 'getInstance' static method."
+      );
     }
     this._glslProgram = null;
   }
@@ -25,15 +27,31 @@ export default class DrawKickerWorld {
   }
 
   static setCamera(gl, glslProgram, material, world_m, normal_m, camera, mesh) {
-    Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', world_m.flatten());
-    Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
+    Shader.trySettingMatrix44ToUniform(
+      gl,
+      glslProgram,
+      material,
+      material._semanticsDic,
+      "WORLD",
+      world_m.flatten()
+    );
+    Shader.trySettingMatrix33ToUniform(
+      gl,
+      glslProgram,
+      material,
+      material._semanticsDic,
+      "MODELVIEWINVERSETRANSPOSE",
+      normal_m.flatten()
+    );
 
     if (camera) {
       let viewMatrix;
       if (mesh.isAffectedByViewMatrix) {
         let cameraMatrix = camera.lookAtRHMatrix();
-          viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrixWithoutMySelf);
-//        viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrix);
+        viewMatrix = cameraMatrix.multiply(
+          camera.inverseWorldMatrixWithoutMySelf
+        );
+        //        viewMatrix = cameraMatrix.multiply(camera.inverseWorldMatrix);
       } else {
         viewMatrix = Matrix44.identity();
       }
@@ -45,40 +63,120 @@ export default class DrawKickerWorld {
         projectionMatrix = Matrix44.identity();
       }
 
-      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
-      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
-      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m).flatten());
+      Shader.trySettingMatrix44ToUniform(
+        gl,
+        glslProgram,
+        material,
+        material._semanticsDic,
+        "VIEW",
+        viewMatrix.flatten()
+      );
+      Shader.trySettingMatrix44ToUniform(
+        gl,
+        glslProgram,
+        material,
+        material._semanticsDic,
+        "PROJECTION",
+        projectionMatrix.flatten()
+      );
+      Shader.trySettingMatrix44ToUniform(
+        gl,
+        glslProgram,
+        material,
+        material._semanticsDic,
+        "MODELVIEW",
+        Matrix44.multiply(viewMatrix, world_m).flatten()
+      );
 
-      camera._lastPVMatrixFromLight = Matrix44.multiply(projectionMatrix, viewMatrix);
+      camera._lastPVMatrixFromLight = Matrix44.multiply(
+        projectionMatrix,
+        viewMatrix
+      );
     }
   }
 
-  static setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, leftOrRight) {
-    Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'WORLD', world_m.flatten());
-    Shader.trySettingMatrix33ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEWINVERSETRANSPOSE', normal_m.flatten());
+  static setVRCamera(
+    gl,
+    glslProgram,
+    material,
+    world_m,
+    normal_m,
+    webvrFrameData,
+    mesh,
+    leftOrRight
+  ) {
+    Shader.trySettingMatrix44ToUniform(
+      gl,
+      glslProgram,
+      material,
+      material._semanticsDic,
+      "WORLD",
+      world_m.flatten()
+    );
+    Shader.trySettingMatrix33ToUniform(
+      gl,
+      glslProgram,
+      material,
+      material._semanticsDic,
+      "MODELVIEWINVERSETRANSPOSE",
+      normal_m.flatten()
+    );
 
     if (webvrFrameData) {
       let viewMatrix;
       if (mesh.isAffectedByViewMatrix) {
-        const invertSittingToStandingTransform = (new Matrix44(webvrFrameData.sittingToStandingTransform, true)).invert();
-        const leftOrRightViewMatrix = new Matrix44(webvrFrameData[leftOrRight + 'ViewMatrix'], true);
-        viewMatrix = Matrix44.multiply(leftOrRightViewMatrix, invertSittingToStandingTransform);
+        const invertSittingToStandingTransform = new Matrix44(
+          webvrFrameData.sittingToStandingTransform,
+          true
+        ).invert();
+        const leftOrRightViewMatrix = new Matrix44(
+          webvrFrameData[leftOrRight + "ViewMatrix"],
+          true
+        );
+        viewMatrix = Matrix44.multiply(
+          leftOrRightViewMatrix,
+          invertSittingToStandingTransform
+        );
       } else {
         viewMatrix = Matrix44.identity();
       }
 
       let projectionMatrix;
       if (mesh.isAffectedByProjectionMatrix) {
-        projectionMatrix = new Matrix44(webvrFrameData[leftOrRight + 'ProjectionMatrix'], true);
+        projectionMatrix = new Matrix44(
+          webvrFrameData[leftOrRight + "ProjectionMatrix"],
+          true
+        );
       } else {
         projectionMatrix = Matrix44.identity();
       }
 
-      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'VIEW', viewMatrix.flatten());
-      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'PROJECTION', projectionMatrix.flatten());
-      Shader.trySettingMatrix44ToUniform(gl, glslProgram, material, material._semanticsDic, 'MODELVIEW', Matrix44.multiply(viewMatrix, world_m).flatten());
+      Shader.trySettingMatrix44ToUniform(
+        gl,
+        glslProgram,
+        material,
+        material._semanticsDic,
+        "VIEW",
+        viewMatrix.flatten()
+      );
+      Shader.trySettingMatrix44ToUniform(
+        gl,
+        glslProgram,
+        material,
+        material._semanticsDic,
+        "PROJECTION",
+        projectionMatrix.flatten()
+      );
+      Shader.trySettingMatrix44ToUniform(
+        gl,
+        glslProgram,
+        material,
+        material._semanticsDic,
+        "MODELVIEW",
+        Matrix44.multiply(viewMatrix, world_m).flatten()
+      );
 
-//      camera._lastPVMatrixFromLight = Matrix44.multiply(projectionMatrix, viewMatrix);
+      //      camera._lastPVMatrixFromLight = Matrix44.multiply(projectionMatrix, viewMatrix);
     }
   }
 
@@ -104,33 +202,49 @@ export default class DrawKickerWorld {
     const isWebVRMode = data.isWebVRMode;
     const webvrFrameData = data.webvrFrameData;
     const forceThisMaterial = data.forceThisMaterial;
+    const isOutlineMode = data.isOutlineMode ? true : false;
 
     var isVAOBound = glem.bindVertexArray(gl, vaoDic[geometryName]);
 
-    let input = mesh._getCurrentAnimationInputValue('time');
+    let input = mesh._getCurrentAnimationInputValue("time");
 
-
-
-    for (let i=0; i<originalMaterials.length;i++) {
+    for (let i = 0; i < originalMaterials.length; i++) {
       let material = originalMaterials[i];
-      let isOutlineVisible = false;
-      if (forceThisMaterial) {
-        material = forceThisMaterial;
-        if (forceThisMaterial.userFlavorName === 'OutlineGizmoMaterial') {
-          isOutlineVisible = true;
-        }
-      }
       if (!material.isVisible) {
         continue;
       }
 
-      let renderpassSpecificMaterial = material['renderpassSpecificMaterial_' + expression.renderPasses[renderPassIndex].instanceName + '_material_' + i];
+      let renderpassSpecificMaterial =
+        material[
+          "renderpassSpecificMaterial_" +
+            expression.renderPasses[renderPassIndex].instanceName +
+            "_material_" +
+            i
+        ];
       if (renderpassSpecificMaterial) {
         material = renderpassSpecificMaterial;
       }
 
+      if (forceThisMaterial) {
+        forceThisMaterial._vertexNofGeometries = material._vertexNofGeometries;
+        forceThisMaterial.shaderInstance = material.shaderInstance;
+        forceThisMaterial._semanticsDic = material._semanticsDic;
+        forceThisMaterial._shaderParametersForShaderInstance =
+          material._shaderParametersForShaderInstance;
+        forceThisMaterial._shaderUniformLocationsOfExpressions =
+          material._shaderUniformLocationsOfExpressions;
+        material = forceThisMaterial;
+        //        material.baseColor = forceThisMaterial.baseColor;
+        //        material.states = forceThisMaterial.states;
+        //        material.globalStatesUsage = forceThisMaterial.globalStatesUsage;
+      }
+
       if (!material.shaderInstance) {
-        console.warn(`Failed to Render due to this material '${material.userFlavorName}(${material.instanceName})' has not shaderInstance.`);
+        console.warn(
+          `Failed to Render due to this material '${material.userFlavorName}(${
+            material.instanceName
+          })' has not shaderInstance.`
+        );
         continue;
       }
       this._glslProgram = material.shaderInstance.glslProgram;
@@ -139,19 +253,37 @@ export default class DrawKickerWorld {
       let glslProgram = this._glslProgram;
 
       if (!isVAOBound) {
-      if (DrawKickerWorld._lastGeometry !== geometryName) {
+        if (DrawKickerWorld._lastGeometry !== geometryName) {
           for (let attribName in vboDic) {
             gl.bindBuffer(gl.ARRAY_BUFFER, vboDic[attribName]);
-            geometry.setUpVertexAttribs(gl, glslProgram, geometry._allVertexAttribs(vertices));
+            geometry.setUpVertexAttribs(
+              gl,
+              glslProgram,
+              geometry._allVertexAttribs(vertices)
+            );
           }
         }
       }
 
-      material._glContext.uniform3i(material.getUniform(glslProgram, 'uniform_objectIdsAndOutlineFlag'), mesh.objectIndex, 0, isOutlineVisible, true);
+      material._glContext.uniform4i(
+        material.getUniform(glslProgram, "uniform_objectIdsAndOutlineFlag"),
+        mesh.objectIndex,
+        0,
+        isOutlineMode,
+        mesh.outlineWidth,
+        true
+      );
 
       let opacity = mesh.opacityAccumulatedAncestry * scene.opacity;
-      let query_result_uniform_opacity = material.getUniform(glslProgram, 'uniform_opacity');
-      material._glContext.uniform1f(query_result_uniform_opacity, opacity, true);
+      let query_result_uniform_opacity = material.getUniform(
+        glslProgram,
+        "uniform_opacity"
+      );
+      material._glContext.uniform1f(
+        query_result_uniform_opacity,
+        opacity,
+        true
+      );
 
       let world_m;
       let normal_m;
@@ -168,22 +300,38 @@ export default class DrawKickerWorld {
         normal_m = Matrix33.identity();
       }
 
-      if (material.getUniform(glslProgram, 'uniform_lightPosition_0')) {
-        lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
-        
-        if (material.getUniform(glslProgram, 'uniform_viewPosition')) {
-          let cameraPos = new Vector4(0, 0, 1, 1);
-          if (camera) {
-            cameraPos = camera.worldMatrixWithoutMySelf.multiplyVector(new Vector4(camera.eyeInner.x, camera.eyeInner.y, camera.eyeInner.z, 1.0));
+      if (material.getUniform(glslProgram, "uniform_viewPosition")) {
+        let cameraPos = new Vector4(0, 0, 1, 1);
+        if (camera) {
+          cameraPos = camera.worldMatrixWithoutMySelf.multiplyVector(
+            new Vector4(
+              camera.eyeInner.x,
+              camera.eyeInner.y,
+              camera.eyeInner.z,
+              1.0
+            )
+          );
           //  console.log(cameraPos);
-          }
-          material._glContext.uniform3f(material.getUniform(glslProgram, 'uniform_viewPosition'), cameraPos.x, cameraPos.y, cameraPos.z, true);
         }
+        material._glContext.uniform3f(
+          material.getUniform(glslProgram, "uniform_viewPosition"),
+          cameraPos.x,
+          cameraPos.y,
+          cameraPos.z,
+          true
+        );
+      }
+
+      if (material.getUniform(glslProgram, "uniform_lightPosition_0")) {
+        lights = material.shaderInstance.getDefaultPointLightIfNotExist(lights);
 
         for (let j = 0; j < lights.length; j++) {
           let light = lights[j];
-          if (material.getUniform(glslProgram, `uniform_lightPosition_${j}`) && material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`)) {
-            let lightPosition = new Vector4(0, 0, 0, 1);            
+          if (
+            material.getUniform(glslProgram, `uniform_lightPosition_${j}`) &&
+            material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`)
+          ) {
+            let lightPosition = new Vector4(0, 0, 0, 1);
             let lightDirection = new Vector4(0, 0, 0, 1);
             let lightIntensity = light.intensity;
             if (!light.isVisible) {
@@ -192,27 +340,64 @@ export default class DrawKickerWorld {
 
             // Directional: [0.0, 0.4), Point:[0.4, 0.6), Spot:[0.6, 1.0]
             let lightType = 0.0; // M_DirectionalLight
-            if (light.className === 'M_PointLight') {
+            if (light.className === "M_PointLight") {
               lightType = 0.5;
-            } else if (light.className === 'M_SpotLight') {
+            } else if (light.className === "M_SpotLight") {
               lightType = 1.0;
             }
-            if (light.className === 'M_PointLight' || light.className === 'M_SpotLight') {
+            if (
+              light.className === "M_PointLight" ||
+              light.className === "M_SpotLight"
+            ) {
               lightPosition = light.worldMatrix.multiplyVector(lightPosition);
             }
-            if (light.className === 'M_DirectionalLight' || light.className === 'M_SpotLight') {
-//              lightDirection = new Vector3(0, 0, 1);
-//              lightDirection = light.worldMatrix.multiplyVector(lightDirection.toVector4()).toVector3();
+            if (
+              light.className === "M_DirectionalLight" ||
+              light.className === "M_SpotLight"
+            ) {
+              //              lightDirection = new Vector3(0, 0, 1);
+              //              lightDirection = light.worldMatrix.multiplyVector(lightDirection.toVector4()).toVector3();
               lightDirection = light.directionInWorld;
               lightDirection.normalize();
             }
-            material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightPosition_${j}`), lightPosition.x, lightPosition.y, lightPosition.z, true);
-            material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightDirection_${j}`), lightDirection.x, lightDirection.y, lightDirection.z, true);
-            material._glContext.uniform4f(material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`), lightIntensity.x, lightIntensity.y, lightIntensity.z, 1.0, true);
-            if (light.className === 'M_SpotLight') {
-              material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightSpotInfo_${j}`), lightType, light.spotCosCutoff, light.spotExponent, true);              
+            material._glContext.uniform3f(
+              material.getUniform(glslProgram, `uniform_lightPosition_${j}`),
+              lightPosition.x,
+              lightPosition.y,
+              lightPosition.z,
+              true
+            );
+            material._glContext.uniform3f(
+              material.getUniform(glslProgram, `uniform_lightDirection_${j}`),
+              lightDirection.x,
+              lightDirection.y,
+              lightDirection.z,
+              true
+            );
+            material._glContext.uniform4f(
+              material.getUniform(glslProgram, `uniform_lightDiffuse_${j}`),
+              lightIntensity.x,
+              lightIntensity.y,
+              lightIntensity.z,
+              1.0,
+              true
+            );
+            if (light.className === "M_SpotLight") {
+              material._glContext.uniform3f(
+                material.getUniform(glslProgram, `uniform_lightSpotInfo_${j}`),
+                lightType,
+                light.spotCosCutoff,
+                light.spotExponent,
+                true
+              );
             } else {
-              material._glContext.uniform3f(material.getUniform(glslProgram, `uniform_lightSpotInfo_${j}`), lightType, 0, 0, true);              
+              material._glContext.uniform3f(
+                material.getUniform(glslProgram, `uniform_lightSpotInfo_${j}`),
+                lightType,
+                0,
+                0,
+                true
+              );
             }
           }
         }
@@ -221,14 +406,22 @@ export default class DrawKickerWorld {
       let isMaterialSetupDone = true;
 
       {
-        let needTobeStillDirty = material.shaderInstance.setUniforms(gl, glslProgram, scene, material, camera, mesh, lights);
+        let needTobeStillDirty = material.shaderInstance.setUniforms(
+          gl,
+          glslProgram,
+          scene,
+          material,
+          camera,
+          mesh,
+          lights
+        );
         material.shaderInstance.dirty = needTobeStillDirty ? true : false;
 
         material.setUpStates(mesh);
 
         this._setUpOrTearDownTextures(true, material);
       }
-      
+
       this._setupOtherTextures(lights);
 
       geometry.drawIntermediate(gl, glslProgram, mesh, material);
@@ -237,45 +430,113 @@ export default class DrawKickerWorld {
 
       if (isWebVRMode) {
         // Left Eye
- //       DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
+        //       DrawKickerWorld.drawGeometry(geometry, material, glem, gl, i, primitiveType, vertexN);
 
-        gl.viewport.apply(gl, [viewport[0], viewport[1], viewport[2] * 0.5, viewport[3]]);
-        DrawKickerWorld.setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, 'left');
-        DrawKickerWorld.drawGeometry(geometry, glem, gl, i, primitiveType, vertexN);
+        gl.viewport.apply(gl, [
+          viewport[0],
+          viewport[1],
+          viewport[2] * 0.5,
+          viewport[3]
+        ]);
+        DrawKickerWorld.setVRCamera(
+          gl,
+          glslProgram,
+          material,
+          world_m,
+          normal_m,
+          webvrFrameData,
+          mesh,
+          "left"
+        );
+        DrawKickerWorld.drawGeometry(
+          geometry,
+          glem,
+          gl,
+          i,
+          primitiveType,
+          vertexN
+        );
 
         // Right Eye
-        gl.viewport.apply(gl, [viewport[2] * 0.5, viewport[1], viewport[2] * 0.5, viewport[3]]);
-        DrawKickerWorld.setVRCamera(gl, glslProgram, material, world_m, normal_m, webvrFrameData, mesh, 'right');
-        DrawKickerWorld.drawGeometry(geometry, glem, gl, i, primitiveType, vertexN);
+        gl.viewport.apply(gl, [
+          viewport[2] * 0.5,
+          viewport[1],
+          viewport[2] * 0.5,
+          viewport[3]
+        ]);
+        DrawKickerWorld.setVRCamera(
+          gl,
+          glslProgram,
+          material,
+          world_m,
+          normal_m,
+          webvrFrameData,
+          mesh,
+          "right"
+        );
+        DrawKickerWorld.drawGeometry(
+          geometry,
+          glem,
+          gl,
+          i,
+          primitiveType,
+          vertexN
+        );
       } else {
-        DrawKickerWorld.setCamera(gl, glslProgram, material, world_m, normal_m, camera, mesh);
-        DrawKickerWorld.drawGeometry(geometry, glem, gl, i, primitiveType, vertexN);
+        DrawKickerWorld.setCamera(
+          gl,
+          glslProgram,
+          material,
+          world_m,
+          normal_m,
+          camera,
+          mesh
+        );
+        DrawKickerWorld.drawGeometry(
+          geometry,
+          glem,
+          gl,
+          i,
+          primitiveType,
+          vertexN
+        );
       }
 
-
-      material.shaderInstance.setUniformsAsTearDown(gl, glslProgram, scene, material, camera, mesh, lights);
+      material.shaderInstance.setUniformsAsTearDown(
+        gl,
+        glslProgram,
+        scene,
+        material,
+        camera,
+        mesh,
+        lights
+      );
 
       this._tearDownOtherTextures(lights);
 
       material.tearDownStates();
-
     }
 
     glem.bindVertexArray(gl, null);
 
-//    gl.bindBuffer(gl.ARRAY_BUFFER, null);
-//    gl.bindBuffer(gl.ELEMENT_BUFFER, null);
+    //    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    //    gl.bindBuffer(gl.ELEMENT_BUFFER, null);
 
     //DrawKickerWorld._lastRenderPassIndex = renderPassIndex;
   }
 
   static drawGeometry(geometry, glem, gl, i, primitiveType, vertexN) {
     if (geometry.isIndexed()) {
-      //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName]);      
+      //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iboArrayDic[geometryName]);
       let indexBitSizeGLConstant = glem.elementIndexBitSizeGLConstant(gl);
       let indexByteSizeNumber = glem.elementIndexByteSizeNumber(gl);
       let offset = geometry.getIndexStartOffsetArrayAtMaterial(i);
-      gl.drawElements(primitiveType, vertexN, indexBitSizeGLConstant, offset * indexByteSizeNumber);
+      gl.drawElements(
+        primitiveType,
+        vertexN,
+        indexBitSizeGLConstant,
+        offset * indexByteSizeNumber
+      );
       //gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
     } else {
       gl.drawArrays(primitiveType, 0, vertexN);
@@ -283,9 +544,9 @@ export default class DrawKickerWorld {
   }
 
   _setUpOrTearDownTextures(isSetUp, material) {
-    let methodName = 'tearDownTexture';
+    let methodName = "tearDownTexture";
     if (isSetUp) {
-      methodName = 'setUpTexture';
+      methodName = "setUpTexture";
     }
 
     let isTextureProcessDone = true;
@@ -294,23 +555,28 @@ export default class DrawKickerWorld {
       let textureSamplerDic = material.uniformTextureSamplerDic[uniformName];
       let textureName = textureSamplerDic.textureName;
       let textureUnitIndex = textureSamplerDic.textureUnitIndex;
-      isTextureProcessDone = material[methodName](textureName, textureUnitIndex);
+      isTextureProcessDone = material[methodName](
+        textureName,
+        textureUnitIndex
+      );
     }
 
     return isTextureProcessDone;
   }
 
   _setupOtherTextures(lights) {
-    for(let i=0; i<lights.length; i++) {
-      if (lights[i].camera && lights[i].camera.texture) {// && lights[i].isCastingShadow) {
+    for (let i = 0; i < lights.length; i++) {
+      if (lights[i].camera && lights[i].camera.texture) {
+        // && lights[i].isCastingShadow) {
         lights[i].camera.texture.setUp();
       }
     }
   }
 
   _tearDownOtherTextures(lights) {
-    for(let i=0; i<lights.length; i++) {
-      if (lights[i].camera && lights[i].camera.texture)  {// && lights[i].isCastingShadow) {
+    for (let i = 0; i < lights.length; i++) {
+      if (lights[i].camera && lights[i].camera.texture) {
+        // && lights[i].isCastingShadow) {
         lights[i].camera.texture.tearDown();
       }
     }

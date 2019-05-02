@@ -1,9 +1,9 @@
 // @flow
 
-import GLBoost from '../../globals';
-import Vector4 from '../../low_level/math/Vector4';
-import M_Mesh from '../elements/meshes/M_Mesh';
-import M_Group from '../elements/M_Group';
+import GLBoost from "../../globals";
+import Vector4 from "../../low_level/math/Vector4";
+import M_Mesh from "../elements/meshes/M_Mesh";
+import M_Group from "../elements/M_Group";
 
 let singleton = Symbol();
 let singletonEnforcer = Symbol();
@@ -12,14 +12,15 @@ let singletonEnforcer = Symbol();
  * This is a loader class of glTF VRize extension Data.
  */
 export default class GLBoostGLTFLoaderExtension {
-
   /**
    * The constructor of ObjLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
    * @param enforcer a Symbol to forbid calling this constructor directly
    */
   constructor(enforcer: Symbol) {
     if (enforcer !== singletonEnforcer) {
-      throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
+      throw new Error(
+        "This is a Singleton class. get the instance using 'getInstance' static method."
+      );
     }
   }
 
@@ -27,7 +28,7 @@ export default class GLBoostGLTFLoaderExtension {
    * The static method to get singleton instance of this class.
    * @return the singleton instance of ObjLoader class
    */
-  static getInstance(): ObjLoader{
+  static getInstance(): ObjLoader {
     if (!this[singleton]) {
       this[singleton] = new GLBoostGLTFLoaderExtension(singletonEnforcer);
     }
@@ -66,7 +67,8 @@ export default class GLBoostGLTFLoaderExtension {
       rootGroup.LastSaved_ApplicationName = asset.LastSaved_ApplicationName;
     }
     if (asset && asset.LastSaved_ApplicationVersion) {
-      rootGroup.LastSaved_ApplicationVersion = asset.LastSaved_ApplicationVersion;
+      rootGroup.LastSaved_ApplicationVersion =
+        asset.LastSaved_ApplicationVersion;
     }
 
     // Animation Tracks
@@ -76,14 +78,17 @@ export default class GLBoostGLTFLoaderExtension {
 
     // Transparent Meshes Draw Order
     if (asset && asset.extras) {
-      const transparentMeshesAsManualOrder = (asset.extras.transparent_meshes_draw_order != null) ? asset.extras.transparent_meshes_draw_order : [];
+      const transparentMeshesAsManualOrder =
+        asset.extras.transparent_meshes_draw_order != null
+          ? asset.extras.transparent_meshes_draw_order
+          : [];
       let meshParents = rootGroup.searchElementsByType(M_Group);
       const transparentMeshes = [];
       for (let name of transparentMeshesAsManualOrder) {
         for (let parent of meshParents) {
           if (parent.userFlavorName === name) {
             const mesh = parent.getChildren()[0];
-            if (mesh.isTransparent) {
+            if (mesh != null && mesh.isTransparent) {
               transparentMeshes.push(mesh);
             }
             break;
@@ -92,24 +97,23 @@ export default class GLBoostGLTFLoaderExtension {
       }
       rootGroup.transparentMeshesAsManualOrder = transparentMeshes;
     }
-
   }
 
   loadExtensionInfoAndSetToRootGroup(rootGroup, json, glBoostContext) {
-    rootGroup['extensions'] = json.extensions;
+    rootGroup["extensions"] = json.extensions;
     if (json.extensions && json.extensions.GLBoost) {
       const ext = json.extensions.GLBoost;
 
       // Assignment for Backward Compatibility
       if (ext.animation) {
         if (ext.animation.fps != null) {
-          rootGroup.animationFps = ext.animation.fps; 
+          rootGroup.animationFps = ext.animation.fps;
         }
         if (ext.animation.tracks != null) {
           rootGroup.animationTracks = ext.animation.tracks;
         }
       }
-      
+
       const transparentMeshesDrawOrder = ext.transparentMeshesDrawOrder;
       if (transparentMeshesDrawOrder) {
         let meshParents = rootGroup.searchElementsByType(M_Group);
@@ -118,7 +122,7 @@ export default class GLBoostGLTFLoaderExtension {
           for (let parent of meshParents) {
             if (parent.userFlavorName === name) {
               const mesh = parent.getChildren()[0];
-              if (mesh.isTransparent) {
+              if (mesh != null && mesh.isTransparent) {
                 transparentMeshes.push(mesh);
               }
               break;
@@ -131,18 +135,28 @@ export default class GLBoostGLTFLoaderExtension {
 
     if (json.extensions && json.extensions.Effekseer) {
       const ext = json.extensions.Effekseer;
+
+      let effekseerBasePath = json.asset.extras.basePath;
+      if (effekseerBasePath == null) {
+        effekseerBasePath = ext.basePath;
+      }
       for (let effect of ext.effects) {
-        const group = rootGroup.searchElement(effect.nodeName, {type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME, format:GLBoost.QUERY_FORMAT_STRING_PERFECT_MATCHING});
+        const group = rootGroup.searchElement(effect.nodeName, {
+          type: GLBoost.QUERY_TYPE_USER_FLAVOR_NAME,
+          format: GLBoost.QUERY_FORMAT_STRING_PERFECT_MATCHING
+        });
         const effekseerElm = glBoostContext.createEffekseerElement();
-        const promise = effekseerElm.load(asset.extras.basePath + effect.efkName + '.efk', true, true);
-        promise.then((effect)=>{
+        const promise = effekseerElm.load(
+          effekseerBasePath + effect.efkName + ".efk",
+          true,
+          true
+        );
+        promise.then(effect => {
           group.addChild(effect);
         });
       }
     }
   }
-
 }
-
 
 GLBoost["GLBoostGLTFLoaderExtension"] = GLBoostGLTFLoaderExtension;

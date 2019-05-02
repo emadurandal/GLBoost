@@ -1,12 +1,14 @@
-import GLBoost from '../../../globals';
-import M_Element from '../M_Element';
+import GLBoost from "../../../globals";
+import M_Element from "../M_Element";
 
 export default class M_AbstractCamera extends M_Element {
   constructor(glBoostContext, toRegister) {
     super(glBoostContext, toRegister);
 
     if (this.constructor === M_AbstractCamera) {
-      throw new TypeError('Cannot construct M_AbstractCamera instances directly.');
+      throw new TypeError(
+        "Cannot construct M_AbstractCamera instances directly."
+      );
     }
 
     this._lowLevelCamera = null;
@@ -24,6 +26,10 @@ export default class M_AbstractCamera extends M_Element {
     return this._lowLevelCamera.cameraController;
   }
 
+  removeCameraController(controller) {
+    this._lowLevelCamera.removeCameraController(controller);
+  }
+
   _needUpdateView() {
     this._lowLevelCamera._needUpdateView();
     this._updateCountAsCameraView++;
@@ -35,7 +41,7 @@ export default class M_AbstractCamera extends M_Element {
 
   get latestViewStateInfoString() {
     var tempString = this._accumulateMyAndParentNameWithUpdateInfo(this);
-    tempString += '_updateCountAsCameraView_' + this._updateCountAsCameraView;
+    tempString += "_updateCountAsCameraView_" + this._updateCountAsCameraView;
 
     return tempString;
   }
@@ -123,8 +129,6 @@ export default class M_AbstractCamera extends M_Element {
   set allInfo(info) {
     this._lowLevelCamera.allInfo = info;
   }
-
 }
 
-GLBoost['M_AbstractCamera'] = M_AbstractCamera;
-
+GLBoost["M_AbstractCamera"] = M_AbstractCamera;

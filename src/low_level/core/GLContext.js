@@ -1,20 +1,18 @@
-import GLBoost from '../../globals';
-import MiscUtil from '../misc/MiscUtil';
-import GLContextWebGL1Impl from '../impl/GLContextWebGL1Impl';
-import GLContextWebGL2Impl from '../impl/GLContextWebGL2Impl';
-import GLExtensionsManager from './GLExtensionsManager';
-import L_GLBoostMonitor from './L_GLBoostMonitor';
-import Logger from '../misc/Logger';
+import GLBoost from "../../globals";
+import MiscUtil from "../misc/MiscUtil";
+import GLContextWebGL1Impl from "../impl/GLContextWebGL1Impl";
+import GLContextWebGL2Impl from "../impl/GLContextWebGL2Impl";
+import GLExtensionsManager from "./GLExtensionsManager";
+import L_GLBoostMonitor from "./L_GLBoostMonitor";
+import Logger from "../misc/Logger";
 
 export default class GLContext {
-
   constructor(canvas, initParameter, gl, width, height) {
-
-    if (typeof gl !== 'undefined' && gl !== null) {
+    if (typeof gl !== "undefined" && gl !== null) {
       this.impl = new GLContextWebGL1Impl(canvas, initParameter, this, gl);
       this._canvasWidth = width;
       this._canvasHeight = height;
-      GLContext._instances['nocanvas'] = this;
+      GLContext._instances["nocanvas"] = this;
     } else {
       if (GLContext._instances[canvas.id] instanceof GLContext) {
         return GLContext._instances[canvas.id];
@@ -36,20 +34,26 @@ export default class GLContext {
 
     this._logger = Logger.getInstance();
 
-    this._glErrorTypes = ['INVALID_ENUM', 'INVALID_VALUE', 'INVALID_OPERATION', 'INVALID_FRAMEBUFFER_OPERATION',
-    'OUT_OF_MEMORY', 'CONTEXT_LOST_WEBGL'];
+    this._glErrorTypes = [
+      "INVALID_ENUM",
+      "INVALID_VALUE",
+      "INVALID_OPERATION",
+      "INVALID_FRAMEBUFFER_OPERATION",
+      "OUT_OF_MEMORY",
+      "CONTEXT_LOST_WEBGL"
+    ];
     this._glErrorMessages = [
-      'An unacceptable value has been specified for an enumerated argument. The command is ignored and the error flag is set.',
-      'A numeric argument is out of range. The command is ignored and the error flag is set.',
-      'The specified command is not allowed for the current state. The command is ignored and the error flag is set.',
-      'The currently bound framebuffer is not framebuffer complete when trying to render to or to read from it.',
-      'Not enough memory is left to execute the command.',
-      'If the WebGL context is lost, this error is returned on the first call to getError. Afterwards and until the context has been restored, it returns gl.NO_ERROR.'
-    ]; 
+      "An unacceptable value has been specified for an enumerated argument. The command is ignored and the error flag is set.",
+      "A numeric argument is out of range. The command is ignored and the error flag is set.",
+      "The specified command is not allowed for the current state. The command is ignored and the error flag is set.",
+      "The currently bound framebuffer is not framebuffer complete when trying to render to or to read from it.",
+      "Not enough memory is left to execute the command.",
+      "If the WebGL context is lost, this error is returned on the first call to getError. Afterwards and until the context has been restored, it returns gl.NO_ERROR."
+    ];
   }
 
   static getInstance(canvas, initParameter, gl, width, height) {
-    if (typeof canvas === 'string') {
+    if (typeof canvas === "string") {
       canvas = window.document.querySelector(canvas);
     }
     return new GLContext(canvas, initParameter, gl, width, height);
@@ -67,7 +71,7 @@ export default class GLContext {
     if (this.impl.canvas) {
       return this.impl.canvas.id;
     } else {
-      return 'nocanvas';
+      return "nocanvas";
     }
   }
 
@@ -83,9 +87,15 @@ export default class GLContext {
     let gl = this.impl.gl;
     let errorCode = gl.getError();
     if (errorCode !== 0) {
-      this.glErrorTypes.forEach((errorType, i)=>{
+      this.glErrorTypes.forEach((errorType, i) => {
         if (gl[errorType] === errorCode) {
-          this._logger.out(GLBoost.LOG_LEVEL_ERROR, GLBoost.LOG_TYPE_GL, false, errorCode, this._glErrorMessages[i]);
+          this._logger.out(
+            GLBoost.LOG_LEVEL_ERROR,
+            GLBoost.LOG_TYPE_GL,
+            false,
+            errorCode,
+            this._glErrorMessages[i]
+          );
         }
       });
     }
@@ -177,13 +187,13 @@ export default class GLContext {
   }
 
   useProgram(program) {
-//    if (!program) {
-      this.gl.useProgram(program);
-      this._currentProgramInuse = program;
+    //    if (!program) {
+    this.gl.useProgram(program);
+    this._currentProgramInuse = program;
 
-      this.checkGLError();
-      this._glslProgramsLatestUsageCount++;
-/*
+    this.checkGLError();
+    this._glslProgramsLatestUsageCount++;
+    /*
       return;
     }
 
@@ -209,14 +219,17 @@ export default class GLContext {
   }
 
   deleteAllPrograms() {
-    let programObjs = this._monitor.getWebGLResources('WebGLProgram');
+    let programObjs = this._monitor.getWebGLResources("WebGLProgram");
     for (let programObj of programObjs) {
       this.deleteProgram(programObj[0], programObj[1]);
     }
   }
 
   getUniformLocation(glslProgram, uniformVariableName) {
-    let uniformLocation = this.gl.getUniformLocation(glslProgram, uniformVariableName);
+    let uniformLocation = this.gl.getUniformLocation(
+      glslProgram,
+      uniformVariableName
+    );
     this.checkGLError();
     if (uniformLocation) {
       uniformLocation.glslProgram = glslProgram;
@@ -229,8 +242,10 @@ export default class GLContext {
   _setUniformValues(uniformFuncStr, args, forceUpdate) {
     let uniformLocation = args[0];
     if (!uniformLocation) {
-      MiscUtil.consoleLog(GLBoost.LOG_OMISSION_PROCESSING,
-        'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation is falsy (undefined or something)');
+      MiscUtil.consoleLog(
+        GLBoost.LOG_OMISSION_PROCESSING,
+        "LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation is falsy (undefined or something)"
+      );
 
       return;
     }
@@ -241,9 +256,8 @@ export default class GLContext {
       return;
     }
 
-
-//    this.gl[uniformFuncStr].apply(this.gl, args);
-/*
+    //    this.gl[uniformFuncStr].apply(this.gl, args);
+    /*
     if (uniformLocation.glslProgram.glslProgramsSelfUsageCount < this._glslProgramsLatestUsageCount) {
       MiscUtil.consoleLog(GLBoost.LOG_OMISSION_PROCESSING,
         'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation.glslProgram is not in use.');
@@ -251,13 +265,18 @@ export default class GLContext {
       return;
     }
 */
-    if (this._currentProgramInuse.createdAt !== uniformLocation.glslProgram.createdAt) {
-       console.error('missmatch!')
+    if (
+      this._currentProgramInuse.createdAt !==
+      uniformLocation.glslProgram.createdAt
+    ) {
+      console.error("missmatch!");
       return;
     }
 
-    
-    if (uniformLocation.glslProgramUsageCountWhenLastSet < this._glslProgramsLatestUsageCount) {
+    if (
+      uniformLocation.glslProgramUsageCountWhenLastSet <
+      this._glslProgramsLatestUsageCount
+    ) {
       // Since I have never sent a uniform value to glslProgram which is currently in use, update it.
       this.gl[uniformFuncStr].apply(this.gl, args);
       args[0].setValue = args;
@@ -266,55 +285,76 @@ export default class GLContext {
       return;
     }
 
-    MiscUtil.consoleLog(GLBoost.LOG_OMISSION_PROCESSING,
-      'LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation.glslProgram is not in use.');
+    MiscUtil.consoleLog(
+      GLBoost.LOG_OMISSION_PROCESSING,
+      "LOG_OMISSION_PROCESSING: gl.uniformXXX call has been omitted since the uniformLocation.glslProgram is not in use."
+    );
   }
 
   // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
   uniformMatrix4fv(uniformLocation, toTranspose, matrix44, forceUpdate) {
-    this._setUniformValues('uniformMatrix4fv', [uniformLocation, toTranspose, matrix44], forceUpdate);
+    this._setUniformValues(
+      "uniformMatrix4fv",
+      [uniformLocation, toTranspose, matrix44],
+      forceUpdate
+    );
   }
 
   // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
   uniform4f(uniformLocation, x, y, z, w, forceUpdate) {
-    this._setUniformValues('uniform4f', [uniformLocation, x, y, z, w], forceUpdate);
+    this._setUniformValues(
+      "uniform4f",
+      [uniformLocation, x, y, z, w],
+      forceUpdate
+    );
   }
 
   // Set forceUpdate to true if there is no way to check whether the values (x, y, z) change from the previous states or not.
   uniform3f(uniformLocation, x, y, z, forceUpdate) {
-    this._setUniformValues('uniform3f', [uniformLocation, x, y, z], forceUpdate);
+    this._setUniformValues(
+      "uniform3f",
+      [uniformLocation, x, y, z],
+      forceUpdate
+    );
   }
 
   // Set forceUpdate to true if there is no way to check whether the values (x, y) change from the previous states or not.
   uniform2f(uniformLocation, x, y, forceUpdate) {
-    this._setUniformValues('uniform2f', [uniformLocation, x, y], forceUpdate);
+    this._setUniformValues("uniform2f", [uniformLocation, x, y], forceUpdate);
   }
 
   // Set forceUpdate to true if there is no way to check whether the value x changes from the previous state or not.
   uniform1f(uniformLocation, x, forceUpdate) {
-    this._setUniformValues('uniform1f', [uniformLocation, x], forceUpdate);
+    this._setUniformValues("uniform1f", [uniformLocation, x], forceUpdate);
   }
 
   // Set forceUpdate to true if there is no way to check whether the values (x, y, z, w) change from the previous states or not.
   uniform4i(uniformLocation, x, y, z, w, forceUpdate) {
-    this._setUniformValues('uniform4i', [uniformLocation, x, y, z, w], forceUpdate);
+    this._setUniformValues(
+      "uniform4i",
+      [uniformLocation, x, y, z, w],
+      forceUpdate
+    );
   }
 
   // Set forceUpdate to true if there is no way to check whether the values (x, y, z) change from the previous states or not.
   uniform3i(uniformLocation, x, y, z, forceUpdate) {
-    this._setUniformValues('uniform3i', [uniformLocation, x, y, z], forceUpdate);
+    this._setUniformValues(
+      "uniform3i",
+      [uniformLocation, x, y, z],
+      forceUpdate
+    );
   }
 
   // Set forceUpdate to true if there is no way to check whether the values (x, y) change from the previous states or not.
   uniform2i(uniformLocation, x, y, forceUpdate) {
-    this._setUniformValues('uniform2i', [uniformLocation, x, y], forceUpdate);
+    this._setUniformValues("uniform2i", [uniformLocation, x, y], forceUpdate);
   }
 
   // Set forceUpdate to true if there is no way to check whether the value x changes from the previous state or not.
   uniform1i(uniformLocation, x, forceUpdate) {
-    this._setUniformValues('uniform1i', [uniformLocation, x], forceUpdate);
+    this._setUniformValues("uniform1i", [uniformLocation, x], forceUpdate);
   }
-
 
   createTexture(glBoostObject) {
     var glResource = this.gl.createTexture();
@@ -359,6 +399,5 @@ export default class GLContext {
   get glslProgramsLatestUsageCount() {
     return this._glslProgramsLatestUsageCount;
   }
-
 }
 GLContext._instances = new Object();

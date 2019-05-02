@@ -1,20 +1,22 @@
-import GLBoostObject from '../../core/GLBoostObject';
-import Vector3 from '../../math/Vector3';
-import Matrix33 from '../../math/Matrix33';
-import MathClassUtil from '../../math/MathClassUtil';
-import GLBoost from '../../../globals';
-import MiscUtil from '../../misc/MiscUtil';
+import GLBoostObject from "../../core/GLBoostObject";
+import Vector3 from "../../math/Vector3";
+import Matrix33 from "../../math/Matrix33";
+import MathClassUtil from "../../math/MathClassUtil";
+import GLBoost from "../../../globals";
+import MiscUtil from "../../misc/MiscUtil";
 
 export default class L_WalkThroughCameraController extends GLBoostObject {
-  constructor(glBoostContext, options = {
-    eventTargetDom: document,
-    horizontalSpeed: 1,
-    turnSpeed: 5,
-    mouseWheelSpeedScale: 0.3,
-    inverseVirticalRotating: false,
-    inverseHorizontalRotating: false
-  })
-  {
+  constructor(
+    glBoostContext,
+    options = {
+      eventTargetDom: document,
+      horizontalSpeed: 1,
+      turnSpeed: 5,
+      mouseWheelSpeedScale: 0.3,
+      inverseVirticalRotating: false,
+      inverseHorizontalRotating: false
+    }
+  ) {
     super(glBoostContext);
 
     this._camaras = new Set();
@@ -24,21 +26,21 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     this._turnSpeed = options.turnSpeed;
     this._mouseWheelSpeedScale = options.mouseWheelSpeedScale;
     this._inverseVirticalRotating = options.inverseVirticalRotating;
-    this._inverseHorizontalRotating = options.inverseHorizontalRotating; 
+    this._inverseHorizontalRotating = options.inverseHorizontalRotating;
 
     this.reset();
 
-    this._onKeydown = (e)=> {
+    this._onKeydown = e => {
       this._isKeyDown = true;
       this._lastKeyCode = e.keyCode;
 
       this.updateCamera();
     };
 
-    this._onKeyup = (e)=> {
+    this._onKeyup = e => {
       this._isKeyDown = false;
       this._lastKeyCode = null;
-    }
+    };
 
     const eventTargetDom = options.eventTargetDom;
 
@@ -46,7 +48,7 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
   }
 
   updateCamera() {
-    this._camaras.forEach(function (camera) {
+    this._camaras.forEach(function(camera) {
       camera._needUpdateView(false);
       camera._needUpdateProjection();
     });
@@ -54,42 +56,68 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
 
   registerEventListeners(eventTargetDom = document) {
     if (eventTargetDom) {
-      document.addEventListener('keydown', this._onKeydown);
-      document.addEventListener('keyup', this._onKeyup);
+      document.addEventListener("keydown", this._onKeydown);
+      document.addEventListener("keyup", this._onKeyup);
 
-      if ('ontouchend' in document) {
-        eventTargetDom.addEventListener('touchstart', this._mouseDown.bind(this));
-        document.addEventListener('touchend', this._mouseUp.bind(this));
-        eventTargetDom.addEventListener('touchmove', this._mouseMove.bind(this));          
+      if ("ontouchend" in document) {
+        eventTargetDom.addEventListener(
+          "touchstart",
+          this._mouseDown.bind(this)
+        );
+        document.addEventListener("touchend", this._mouseUp.bind(this));
+        eventTargetDom.addEventListener(
+          "touchmove",
+          this._mouseMove.bind(this)
+        );
       }
-      if ('onmouseup' in document) {
-        eventTargetDom.addEventListener('mousedown', this._mouseDown.bind(this));
-        document.addEventListener('mouseup', this._mouseUp.bind(this));
-        eventTargetDom.addEventListener('mousemove', this._mouseMove.bind(this));          
+      if ("onmouseup" in document) {
+        eventTargetDom.addEventListener(
+          "mousedown",
+          this._mouseDown.bind(this)
+        );
+        document.addEventListener("mouseup", this._mouseUp.bind(this));
+        eventTargetDom.addEventListener(
+          "mousemove",
+          this._mouseMove.bind(this)
+        );
       }
       if (window.WheelEvent) {
-        eventTargetDom.addEventListener('wheel', this._mouseWheel.bind(this));
+        eventTargetDom.addEventListener("wheel", this._mouseWheel.bind(this));
       }
     }
   }
 
   unregisterEventListeners(eventTargetDom = document) {
     if (eventTargetDom) {
-      document.removeEventListener('keydown', this._onKeydown);
-      document.removeEventListener('keyup', this._onKeyup);
-      
-      if ('ontouchend' in document) {
-        eventTargetDom.removeEventListener('touchstart', this._mouseDown.bind(this));
-        document.removeEventListener('touchend', this._mouseUp.bind(this));
-        eventTargetDom.removeEventListener('touchmove', this._mouseMove).bind(this);          
+      document.removeEventListener("keydown", this._onKeydown);
+      document.removeEventListener("keyup", this._onKeyup);
+
+      if ("ontouchend" in document) {
+        eventTargetDom.removeEventListener(
+          "touchstart",
+          this._mouseDown.bind(this)
+        );
+        document.removeEventListener("touchend", this._mouseUp.bind(this));
+        eventTargetDom
+          .removeEventListener("touchmove", this._mouseMove)
+          .bind(this);
       }
-      if ('onmouseup' in document) {
-        eventTargetDom.removeEventListener('mousedown', this._mouseDown.bind(this));
-        document.removeEventListener('mouseup', this._mouseUp.bind(this));
-        eventTargetDom.removeEventListener('mousemove', this._mouseMove.bind(this));          
+      if ("onmouseup" in document) {
+        eventTargetDom.removeEventListener(
+          "mousedown",
+          this._mouseDown.bind(this)
+        );
+        document.removeEventListener("mouseup", this._mouseUp.bind(this));
+        eventTargetDom.removeEventListener(
+          "mousemove",
+          this._mouseMove.bind(this)
+        );
       }
       if (window.WheelEvent) {
-        eventTargetDom.removeEventListener('wheel', this._mouseWheel.bind(this));
+        eventTargetDom.removeEventListener(
+          "wheel",
+          this._mouseWheel.bind(this)
+        );
       }
     }
   }
@@ -99,13 +127,17 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
       return;
     }
     const delta = e.wheelDelta * this._mouseWheelSpeedScale;
-    const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
+    const horizontalDir = new Vector3(
+      this._currentDir.x,
+      0,
+      this._currentDir.z
+    ).normalize();
     this._currentPos.add(Vector3.multiply(horizontalDir, delta));
     this._currentCenter.add(Vector3.multiply(horizontalDir, delta));
   }
 
   _mouseDown(evt) {
-    MiscUtil.preventDefaultForDesktopOnly(evt)
+    MiscUtil.preventDefaultForDesktopOnly(evt);
     evt.stopPropagation();
     this._isMouseDown = true;
 
@@ -117,7 +149,7 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
   }
 
   _mouseMove(evt) {
-    MiscUtil.preventDefaultForDesktopOnly(evt)
+    MiscUtil.preventDefaultForDesktopOnly(evt);
     evt.stopPropagation();
     if (!this._isMouseDown) {
       return;
@@ -127,13 +159,13 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     this._draggedMouseXOnCanvas = evt.clientX - rect.left;
     this._draggedMouseYOnCanvas = evt.clientY - rect.top;
 
-    this._deltaMouseXOnCanvas = this._draggedMouseXOnCanvas - this._clickedMouseXOnCanvas;
-    this._deltaMouseYOnCanvas = this._draggedMouseYOnCanvas - this._clickedMouseYOnCanvas;
+    this._deltaMouseXOnCanvas =
+      this._draggedMouseXOnCanvas - this._clickedMouseXOnCanvas;
+    this._deltaMouseYOnCanvas =
+      this._draggedMouseYOnCanvas - this._clickedMouseYOnCanvas;
 
-    
     this._isMouseDrag = true;
     this.updateCamera();
-
   }
 
   _mouseUp(evt) {
@@ -143,12 +175,9 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     let rect = evt.target.getBoundingClientRect();
     this._clickedMouseXOnCanvas = evt.clientX - rect.left;
     this._clickedMouseYOnCanvas = evt.clientY - rect.top;
-    
   }
 
-  tryReset() {
-
-  }
+  tryReset() {}
 
   reset() {
     this._isKeyDown = false;
@@ -168,13 +197,17 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     this._deltaX = 0;
     this._newDir = Vector3.zero();
 
-    this._camaras.forEach(function (camera) {
+    this._camaras.forEach(function(camera) {
       camera._needUpdateView(false);
     });
   }
 
   addCamera(camera) {
     this._camaras.add(camera);
+  }
+
+  removeCamera(camera) {
+    this._camaras.delete(camera);
   }
 
   convert(camera) {
@@ -185,7 +218,10 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
       this._currentCenter = camera.center.clone();
     }
     if (this._currentDir === null) {
-      this._currentDir = Vector3.subtract(camera.center, camera.eye).normalize();
+      this._currentDir = Vector3.subtract(
+        camera.center,
+        camera.eye
+      ).normalize();
     }
 
     let newEyeToCenter = null;
@@ -196,68 +232,104 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     this._newDir.z = this._currentDir.z * (1 - t);
     this._newDir.normalize();
 
-    switch(this._lastKeyCode) {
+    switch (this._lastKeyCode) {
       case 87: // w key
       case 38: // arrow upper key
-      {
-        const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
-        this._currentPos.add(Vector3.multiply(horizontalDir, this._horizontalSpeed));
-        this._currentCenter.add(Vector3.multiply(horizontalDir, this._horizontalSpeed));
-      }
-      break;
+        {
+          const horizontalDir = new Vector3(
+            this._currentDir.x,
+            0,
+            this._currentDir.z
+          ).normalize();
+          this._currentPos.add(
+            Vector3.multiply(horizontalDir, this._horizontalSpeed)
+          );
+          this._currentCenter.add(
+            Vector3.multiply(horizontalDir, this._horizontalSpeed)
+          );
+        }
+        break;
       case 65: // a key
       case 37: // arrow left key
-      {
-        const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
-        const leftDir = Matrix33.rotateY(90).multiplyVector(horizontalDir);
-        this._currentPos.add(Vector3.multiply(leftDir, this._horizontalSpeed));
-        this._currentCenter.add(Vector3.multiply(leftDir, this._horizontalSpeed));
-      }
-    break;
+        {
+          const horizontalDir = new Vector3(
+            this._currentDir.x,
+            0,
+            this._currentDir.z
+          ).normalize();
+          const leftDir = Matrix33.rotateY(90).multiplyVector(horizontalDir);
+          this._currentPos.add(
+            Vector3.multiply(leftDir, this._horizontalSpeed)
+          );
+          this._currentCenter.add(
+            Vector3.multiply(leftDir, this._horizontalSpeed)
+          );
+        }
+        break;
       case 83: // s key
       case 40: // arrow down key
-      {
-        const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
-        this._currentPos.add(Vector3.multiply(horizontalDir, -this._horizontalSpeed));
-        this._currentCenter.add(Vector3.multiply(horizontalDir, -this._horizontalSpeed));
-      }
-      break;
+        {
+          const horizontalDir = new Vector3(
+            this._currentDir.x,
+            0,
+            this._currentDir.z
+          ).normalize();
+          this._currentPos.add(
+            Vector3.multiply(horizontalDir, -this._horizontalSpeed)
+          );
+          this._currentCenter.add(
+            Vector3.multiply(horizontalDir, -this._horizontalSpeed)
+          );
+        }
+        break;
       case 68: // d key
       case 39: // arrow right key
-      {
-        const horizontalDir = (new Vector3(this._currentDir.x, 0, this._currentDir.z)).normalize();
-        const rightDir = Matrix33.rotateY(-90).multiplyVector(horizontalDir);
-        this._currentPos.add(Vector3.multiply(rightDir, this._horizontalSpeed));
-        this._currentCenter.add(Vector3.multiply(rightDir, this._horizontalSpeed));
-      }
-      break;
+        {
+          const horizontalDir = new Vector3(
+            this._currentDir.x,
+            0,
+            this._currentDir.z
+          ).normalize();
+          const rightDir = Matrix33.rotateY(-90).multiplyVector(horizontalDir);
+          this._currentPos.add(
+            Vector3.multiply(rightDir, this._horizontalSpeed)
+          );
+          this._currentCenter.add(
+            Vector3.multiply(rightDir, this._horizontalSpeed)
+          );
+        }
+        break;
       case 81: // q key
-      {
-        this._currentPos.add(Vector3.multiply(this._newDir, -this._horizontalSpeed));
-        this._currentCenter.add(Vector3.multiply(this._newDir, -this._horizontalSpeed));
-      }
-      break;
+        {
+          this._currentPos.add(
+            Vector3.multiply(this._newDir, -this._horizontalSpeed)
+          );
+          this._currentCenter.add(
+            Vector3.multiply(this._newDir, -this._horizontalSpeed)
+          );
+        }
+        break;
       case 69: // e key
-      {
-        this._currentPos.add(Vector3.multiply(this._newDir, this._horizontalSpeed));
-        this._currentCenter.add(Vector3.multiply(this._newDir, this._horizontalSpeed));
-      }
-      break;
+        {
+          this._currentPos.add(
+            Vector3.multiply(this._newDir, this._horizontalSpeed)
+          );
+          this._currentCenter.add(
+            Vector3.multiply(this._newDir, this._horizontalSpeed)
+          );
+        }
+        break;
       case 82: // r key
         this._currentPos.add(new Vector3(0, this._virticalSpeed, 0));
         this._currentCenter.add(new Vector3(0, this._virticalSpeed, 0));
-      break;
+        break;
       case 70: // f key
         this._currentPos.add(new Vector3(0, -this._virticalSpeed, 0));
         this._currentCenter.add(new Vector3(0, -this._virticalSpeed, 0));
-      break;
+        break;
     }
 
-
-
-
     if (this._isMouseDrag) {
-
       if (this._inverseHorizontalRotating) {
         this._deltaX = this._deltaMouseXOnCanvas * this._mouseXAdjustScale;
       } else {
@@ -270,21 +342,23 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
       }
       this._deltaY = Math.max(-120, Math.min(50, this._deltaY));
 
+      this._currentDir = Matrix33.rotateY(this._deltaX).multiplyVector(
+        this._currentDir
+      );
 
-      this._currentDir = Matrix33.rotateY(this._deltaX).multiplyVector(this._currentDir);
-
-      newEyeToCenter = Matrix33.rotateY(this._deltaX).multiplyVector(Vector3.subtract(this._currentCenter, this._currentPos));
+      newEyeToCenter = Matrix33.rotateY(this._deltaX).multiplyVector(
+        Vector3.subtract(this._currentCenter, this._currentPos)
+      );
       newEyeToCenter.x = newEyeToCenter.x * (1 - t);
       newEyeToCenter.y = t;
       newEyeToCenter.z = newEyeToCenter.z * (1 - t);
       newEyeToCenter.normalize();
       this._currentCenter = Vector3.add(this._currentPos, newEyeToCenter);
 
-
       this._clickedMouseXOnCanvas = this._draggedMouseXOnCanvas;
       this._clickedMouseYOnCanvas = this._draggedMouseYOnCanvas;
       this._deltaMouseXOnCanvas = 0;
-      this._deltaMouseYOnCanvas = 0; 
+      this._deltaMouseYOnCanvas = 0;
     }
 
     let newLeft = camera.left;
@@ -292,17 +366,25 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     let newTop = camera.top;
     let newBottom = camera.bottom;
 
-
-
-    return [this._currentPos, this._currentCenter, camera.up.clone(), camera.zNear, camera.zFar, newLeft, newRight, newTop, newBottom];
+    return [
+      this._currentPos,
+      this._currentCenter,
+      camera.up.clone(),
+      camera.zNear,
+      camera.zFar,
+      newLeft,
+      newRight,
+      newTop,
+      newBottom
+    ];
   }
 
   getDirection() {
-    return (this._currentCenter !== null) ? this._newDir.clone() : null;
+    return this._currentCenter !== null ? this._newDir.clone() : null;
   }
 
   set horizontalSpeed(value) {
-    this._horizontalSpeed = value; 
+    this._horizontalSpeed = value;
   }
 
   get horizontalSpeed() {
@@ -310,7 +392,7 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
   }
 
   set virticalSpeed(value) {
-    this._virticalSpeed = value; 
+    this._virticalSpeed = value;
   }
 
   get virticalSpeed() {
@@ -346,16 +428,20 @@ export default class L_WalkThroughCameraController extends GLBoostObject {
     if (typeof arg === "string") {
       json = JSON.parse(arg);
     }
-    for(let key in json) {
-      if(json.hasOwnProperty(key) && key in this) {
+    for (let key in json) {
+      if (json.hasOwnProperty(key) && key in this) {
         if (key === "quaternion") {
-          this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToQuaternion(json[key]));
+          this[key] = MathClassUtil.cloneOfMathObjects(
+            MathClassUtil.arrayToQuaternion(json[key])
+          );
         } else {
-          this[key] = MathClassUtil.cloneOfMathObjects(MathClassUtil.arrayToVectorOrMatrix(json[key]));
+          this[key] = MathClassUtil.cloneOfMathObjects(
+            MathClassUtil.arrayToVectorOrMatrix(json[key])
+          );
         }
       }
     }
   }
 }
 
-GLBoost['L_WalkThroughCameraController'] = L_WalkThroughCameraController;
+GLBoost["L_WalkThroughCameraController"] = L_WalkThroughCameraController;

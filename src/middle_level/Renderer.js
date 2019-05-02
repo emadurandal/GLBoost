@@ -1,11 +1,13 @@
 // @flow
 
-import GLExtensionsManager from '../low_level/core/GLExtensionsManager';
-import GLBoostObject from '../low_level/core/GLBoostObject';
-import Matrix44 from '../low_level/math/Matrix44';
-import Vector3 from '../low_level/math/Vector3';
-import EffekseerElement from './plugins/EffekseerElement';
-import Logger from '../low_level/misc/Logger';
+import GLExtensionsManager from "../low_level/core/GLExtensionsManager";
+import GLBoostObject from "../low_level/core/GLBoostObject";
+import Matrix44 from "../low_level/math/Matrix44";
+import Vector3 from "../low_level/math/Vector3";
+import Vector4 from "../low_level/math/Vector4";
+import EffekseerElement from "./plugins/EffekseerElement";
+import Logger from "../low_level/misc/Logger";
+import ClassicMaterial from "../low_level/materials/ClassicMaterial";
 
 /**
  * This class take a role as operator of rendering process. In order to render images to canvas, this Renderer class gathers other elements' data, decides a plan of drawing process, and then just execute it.
@@ -20,7 +22,12 @@ export default class Renderer extends GLBoostObject {
     const gl = glContext.gl;
 
     if (_clearColor) {
-      gl.clearColor( _clearColor.red, _clearColor.green, _clearColor.blue, _clearColor.alpha );
+      gl.clearColor(
+        _clearColor.red,
+        _clearColor.green,
+        _clearColor.blue,
+        _clearColor.alpha
+      );
     }
 
     this.__logger = Logger.getInstance();
@@ -36,22 +43,31 @@ export default class Renderer extends GLBoostObject {
     this.__isReadyForWebVR = false;
     this.__animationFrameObject = window;
     this.__effekseerElements = [];
-  }
 
+    this._outlineMaterial = new ClassicMaterial(this._glBoostSystem);
+    this._outlineMaterial.baseColor = new Vector4(0, 1, 0, 1);
+    this._outlineMaterial.states.enable = [2884]; // gl.CULL_FACE
+    this._outlineMaterial.states.functions.cullFace = [1028]; // gl.front
+    this._outlineMaterial.states.functions.depthMask = [true]; // Write depth value
+    //this._outlineMaterial.shaderClass = GLBoost.PhongShader;
+    this._outlineMaterial.globalStatesUsage =
+      GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
+  }
 
   /**
    * update things of elements of the expression.
    * @param expression a instance of Expression class
    */
   update(expression: Expression) {
-    
     let skeletalMeshes = [];
     let effekseerElements = [];
     // gather scenes as unique
     for (let renderPass of expression.renderPasses) {
       skeletalMeshes = skeletalMeshes.concat(renderPass._skeletalMeshes);
-//      effekseerElements = effekseerElements.concat(renderPass._effekseerElements);
-      effekseerElements = effekseerElements.concat(renderPass.scene.searchElementsByType(EffekseerElement));
+      //      effekseerElements = effekseerElements.concat(renderPass._effekseerElements);
+      effekseerElements = effekseerElements.concat(
+        renderPass.scene.searchElementsByType(EffekseerElement)
+      );
       renderPass.scene.updateAmountOfAmbientLightsIntensity();
       let camera = renderPass.scene.getMainCamera();
       for (let effekseerElement of effekseerElements) {
@@ -69,15 +85,17 @@ export default class Renderer extends GLBoostObject {
       }, []);
     };
     skeletalMeshes = unique(skeletalMeshes);
-    
+
     for (let mesh of skeletalMeshes) {
       mesh.geometry.update(mesh);
     }
 
-    if (typeof effekseer !== "undefined" && this.__effekseerElements.length > 0) {
+    if (
+      typeof effekseer !== "undefined" &&
+      this.__effekseerElements.length > 0
+    ) {
       effekseer.update();
     }
-
   }
 
   /**
@@ -85,12 +103,29 @@ export default class Renderer extends GLBoostObject {
    * @param expression a instance of Expression class
    */
   draw(expression: Expression) {
-    let renderPassTag = '';
-    expression.renderPasses.forEach((renderPass, index)=>{
+    let renderPassTag = "";
+
+    if (this._outlineMaterial.shaderInstance == null) {
+      const mesh = expression.renderPasses[0].meshes[0];
+      if (mesh != null) {
+        this._outlineMaterial.shaderInstance = mesh.geometry.prepareGLSLProgram(
+          expression,
+          this._outlineMaterial,
+          true,
+          [],
+          this._outlineMaterial.shaderClass
+        );
+      }
+    }
+
+    expression.renderPasses.forEach((renderPass, index) => {
       if (!renderPass.isEnableToDraw || !renderPass.scene) {
         return;
       }
-      if (GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING && GLBoost.valueOfGLBoostConstants[GLBoost.LOG_TYPE_PERFORMANCE] !== false) {
+      if (
+        GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING &&
+        GLBoost.valueOfGLBoostConstants[GLBoost.LOG_TYPE_PERFORMANCE] !== false
+      ) {
         renderPass._startUnixTime = performance.now();
       }
 
@@ -103,12 +138,11 @@ export default class Renderer extends GLBoostObject {
 
       let lights = renderPass.scene.lightsExceptAmbient;
 
-      renderPass.preRender(camera ? true:false, lights);
+      renderPass.preRender(camera ? true : false, lights);
 
       var glContext = this._glContext;
       var gl = glContext.gl;
       var glem = GLExtensionsManager.getInstance(this._glContext);
-
 
       // set render target buffers for each RenderPass.
       /*
@@ -128,13 +162,24 @@ export default class Renderer extends GLBoostObject {
 
       let viewport = null;
       if (renderPass.viewport) {
-        viewport = [renderPass.viewport.x, renderPass.viewport.y, renderPass.viewport.z, renderPass.viewport.w];
+        viewport = [
+          renderPass.viewport.x,
+          renderPass.viewport.y,
+          renderPass.viewport.z,
+          renderPass.viewport.w
+        ];
       } else {
         if (this.isWebVRMode) {
           viewport = [0, 0, glContext.canvasWidth, glContext.canvasHeight];
         } else if (camera) {
-          let deltaWidth = glContext.canvasHeight*camera.aspect - glContext.canvasWidth;
-          viewport = [-deltaWidth/2, 0, glContext.canvasHeight*camera.aspect, glContext.canvasHeight];
+          let deltaWidth =
+            glContext.canvasHeight * camera.aspect - glContext.canvasWidth;
+          viewport = [
+            -deltaWidth / 2,
+            0,
+            glContext.canvasHeight * camera.aspect,
+            glContext.canvasHeight
+          ];
         } else {
           viewport = [0, 0, glContext.canvasWidth, glContext.canvasHeight];
         }
@@ -150,16 +195,27 @@ export default class Renderer extends GLBoostObject {
         if (this.__webvrDisplay.stageParameters) {
           this.__webvrFrameData.sittingToStandingTransform = this.__webvrDisplay.stageParameters.sittingToStandingTransform;
         } else {
-          this.__webvrFrameData.sittingToStandingTransform = Matrix44.translate(this.__defaultUserSittingPositionInVR).flatten();
+          this.__webvrFrameData.sittingToStandingTransform = Matrix44.translate(
+            this.__defaultUserSittingPositionInVR
+          ).flatten();
         }
       }
 
       // draw pre gizmos
-      this._drawGizmos(renderPass.preGizmos, expression, lights, camera, renderPass, index, viewport, true);
+      this._drawGizmos(
+        renderPass.preGizmos,
+        expression,
+        lights,
+        camera,
+        renderPass,
+        index,
+        viewport,
+        true
+      );
 
       // draw opacity meshes.
       const opacityMeshes = renderPass.opacityMeshes;
-      opacityMeshes.forEach((mesh)=> {
+      opacityMeshes.forEach(mesh => {
         if (mesh.isVisible) {
           mesh.draw({
             expression: expression,
@@ -178,9 +234,11 @@ export default class Renderer extends GLBoostObject {
         renderPass.sortTransparentMeshes(camera);
       }
       // draw transparent meshes.
-      const transparentMeshes = (renderPass.transparentMeshesAsManualOrder) ? renderPass.transparentMeshesAsManualOrder : renderPass.transparentMeshes;
+      const transparentMeshes = renderPass.transparentMeshesAsManualOrder
+        ? renderPass.transparentMeshesAsManualOrder
+        : renderPass.transparentMeshes;
 
-      transparentMeshes.forEach((mesh)=> {
+      transparentMeshes.forEach(mesh => {
         //console.log(mesh.userFlavorName);
         if (mesh.isVisible && mesh.isTransparent) {
           mesh.draw({
@@ -195,37 +253,111 @@ export default class Renderer extends GLBoostObject {
           });
         }
       });
-      
+
+      this._drawOutlineMeshes(
+        expression,
+        lights,
+        camera,
+        renderPass,
+        index,
+        viewport
+      );
+
+      // draw Outline of meshes
+
       // draw post gizmos
-      this._drawGizmos(renderPass.postGizmos, expression, lights, camera, renderPass, index, viewport, false);
+      this._drawGizmos(
+        renderPass.postGizmos,
+        expression,
+        lights,
+        camera,
+        renderPass,
+        index,
+        viewport,
+        false
+      );
 
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-//      glem.drawBuffers(gl, [gl.BACK]);
+      //      glem.drawBuffers(gl, [gl.BACK]);
 
-      if (typeof effekseer !== "undefined" && this.__effekseerElements.length > 0 && camera != null) {
+      if (
+        typeof effekseer !== "undefined" &&
+        this.__effekseerElements.length > 0 &&
+        camera != null
+      ) {
         const projection = camera.projectionRHMatrix().m;
-        const viewing = camera.lookAtRHMatrix().multiply(camera.inverseWorldMatrixWithoutMySelf).m; 
+        const viewing = camera
+          .lookAtRHMatrix()
+          .multiply(camera.inverseWorldMatrixWithoutMySelf).m;
         effekseer.setProjectionMatrix(projection);
         effekseer.setCameraMatrix(viewing);
         effekseer.draw();
       }
 
-      renderPass.postRender(camera ? true:false, lights);
+      renderPass.postRender(camera ? true : false, lights);
 
       renderPass._endUnixTime = performance.now();
     });
-    if (GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING && GLBoost.valueOfGLBoostConstants[GLBoost.LOG_TYPE_PERFORMANCE] !== false) {
-      expression.renderPasses.forEach((renderPass, index)=>{
-        this.__logger.out(GLBoost.LOG_LEVEL_INFO, GLBoost.LOG_TYPE_PERFORMANCE, false, `RenderPass[${index}]: ${renderPass._endUnixTime - renderPass._startUnixTime}`);
+    if (
+      GLBoost.VALUE_CONSOLE_OUT_FOR_DEBUGGING &&
+      GLBoost.valueOfGLBoostConstants[GLBoost.LOG_TYPE_PERFORMANCE] !== false
+    ) {
+      expression.renderPasses.forEach((renderPass, index) => {
+        this.__logger.out(
+          GLBoost.LOG_LEVEL_INFO,
+          GLBoost.LOG_TYPE_PERFORMANCE,
+          false,
+          `RenderPass[${index}]: ${renderPass._endUnixTime -
+            renderPass._startUnixTime}`
+        );
       });
     }
   }
 
-  _drawGizmos(gizmos, expression, lights, camera, renderPass, index, viewport, isDepthTest) {
-    const globalStatesUsageBackup = this._glBoostSystem._glBoostContext.globalStatesUsage;
-    this._glBoostSystem._glBoostContext.globalStatesUsage = GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
+  _drawOutlineMeshes(expression, lights, camera, renderPass, index, viewport) {
+    const globalStatesUsageBackup = this._glBoostSystem._glBoostContext
+      .globalStatesUsage;
+    this._glBoostSystem._glBoostContext.globalStatesUsage =
+      GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
+
+    const meshes = renderPass.outlineModeMeshes;
+    meshes.forEach(mesh => {
+      if (mesh.isOutlineVisible) {
+        mesh.AABBInWorld.updateAllInfo();
+        mesh.draw({
+          expression: expression,
+          lights: lights,
+          camera: camera,
+          renderPass: renderPass,
+          renderPassIndex: index,
+          viewport: viewport,
+          isWebVRMode: this.isWebVRMode,
+          webvrFrameData: this.__webvrFrameData,
+          forceThisMaterial: this._outlineMaterial,
+          isOutlineMode: true
+        });
+      }
+    });
+    this._glBoostSystem._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
+    this._glBoostSystem._glBoostContext.restoreGlobalStatesToDefault();
+  }
+
+  _drawGizmos(
+    gizmos,
+    expression,
+    lights,
+    camera,
+    renderPass,
+    index,
+    viewport,
+    isDepthTest
+  ) {
+    const globalStatesUsageBackup = this._glBoostSystem._glBoostContext
+      .globalStatesUsage;
+    this._glBoostSystem._glBoostContext.globalStatesUsage =
+      GLBoost.GLOBAL_STATES_USAGE_INCLUSIVE;
     this._glBoostSystem._glBoostContext.currentGlobalStates = [
-      3042, // gl.BLEND
+      3042 // gl.BLEND
     ];
     if (isDepthTest) {
       this._glBoostSystem._glBoostContext.currentGlobalStates.push(2929); // gl.DEPTH_TEST
@@ -249,7 +381,6 @@ export default class Renderer extends GLBoostObject {
 
     this._glBoostSystem._glBoostContext.globalStatesUsage = globalStatesUsageBackup;
     this._glBoostSystem._glBoostContext.restoreGlobalStatesToDefault();
-
   }
 
   _clearBuffer(gl, renderPass) {
@@ -272,9 +403,9 @@ export default class Renderer extends GLBoostObject {
         gl.clear(gl.DEPTH_BUFFER_BIT);
       }
     } else if (clearColor || clearDepth) {
-      gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+      gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     } else if (clearColor) {
-      gl.clear( gl.COLOR_BUFFER_BIT );
+      gl.clear(gl.COLOR_BUFFER_BIT);
     }
   }
 
@@ -284,17 +415,17 @@ export default class Renderer extends GLBoostObject {
    * @param depth_flg true: clear depth, false: don't clear depth
    * @param stencil_flg  true: clear stencil, false: don't clear stencil
    */
-  clearCanvas( color_flg: boolean, depth_flg: boolean, stencil_flg: boolean ) {
+  clearCanvas(color_flg: boolean, depth_flg: boolean, stencil_flg: boolean) {
     const gl = this._glContext.gl;
 
     var bufferBits = 0;
 
-    if ( color_flg === void 0 || color_flg ) bufferBits |= gl.COLOR_BUFFER_BIT;
-    if ( depth_flg === void 0 || depth_flg ) bufferBits |= gl.DEPTH_BUFFER_BIT;
-    if ( stencil_flg === void 0 || stencil_flg ) bufferBits |= gl.STENCIL_BUFFER_BIT;
+    if (color_flg === void 0 || color_flg) bufferBits |= gl.COLOR_BUFFER_BIT;
+    if (depth_flg === void 0 || depth_flg) bufferBits |= gl.DEPTH_BUFFER_BIT;
+    if (stencil_flg === void 0 || stencil_flg)
+      bufferBits |= gl.STENCIL_BUFFER_BIT;
 
-    gl.clear( bufferBits );
-
+    gl.clear(bufferBits);
   }
 
   /**
@@ -304,7 +435,6 @@ export default class Renderer extends GLBoostObject {
   get glContext(): webglcontext {
     return this._glContext.gl;
   }
-
 
   /**
    * resize canvas and viewport.
@@ -323,16 +453,18 @@ export default class Renderer extends GLBoostObject {
     args.splice(0, 0, time);
     renderLoopFunc.apply(renderLoopFunc, args);
 
-    this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame((_time)=>{
-      this.doRenderLoop(renderLoopFunc, _time, args[1]);
-      if (this.__requestedToEnterWebVR) {
-        this.__isWebVRMode = true;
-      }
-    }, time);
+    this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame(
+      _time => {
+        this.doRenderLoop(renderLoopFunc, _time, args[1]);
+        if (this.__requestedToEnterWebVR) {
+          this.__isWebVRMode = true;
+        }
+      },
+      time
+    );
   }
 
   doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args) {
-
     if (beforeCallback) {
       beforeCallback.apply(beforeCallback, args);
     }
@@ -349,12 +481,19 @@ export default class Renderer extends GLBoostObject {
       this.__webvrDisplay.submitFrame();
     }
 
-    this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame(()=>{
-      this.doConvenientRenderLoop(expression, beforeCallback, afterCallback, ...args);
-      if (this.__requestedToEnterWebVR) {
-        this.__isWebVRMode = true;
+    this.__animationFrameId = this.__animationFrameObject.requestAnimationFrame(
+      () => {
+        this.doConvenientRenderLoop(
+          expression,
+          beforeCallback,
+          afterCallback,
+          ...args
+        );
+        if (this.__requestedToEnterWebVR) {
+          this.__isWebVRMode = true;
+        }
       }
-    });
+    );
   }
 
   stopRenderLoop() {
@@ -362,17 +501,19 @@ export default class Renderer extends GLBoostObject {
     this.__animationFrameId = -1;
   }
 
-
-
   // WebVR
-  async enterWebVR(initialUserSittingPositionIfStageParametersDoNotExist, minRenderWidth = null, minRenderHeight = null) {
+  async enterWebVR(
+    initialUserSittingPositionIfStageParametersDoNotExist,
+    minRenderWidth = null,
+    minRenderHeight = null
+  ) {
     if (initialUserSittingPositionIfStageParametersDoNotExist) {
       this.__defaultUserSittingPositionInVR = initialUserSittingPositionIfStageParametersDoNotExist;
     }
     this.__minRenderWidthFromUser = minRenderWidth;
     this.__minRenderHeightFromUser = minRenderHeight;
 
-    return new Promise((resolve, reject)=> {
+    return new Promise((resolve, reject) => {
       if (!this.__webvrDisplay.isPresenting) {
         this.__animationFrameObject = this.__webvrDisplay;
         const leftEye = this.__webvrDisplay.getEyeParameters("left");
@@ -381,32 +522,47 @@ export default class Renderer extends GLBoostObject {
         this.__canvasWidthBackup = this._glContext.canvasWidth;
         this.__canvasHeightBackup = this._glContext.canvaHeight;
 
-        if (this.__minRenderWidthFromUser > leftEye.renderWidth && this.__minRenderHeightFromUser > rightEye.renderWidth) {
-          this.resize(this.__minRenderWidthFromUser * 2, this.__minRenderHeightFromUser);
+        if (
+          this.__minRenderWidthFromUser > leftEye.renderWidth &&
+          this.__minRenderHeightFromUser > rightEye.renderWidth
+        ) {
+          this.resize(
+            this.__minRenderWidthFromUser * 2,
+            this.__minRenderHeightFromUser
+          );
         } else {
-          this.resize(Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2, Math.max(leftEye.renderHeight, rightEye.renderHeight));
+          this.resize(
+            Math.max(leftEye.renderWidth, rightEye.renderWidth) * 2,
+            Math.max(leftEye.renderHeight, rightEye.renderHeight)
+          );
         }
-        this.__webvrDisplay.requestPresent([{source: this._glContext.canvas}]).then(() => {
-          //this.__switchAnimationFrameFunctions(this.__webvrDisplay);
-          this.__requestedToEnterWebVR = true;
-          resolve();
-        }).catch(() => {
-          console.error('Failed to requestPresent. Please check your VR Setting, or something wrong with your VR system?');
-          reject();
-        });
+        this.__webvrDisplay
+          .requestPresent([{ source: this._glContext.canvas }])
+          .then(() => {
+            //this.__switchAnimationFrameFunctions(this.__webvrDisplay);
+            this.__requestedToEnterWebVR = true;
+            resolve();
+          })
+          .catch(() => {
+            console.error(
+              "Failed to requestPresent. Please check your VR Setting, or something wrong with your VR system?"
+            );
+            reject();
+          });
       }
     });
   }
 
   async readyForWebVR(requestButtonDom) {
-    if ( window.VRFrameData ) {
+    if (window.VRFrameData) {
       this.__webvrFrameData = new window.VRFrameData();
     }
 
-    return new Promise((resolve, reject)=> {
-      if ( navigator.getVRDisplays ) {
-        navigator.getVRDisplays()
-          .then((vrDisplays)=>{
+    return new Promise((resolve, reject) => {
+      if (navigator.getVRDisplays) {
+        navigator
+          .getVRDisplays()
+          .then(vrDisplays => {
             if (vrDisplays.length > 0) {
               const webvrDisplay = vrDisplays[vrDisplays.length - 1];
               webvrDisplay.depthNear = 0.01;
@@ -416,11 +572,11 @@ export default class Renderer extends GLBoostObject {
                 this.__webvrDisplay = webvrDisplay;
 
                 if (requestButtonDom) {
-                  requestButtonDom.style.display = 'block';
+                  requestButtonDom.style.display = "block";
                 } else {
                   const paragrach = document.createElement("p");
                   const anchor = document.createElement("a");
-                  anchor.setAttribute("id", 'enter-vr');
+                  anchor.setAttribute("id", "enter-vr");
                   const enterVr = document.createTextNode("Enter VR");
 
                   anchor.appendChild(enterVr);
@@ -428,7 +584,7 @@ export default class Renderer extends GLBoostObject {
 
                   const canvas = this.glContext.canvas;
                   canvas.parent.insertBefore(paragrach, canvas);
-                  window.addEventListener('click', this.enterWebVR.bind(this));
+                  window.addEventListener("click", this.enterWebVR.bind(this));
                 }
 
                 this.__isReadyForWebVR = true;
@@ -438,16 +594,22 @@ export default class Renderer extends GLBoostObject {
                 reject();
               }
             } else {
-              console.error('Failed to get VR Display. Please check your VR Setting, or something wrong with your VR system?');
+              console.error(
+                "Failed to get VR Display. Please check your VR Setting, or something wrong with your VR system?"
+              );
               reject();
             }
           })
-          .catch(()=>{
-            console.error('Failed to get VR Displays. Please check your VR Setting.');
+          .catch(() => {
+            console.error(
+              "Failed to get VR Displays. Please check your VR Setting."
+            );
             reject();
           });
       } else {
-        console.error('Your browser does not support WebVR. Or it is disabled. Check again.');
+        console.error(
+          "Your browser does not support WebVR. Or it is disabled. Check again."
+        );
         reject();
       }
     });
@@ -462,7 +624,6 @@ export default class Renderer extends GLBoostObject {
     this.__isReadyForWebVR = false;
     this.__animationFrameObject = window;
   }
-
 
   async disableWebVR() {
     this.__isWebVRMode = false;
