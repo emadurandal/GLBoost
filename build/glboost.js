@@ -24279,26 +24279,6 @@ albedo.rgb *= (1.0 - metallic);
         extendedJson: null //   URI string / JSON Object / ArrayBuffer
       };
 
-      (function() {
-        const userAgent = window.navigator.userAgent.toLowerCase();
-        if(userAgent.indexOf('safari') !== -1) {
-          var cors_api_host = 'cors-anywhere.glboost.org';
-          var cors_api_url = 'https://' + cors_api_host + '/';
-          var slice = [].slice;
-          var origin = window.location.protocol + '//' + window.location.host;
-          var open = XMLHttpRequest.prototype.open;
-          XMLHttpRequest.prototype.open = function() {
-              var args = slice.call(arguments);
-              var targetOrigin = /^https?:\/\/([^\/]+)/i.exec(args[1]);
-              if (targetOrigin && targetOrigin[0].toLowerCase() !== origin &&
-                  targetOrigin[1] !== cors_api_host) {
-                  args[1] = cors_api_url + args[1];
-              }
-              return open.apply(this, args);
-          };
-        }
-      })();
-
       if (options && options.files) {
         for (let fileName in options.files) {
           const splitted = fileName.split('.');
@@ -26843,4 +26823,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-408-g0ea6b-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-409-g7c04-mod branch: develop';
