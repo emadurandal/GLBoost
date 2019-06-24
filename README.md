@@ -31,33 +31,34 @@ If you want to watch examples in local. Go to GLBoost top directory by terminal 
 
 ```
 $ cd GLBoost
+$ npm install
 $ npm start
 ```
 
 ## Key features
 
-* ECMAScript 2015 based library
-* Shader classes Mixin layered mechanism
-* WebGL2.0 Ready (Currently, Firefox and Chrome)
-* User's Custom Shader Support
-* Obj and glTF 1.0/2.0 loader
-* Phisically Based Rendering Support (Metallic-Roughness) (with/without Image based Lighting)
-* Experienced use in multiple commercial products/services
+- ECMAScript 2015 based library
+- Shader classes Mixin layered mechanism
+- WebGL2.0 Ready (Currently, Firefox and Chrome)
+- User's Custom Shader Support
+- Obj and glTF 1.0/2.0 loader
+- Phisically Based Rendering Support (Metallic-Roughness) (with/without Image based Lighting)
+- Experienced use in multiple commercial products/services
 
 <img src="assets/pbr_ibl_sample.jpg" alt="GLBoostViewer" title="GLBoostViewer" width="512">
 
 ## Supported Browsers
 
-* Google Chrome (even WebGL 2.0 mode)
-* Firefox (even WebGL 2.0 mode)
-* Safari
-* iOS Safari
-* Android Chrome
-* Microsoft Edge (Xbox One included)
+- Google Chrome (even WebGL 2.0 mode)
+- Firefox (even WebGL 2.0 mode)
+- Safari
+- iOS Safari
+- Android Chrome
+- Microsoft Edge (Xbox One included)
 
 ## Unsupported Browsers
 
-* Internet Explorer
+- Internet Explorer
 
 ## How to use
 
@@ -96,7 +97,7 @@ var scene = glBoostContext.createScene();
 
 // setup material
 var material = glBoostContext.createClassicMaterial();
-var texture = glBoostContext.createTexture('resources/texture.png');
+var texture = glBoostContext.createTexture("resources/texture.png");
 material.setTexture(texture);
 material.shaderClass = GLBoost.PhongShader;
 
@@ -109,21 +110,27 @@ var earth = glBoostContext.createMesh(geometry, material);
 scene.addChild(earth);
 
 // make a directonal light
-var directionalLight = glBoostContext.createDirectionalLight(new GLBoost.Vector3(1, 1, 1), new GLBoost.Vector3(-1, -1, -1));
+var directionalLight = glBoostContext.createDirectionalLight(
+  new GLBoost.Vector3(1, 1, 1),
+  new GLBoost.Vector3(-1, -1, -1)
+);
 // add the light to the scene
-scene.addChild( directionalLight );
+scene.addChild(directionalLight);
 
 // setup camera
-var camera = glBoostContext.createPerspectiveCamera({
-  eye: new GLBoost.Vector3(0.0, 0.0, 60.0),
-  center: new GLBoost.Vector3(0.0, 0.0, 0.0),
-  up: new GLBoost.Vector3(0.0, 1.0, 0.0)
-}, {
-  fovy: 45.0,
-  aspect: 1.0,
-  zNear: 0.1,
-  zFar: 1000.0
-});
+var camera = glBoostContext.createPerspectiveCamera(
+  {
+    eye: new GLBoost.Vector3(0.0, 0.0, 60.0),
+    center: new GLBoost.Vector3(0.0, 0.0, 0.0),
+    up: new GLBoost.Vector3(0.0, 1.0, 0.0)
+  },
+  {
+    fovy: 45.0,
+    aspect: 1.0,
+    zNear: 0.1,
+    zFar: 1000.0
+  }
+);
 // add the camera to the scene
 scene.addChild(camera);
 
@@ -137,13 +144,12 @@ expression.renderPasses[0].scene = scene;
 expression.prepareToRender();
 
 // rendering loop
-renderer.doConvenientRenderLoop(expression, function(){
+renderer.doConvenientRenderLoop(expression, function() {
   // rotate camera
   var rotateMatrixY = GLBoost.Matrix33.rotateY(-1.0);
   rotatedVector = rotateMatrixY.multiplyVector(camera.eye);
   camera.eye = rotatedVector;
 });
-
 ```
 
 for other usage, check [examples](https://gitcdn.xyz/repo/emadurandal/GLBoost/master/examples/index.html)!
@@ -189,15 +195,15 @@ $ npm run test
 
 ### Coming Soon
 
-* Improvement of Realtime shadow
+- Improvement of Realtime shadow
 
 ### Near Future
 
-* Both Clustered Forward Rendering and Deferred Rendering Support
-* Global Illumination (Light Propergation Volume or etc...)
-* Unity like Entity-Component-System
-* Original Giga DataTexture Architecture
-* High-level API for beginners
+- Both Clustered Forward Rendering and Deferred Rendering Support
+- Global Illumination (Light Propergation Volume or etc...)
+- Unity like Entity-Component-System
+- Original Giga DataTexture Architecture
+- High-level API for beginners
 
 ## License
 
