@@ -31,6 +31,7 @@ If you want to watch examples in local. Go to GLBoost top directory by terminal 
 
 ```
 $ cd GLBoost
+$ npm install
 $ npm start
 ```
 
