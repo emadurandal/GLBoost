@@ -1,6 +1,6 @@
 # !!! CAUTION !!!
 
-This library is already deprecated. (technically outdated too)
+This library is already deprecated (technically outdated too).
 I develop a new Web3D library. Please wait for that.
 
 # GLBoost
