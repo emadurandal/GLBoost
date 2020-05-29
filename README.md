@@ -1,3 +1,8 @@
+# Caution
+
+This library is already deprecated. (technically outdated too)
+I develop a new Web3D library. Please wait for that.
+
 # GLBoost
 
 ![GLBoost](https://github.com/emadurandal/GLBoost/raw/master/logo.png "GLBoost")
