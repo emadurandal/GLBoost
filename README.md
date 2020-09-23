@@ -1,7 +1,7 @@
 # !!! CAUTION !!!
 
 This library is already deprecated (technically outdated too).
-I develop a new Web3D library. Please wait for that.
+I recommend switching to our new library, [Rhodonite](https://github.com/actnwit/RhodoniteTS)
 
 # GLBoost
 
