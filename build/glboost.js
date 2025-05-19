@@ -24188,14 +24188,15 @@ albedo.rgb *= (1.0 - metallic);
    * This is a loader class of glTF2 file format. You can see more detail of glTF2 format at https://github.com/KhronosGroup/glTF .
    */
   class GLTF2Loader {
-
     /**
      * The constructor of GLTFLoader class. But you cannot use this constructor directly because of this class is a singleton class. Use getInstance() static method.
      * @param enforcer a Symbol to forbid calling this constructor directly
      */
     constructor(enforcer        ) {
       if (enforcer !== singletonEnforcer$4) {
-        throw new Error("This is a Singleton class. get the instance using 'getInstance' static method.");
+        throw new Error(
+          "This is a Singleton class. get the instance using 'getInstance' static method."
+        );
       }
     }
 
@@ -24210,8 +24211,13 @@ albedo.rgb *= (1.0 - metallic);
         defaultOptions[optionName] = options[optionName];
       }
 
-      if (defaultOptions.loaderExtension && typeof defaultOptions.loaderExtension === "string") {
-        defaultOptions.loaderExtension = GLBoost$1[options.loaderExtension].getInstance();
+      if (
+        defaultOptions.loaderExtension &&
+        typeof defaultOptions.loaderExtension === "string"
+      ) {
+        defaultOptions.loaderExtension = GLBoost$1[
+          options.loaderExtension
+        ].getInstance();
       }
 
       if (defaultOptions.statesOfElements) {
@@ -24244,10 +24250,10 @@ albedo.rgb *= (1.0 - metallic);
      */
     loadGLTF(uri        , options         = {})          {
       let defaultOptions = {
-        files: { 
-          //        "foo.gltf": content of file as ArrayBuffer, 
-          //        "foo.bin": content of file as ArrayBuffer, 
-          //        "boo.png": content of file as ArrayBuffer 
+        files: {
+          //        "foo.gltf": content of file as ArrayBuffer,
+          //        "foo.bin": content of file as ArrayBuffer,
+          //        "boo.png": content of file as ArrayBuffer
         },
         loaderExtension: null,
         isNeededToMultiplyAlphaToColorOfPixelOutput: true,
@@ -24263,7 +24269,7 @@ albedo.rgb *= (1.0 - metallic);
             specifyMethod: GLBoost$1.QUERY_TYPE_USER_FLAVOR_NAME, // GLBoost.QUERY_TYPE_INSTANCE_NAME // GLBoost.QUERY_TYPE_INSTANCE_NAME_WITH_USER_FLAVOR
             states: {
               enable: [
-                  // 3042,  // BLEND
+                // 3042,  // BLEND
               ],
               functions: {
                 //"blendFuncSeparate": [1, 0, 1, 0],
@@ -24281,38 +24287,61 @@ albedo.rgb *= (1.0 - metallic);
 
       if (options && options.files) {
         for (let fileName in options.files) {
-          const splitted = fileName.split('.');
+          const splitted = fileName.split(".");
           const fileExtension = splitted[splitted.length - 1];
 
-          if (fileExtension === 'gltf' || fileExtension === 'glb') {
-            return new Promise((resolve, response)=>{
-              this._checkArrayBufferOfGltf(options.files[fileName], null, options, defaultOptions, resolve);
-            }, (reject, error)=>{
-      
-            });
+          if (fileExtension === "gltf" || fileExtension === "glb") {
+            return new Promise(
+              (resolve, response) => {
+                this._checkArrayBufferOfGltf(
+                  options.files[fileName],
+                  null,
+                  options,
+                  defaultOptions,
+                  resolve
+                );
+              },
+              (reject, error) => {}
+            );
           }
-        }      
+        }
       }
 
-      return DataUtil.loadResourceAsync(uri, true,
-        (resolve, response)=>{
+      return DataUtil.loadResourceAsync(
+        uri,
+        true,
+        (resolve, response) => {
           var arrayBuffer = response;
 
           if (options.extendedJson) {
-            fetch(options.extendedJson).then((_response)=> {
-              _response.json().then((json)=>{
-                options.extendedJson = json;
-                this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+            fetch(options.extendedJson)
+              .then(_response => {
+                _response.json().then(json => {
+                  options.extendedJson = json;
+                  this._checkArrayBufferOfGltf(
+                    arrayBuffer,
+                    uri,
+                    options,
+                    defaultOptions,
+                    resolve
+                  );
+                });
+              })
+              .then(json => {
+                //this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+                console.log("Result of ladding extended JSON");
               });
-            }).then((json)=> {
-              //this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
-              console.log("Result of ladding extended JSON");
-            });
           } else {
-            this._checkArrayBufferOfGltf(arrayBuffer, uri, options, defaultOptions, resolve);
+            this._checkArrayBufferOfGltf(
+              arrayBuffer,
+              uri,
+              options,
+              defaultOptions,
+              resolve
+            );
           }
-        
-        }, (reject, error)=>{}
+        },
+        (reject, error) => {}
       );
     }
 
@@ -24326,26 +24355,45 @@ albedo.rgb *= (1.0 - metallic);
       let magic = dataView.getUint32(0, isLittleEndian);
 
       // 0x46546C67 is 'glTF' in ASCII codes.
-      if (magic !== 0x46546C67) {
+      if (magic !== 0x46546c67) {
         this._loadAsTextJson(arrayBuffer, uri, options, defaultOptions, resolve);
       } else {
-        this._loadAsBinaryJson(dataView, uri, isLittleEndian, arrayBuffer, options, defaultOptions, resolve);
+        this._loadAsBinaryJson(
+          dataView,
+          uri,
+          isLittleEndian,
+          arrayBuffer,
+          options,
+          defaultOptions,
+          resolve
+        );
       }
     }
 
-    _loadAsBinaryJson(dataView, uri, isLittleEndian, arrayBuffer, options, defaultOptions, resolve) {
+    _loadAsBinaryJson(
+      dataView,
+      uri,
+      isLittleEndian,
+      arrayBuffer,
+      options,
+      defaultOptions,
+      resolve
+    ) {
       let gltfVer = dataView.getUint32(4, isLittleEndian);
       if (gltfVer !== 2) {
-        reject('invalid version field in this binary glTF file.');
+        reject("invalid version field in this binary glTF file.");
       }
       let lengthOfThisFile = dataView.getUint32(8, isLittleEndian);
       let lengthOfJSonChunkData = dataView.getUint32(12, isLittleEndian);
       let chunkType = dataView.getUint32(16, isLittleEndian);
       // 0x4E4F534A means JSON format (0x4E4F534A is 'JSON' in ASCII codes)
-      if (chunkType !== 0x4E4F534A) {
-        reject('invalid chunkType of chunk0 in this binary glTF file.');
+      if (chunkType !== 0x4e4f534a) {
+        reject("invalid chunkType of chunk0 in this binary glTF file.");
       }
-      let arrayBufferJSonContent = arrayBuffer.slice(20, 20 + lengthOfJSonChunkData);
+      let arrayBufferJSonContent = arrayBuffer.slice(
+        20,
+        20 + lengthOfJSonChunkData
+      );
       let gotText = DataUtil.arrayBufferToString(arrayBufferJSonContent);
       let gltfJson = JSON.parse(gotText);
       options = this._getOptions(defaultOptions, gltfJson, options);
@@ -24354,7 +24402,7 @@ albedo.rgb *= (1.0 - metallic);
       let basePath = null;
       if (uri) {
         //Set the location of glb file as basePath
-        basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
+        basePath = uri.substring(0, uri.lastIndexOf("/")) + "/";
       }
 
       if (gltfJson.asset.extras === undefined) {
@@ -24363,9 +24411,14 @@ albedo.rgb *= (1.0 - metallic);
       this._mergeExtendedJson(gltfJson, options.extendedJson);
       gltfJson.asset.extras.basePath = basePath;
 
-      let promise = this._loadInner(arrayBufferBinary, basePath, gltfJson, options);
-      promise.then((gltfJson) => {
-        console.log('Resoureces loading done!');
+      let promise = this._loadInner(
+        arrayBufferBinary,
+        basePath,
+        gltfJson,
+        options
+      );
+      promise.then(gltfJson => {
+        console.log("Resoureces loading done!");
         resolve(gltfJson[0][0]);
       });
     }
@@ -24375,21 +24428,21 @@ albedo.rgb *= (1.0 - metallic);
       let basePath = null;
       if (uri) {
         //Set the location of gltf file as basePath
-        basePath = uri.substring(0, uri.lastIndexOf('/')) + '/';
+        basePath = uri.substring(0, uri.lastIndexOf("/")) + "/";
       }
       let gltfJson = JSON.parse(gotText);
       if (gltfJson.asset.extras === undefined) {
         gltfJson.asset.extras = {};
-      } 
+      }
 
       options = this._getOptions(defaultOptions, gltfJson, options);
-      
+
       this._mergeExtendedJson(gltfJson, options.extendedJson);
       gltfJson.asset.extras.basePath = basePath;
 
       let promise = this._loadInner(null, basePath, gltfJson, options);
-      promise.then((gltfJson) => {
-        console.log('Resoureces loading done!');
+      promise.then(gltfJson => {
+        console.log("Resoureces loading done!");
         resolve(gltfJson[0][0]);
       });
     }
@@ -24399,10 +24452,10 @@ albedo.rgb *= (1.0 - metallic);
       if (extendedData instanceof ArrayBuffer) {
         const extendedJsonStr = DataUtil.arrayBufferToString(extendedData);
         extendedJson = JSON.parse(extendedJsonStr);
-      } else if (typeof extendedData === 'string') {
+      } else if (typeof extendedData === "string") {
         extendedJson = JSON.parse(extendedData);
         extendedJson = extendedJson;
-      } else if (typeof extendedData === 'object') {
+      } else if (typeof extendedData === "object") {
         extendedJson = extendedData;
       }
 
@@ -24417,17 +24470,26 @@ albedo.rgb *= (1.0 - metallic);
         buffers: [],
         images: []
       };
-      promises.push(this._loadResources(arrayBufferBinary, basePath, gltfJson, options, resources));
-      promises.push(new Promise(((resolve, reject) => {
-        this._loadJsonContent(gltfJson, resources, options);
-        resolve();
-      })));
+      promises.push(
+        this._loadResources(
+          arrayBufferBinary,
+          basePath,
+          gltfJson,
+          options,
+          resources
+        )
+      );
+      promises.push(
+        new Promise((resolve, reject) => {
+          this._loadJsonContent(gltfJson, resources, options);
+          resolve();
+        })
+      );
 
       return Promise.all(promises);
     }
 
     _loadJsonContent(gltfJson, resources, options) {
-
       // Scene
       this._loadDependenciesOfScenes(gltfJson);
 
@@ -24435,7 +24497,7 @@ albedo.rgb *= (1.0 - metallic);
       this._loadDependenciesOfNodes(gltfJson);
 
       // Node Transformation
-  //    this._loadTransformationsOfNodes(gltfJson);
+      //    this._loadTransformationsOfNodes(gltfJson);
 
       // Mesh
       this._loadDependenciesOfMeshes(gltfJson);
@@ -24465,7 +24527,6 @@ albedo.rgb *= (1.0 - metallic);
         gltfJson.asset.extras = {};
       }
       gltfJson.asset.extras.glboostOptions = options;
-
     }
 
     _loadDependenciesOfScenes(gltfJson) {
@@ -24478,9 +24539,7 @@ albedo.rgb *= (1.0 - metallic);
     }
 
     _loadDependenciesOfNodes(gltfJson) {
-
       for (let node of gltfJson.nodes) {
-
         // Hierarchy
         if (node.children) {
           node.childrenIndices = node.children.concat();
@@ -24489,7 +24548,7 @@ albedo.rgb *= (1.0 - metallic);
             node.children[i] = gltfJson.nodes[node.childrenIndices[i]];
           }
         }
-   
+
         // Mesh
         if (node.mesh !== void 0 && gltfJson.meshes !== void 0) {
           node.meshIndex = node.mesh;
@@ -24512,25 +24571,23 @@ albedo.rgb *= (1.0 - metallic);
           node.cameraIndex = node.camera;
           node.camera = gltfJson.cameras[node.cameraIndex];
         }
-
       }
-
-
     }
-    
+
     _loadDependenciesOfMeshes(gltfJson) {
       // Mesh
       for (let mesh of gltfJson.meshes) {
         for (let primitive of mesh.primitives) {
           if (primitive.material !== void 0) {
             primitive.materialIndex = primitive.material;
-            primitive.material = gltfJson.materials[primitive.materialIndex];  
+            primitive.material = gltfJson.materials[primitive.materialIndex];
           }
 
           primitive.attributesindex = Object.assign({}, primitive.attributes);
           for (let attributeName in primitive.attributesindex) {
             if (primitive.attributesindex[attributeName] >= 0) {
-              let accessor = gltfJson.accessors[primitive.attributesindex[attributeName]];
+              let accessor =
+                gltfJson.accessors[primitive.attributesindex[attributeName]];
               accessor.extras = {
                 toGetAsTypedArray: true
               };
@@ -24555,11 +24612,14 @@ albedo.rgb *= (1.0 - metallic);
           if (material.pbrMetallicRoughness) {
             let baseColorTexture = material.pbrMetallicRoughness.baseColorTexture;
             if (baseColorTexture !== void 0) {
-              baseColorTexture.texture = gltfJson.textures[baseColorTexture.index];
+              baseColorTexture.texture =
+                gltfJson.textures[baseColorTexture.index];
             }
-            let metallicRoughnessTexture = material.pbrMetallicRoughness.metallicRoughnessTexture;
+            let metallicRoughnessTexture =
+              material.pbrMetallicRoughness.metallicRoughnessTexture;
             if (metallicRoughnessTexture !== void 0) {
-              metallicRoughnessTexture.texture = gltfJson.textures[metallicRoughnessTexture.index];
+              metallicRoughnessTexture.texture =
+                gltfJson.textures[metallicRoughnessTexture.index];
             }
           }
 
@@ -24604,19 +24664,17 @@ albedo.rgb *= (1.0 - metallic);
           skin.skeleton = gltfJson.nodes[skin.skeletonIndex];
 
           skin.inverseBindMatricesIndex = skin.inverseBindMatrices;
-          skin.inverseBindMatrices = gltfJson.accessors[skin.inverseBindMatricesIndex];
+          skin.inverseBindMatrices =
+            gltfJson.accessors[skin.inverseBindMatricesIndex];
 
           skin.jointsIndices = skin.joints;
           skin.joints = [];
           for (let jointIndex of skin.jointsIndices) {
             skin.joints.push(gltfJson.nodes[jointIndex]);
           }
-          
         }
-    
       }
     }
-
 
     _loadDependenciesOfAnimations(gltfJson) {
       if (gltfJson.animations) {
@@ -24624,16 +24682,18 @@ albedo.rgb *= (1.0 - metallic);
           for (let channel of animation.channels) {
             channel.samplerIndex = channel.sampler;
             channel.sampler = animation.samplers[channel.samplerIndex];
-            
+
             channel.target.nodeIndex = channel.target.node;
-            channel.target.node = gltfJson.nodes[channel.target.nodeIndex];          
+            channel.target.node = gltfJson.nodes[channel.target.nodeIndex];
           }
           for (let channel of animation.channels) {
             channel.sampler.inputIndex = channel.sampler.input;
             channel.sampler.outputIndex = channel.sampler.output;
-            channel.sampler.input = gltfJson.accessors[channel.sampler.inputIndex];
-            channel.sampler.output = gltfJson.accessors[channel.sampler.outputIndex];
-            if (channel.target.path === 'rotation') {
+            channel.sampler.input =
+              gltfJson.accessors[channel.sampler.inputIndex];
+            channel.sampler.output =
+              gltfJson.accessors[channel.sampler.outputIndex];
+            if (channel.target.path === "rotation") {
               if (channel.sampler.output.extras === void 0) {
                 channel.sampler.output.extras = {};
               }
@@ -24664,8 +24724,7 @@ albedo.rgb *= (1.0 - metallic);
       }
     }
 
-    
-  //  _loadTransformationsOfNodes(gltfJson) {  }
+    //  _loadTransformationsOfNodes(gltfJson) {  }
 
     _loadResources(arrayBufferBinary, basePath, gltfJson, options, resources) {
       let promisesToLoadResources = [];
@@ -24676,8 +24735,15 @@ albedo.rgb *= (1.0 - metallic);
 
         let shaderJson = gltfJson.shaders[i];
         let shaderType = shaderJson.type;
-        if (typeof shaderJson.extensions !== 'undefined' && typeof shaderJson.extensions.KHR_binary_glTF !== 'undefined') {
-          resources.shaders[i].shaderText = this._accessBinaryAsShader(shaderJson.extensions.KHR_binary_glTF.bufferView, gltfJson, arrayBufferBinary);
+        if (
+          typeof shaderJson.extensions !== "undefined" &&
+          typeof shaderJson.extensions.KHR_binary_glTF !== "undefined"
+        ) {
+          resources.shaders[i].shaderText = this._accessBinaryAsShader(
+            shaderJson.extensions.KHR_binary_glTF.bufferView,
+            gltfJson,
+            arrayBufferBinary
+          );
           resources.shaders[i].shaderType = shaderType;
           continue;
         }
@@ -24685,11 +24751,13 @@ albedo.rgb *= (1.0 - metallic);
         let shaderUri = shaderJson.uri;
 
         if (options.files) {
-          const splitted = shaderUri.split('/');
+          const splitted = shaderUri.split("/");
           const filename = splitted[splitted.length - 1];
           if (options.files[filename]) {
             const arrayBuffer = options.files[filename];
-            shaders[shaderName].shaderText = DataUtil.arrayBufferToString(arrayBuffer);
+            shaders[shaderName].shaderText = DataUtil.arrayBufferToString(
+              arrayBuffer
+            );
             shaders[shaderName].shaderType = shaderType;
             continue;
           }
@@ -24699,7 +24767,9 @@ albedo.rgb *= (1.0 - metallic);
           promisesToLoadResources.push(
             new Promise((resolve, rejected) => {
               let arrayBuffer = DataUtil.base64ToArrayBuffer(shaderUri);
-              resources.shaders[i].shaderText = DataUtil.arrayBufferToString(arrayBuffer);
+              resources.shaders[i].shaderText = DataUtil.arrayBufferToString(
+                arrayBuffer
+              );
               resources.shaders[i].shaderType = shaderType;
               resolve();
             })
@@ -24707,15 +24777,15 @@ albedo.rgb *= (1.0 - metallic);
         } else {
           shaderUri = basePath + shaderUri;
           promisesToLoadResources.push(
-            DataUtil.loadResourceAsync(shaderUri, false,
-              (resolve, response)=>{
+            DataUtil.loadResourceAsync(
+              shaderUri,
+              false,
+              (resolve, response) => {
                 resources.shaders[i].shaderText = response;
                 resources.shaders[i].shaderType = shaderType;
                 resolve(gltfJson);
               },
-              (reject, error)=>{
-
-              }
+              (reject, error) => {}
             )
           );
         }
@@ -24728,17 +24798,17 @@ albedo.rgb *= (1.0 - metallic);
         let splitted = null;
         let filename = null;
         if (bufferInfo.uri) {
-          splitted = bufferInfo.uri.split('/');
-          filename = splitted[splitted.length - 1];  
+          splitted = bufferInfo.uri.split("/");
+          filename = splitted[splitted.length - 1];
         }
-        if (typeof bufferInfo.uri === 'undefined') {
+        if (typeof bufferInfo.uri === "undefined") {
           promisesToLoadResources.push(
             new Promise((resolve, rejected) => {
               resources.buffers[i] = arrayBufferBinary;
               bufferInfo.buffer = arrayBufferBinary;
               resolve(gltfJson);
-            }
-          ));
+            })
+          );
         } else if (bufferInfo.uri.match(/^data:application\/(.*);base64,/)) {
           promisesToLoadResources.push(
             new Promise((resolve, rejected) => {
@@ -24755,19 +24825,19 @@ albedo.rgb *= (1.0 - metallic);
               resources.buffers[i] = arrayBuffer;
               bufferInfo.buffer = arrayBuffer;
               resolve(gltfJson);
-            }
-          ));
+            })
+          );
         } else {
           promisesToLoadResources.push(
-            DataUtil.loadResourceAsync(basePath + bufferInfo.uri, true,
-              (resolve, response)=>{
+            DataUtil.loadResourceAsync(
+              basePath + bufferInfo.uri,
+              true,
+              (resolve, response) => {
                 resources.buffers[i] = response;
                 bufferInfo.buffer = response;
                 resolve(gltfJson);
               },
-              (reject, error)=>{
-
-              }
+              (reject, error) => {}
             )
           );
         }
@@ -24781,15 +24851,20 @@ albedo.rgb *= (1.0 - metallic);
 
         let imageUri = null;
 
-        if (typeof imageJson.uri === 'undefined') {
-          imageUri = this._accessBinaryAsImage(imageJson.bufferView, gltfJson, arrayBufferBinary, imageJson.mimeType);
+        if (typeof imageJson.uri === "undefined") {
+          imageUri = this._accessBinaryAsImage(
+            imageJson.bufferView,
+            gltfJson,
+            arrayBufferBinary,
+            imageJson.mimeType
+          );
         } else {
           let imageFileStr = imageJson.uri;
-          const splitted = imageFileStr.split('/');
+          const splitted = imageFileStr.split("/");
           const filename = splitted[splitted.length - 1];
           if (options.files && options.files[filename]) {
             const arrayBuffer = options.files[filename];
-            const splitted = filename.split('.');
+            const splitted = filename.split(".");
             const fileExtension = splitted[splitted.length - 1];
             imageUri = this._accessArrayBufferAsImage(arrayBuffer, fileExtension);
           } else if (imageFileStr.match(/^data:/)) {
@@ -24800,8 +24875,9 @@ albedo.rgb *= (1.0 - metallic);
         }
         if (options.isNeededToMultiplyAlphaToColorOfPixelOutput) {
           if (options.isTextureImageToLoadPreMultipliedAlpha) ;
-        } else { // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
-          if (options.isTextureImageToLoadPreMultipliedAlpha) ;        
+        } else {
+          // if is NOT Needed To Multiply AlphaToColor Of PixelOutput
+          if (options.isTextureImageToLoadPreMultipliedAlpha) ;
         }
 
         // let texture = glBoostContext.createTexture(null, textureName, {
@@ -24811,53 +24887,42 @@ albedo.rgb *= (1.0 - metallic);
         //   'TEXTURE_WRAP_T': samplerJson.wrapT,
         //   'UNPACK_PREMULTIPLY_ALPHA_WEBGL': isNeededToMultiplyAlphaToColorOfTexture
         // });
-        
-        if (options.extensionLoader && options.extensionLoader.setUVTransformToTexture) {
+
+        if (
+          options.extensionLoader &&
+          options.extensionLoader.setUVTransformToTexture
+        ) {
           options.extensionLoader.setUVTransformToTexture(texture, samplerJson);
         }
-        
-        promisesToLoadResources.push(new Promise((resolve, reject)=> {
-          let img = new Image();
-          img.crossOrigin = 'Anonymous';
-          img.src = imageUri;
-          imageJson.image = img;
-          if (imageUri.match(/^data:/)) {
-            resolve(gltfJson);
-          } else {
-            /*
+
+        promisesToLoadResources.push(
+          new Promise((resolve, reject) => {
+            let img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.src = imageUri;
+            imageJson.image = img;
+            if (imageUri.match(/^data:/)) {
+              resolve(gltfJson);
+            } else {
+              /*
             img.crossOrigin = 'Anonymous';
             img.onload = () => {
               resolve(gltfJson);
             };
            */
 
-            const load = (img, response)=> {
-              
-              var bytes = new Uint8Array(response);
-              var binaryData = "";
-              for (var i = 0, len = bytes.byteLength; i < len; i++) {
-                binaryData += String.fromCharCode(bytes[i]);
-              }
-              const split = imageUri.split('.');
-              let ext = split[split.length-1];
-              img.src = this._getImageType(ext) + window.btoa(binaryData);
-              img.onload = ()=>{
-                resolve(gltfJson);
-              };
-              /*
-              var img = new Image();
-              img.crossOrigin = 'Anonymous';
-              var url = window.URL || window.webkitURL;
-              img.src = url.createObjectURL(response);
-  */
-  /*
-              const split = imageUri.split('.');
-              let ext = split[split.length-1];
-              if (ext === 'jpg') {
-                ext = 'jpeg';
-              }
-              const blob = new Blob([ response ], { type: "image/"+ext });
-  *//*
+              const load = (img, response) => {
+                var bytes = new Uint8Array(response);
+                var binaryData = "";
+                for (var i = 0, len = bytes.byteLength; i < len; i++) {
+                  binaryData += String.fromCharCode(bytes[i]);
+                }
+                const split = imageUri.split(".");
+                let ext = split[split.length - 1];
+                img.src = this._getImageType(ext) + window.btoa(binaryData);
+                img.onload = () => {
+                  resolve(gltfJson);
+                }; /*
               var reader = new FileReader();
               reader.onloadend = ()=> {
                 img.src = reader.result;
@@ -24866,37 +24931,50 @@ albedo.rgb *= (1.0 - metallic);
               // DataURLとして読み込む
               reader.readAsDataURL(response);
               */
-  //            resolve(gltfJson);
-            };
+                /*
+              var img = new Image();
+              img.crossOrigin = 'Anonymous';
+              var url = window.URL || window.webkitURL;
+              img.src = url.createObjectURL(response);
+  */
+                /*
+              const split = imageUri.split('.');
+              let ext = split[split.length-1];
+              if (ext === 'jpg') {
+                ext = 'jpeg';
+              }
+              const blob = new Blob([ response ], { type: "image/"+ext });
+  */
+                //            resolve(gltfJson);
+              };
 
-            const loadBinaryImage = ()=> {
-              var xhr = new XMLHttpRequest();
-              //xhr.setRequestHeader('origin', 'x-requested-with');
-              xhr.onreadystatechange = (function(_img) {
-                return function(){
+              const loadBinaryImage = () => {
+                var xhr = new XMLHttpRequest();
+                //xhr.setRequestHeader('origin', 'x-requested-with');
+                xhr.onreadystatechange = (function(_img) {
+                  return function() {
+                    //console.log('e2222222', this.readyState, this.status);
 
-                //console.log('e2222222', this.readyState, this.status);
-                
-                if (this.readyState == 4 && this.status == 200) {
-                  /*
+                    if (this.readyState == 4 && this.status == 200) {
+                      /*
                   var img = new Image();
                   var url = window.URL || window.webkitURL;
                   img.src = url.createObjectURL(this.response);
                   */
-                 load(_img, this.response);
-                }
-              }
-              })(img);
-              xhr.open('GET', imageUri);
-              xhr.responseType = 'arraybuffer';
-              xhr.send();
-            };
-            loadBinaryImage();
+                      load(_img, this.response);
+                    }
+                  };
+                })(img);
+                xhr.open("GET", imageUri);
+                xhr.responseType = "arraybuffer";
+                xhr.send();
+              };
+              loadBinaryImage();
+            }
 
-          }
-
-          resources.images[i] = img;
-        }));
+            resources.images[i] = img;
+          })
+        );
       }
 
       return Promise.all(promisesToLoadResources);
@@ -24904,32 +24982,40 @@ albedo.rgb *= (1.0 - metallic);
 
     _sliceBufferViewToArrayBuffer(json, bufferViewStr, arrayBuffer) {
       let bufferViewJson = json.bufferViews[bufferViewStr];
-      let byteOffset = (bufferViewJson.byteOffset != null) ? bufferViewJson.byteOffset : 0;
+      let byteOffset =
+        bufferViewJson.byteOffset != null ? bufferViewJson.byteOffset : 0;
       let byteLength = bufferViewJson.byteLength;
-      let arrayBufferSliced = arrayBuffer.slice(byteOffset, byteOffset + byteLength);
+      let arrayBufferSliced = arrayBuffer.slice(
+        byteOffset,
+        byteOffset + byteLength
+      );
       return arrayBufferSliced;
     }
 
     _accessBinaryAsImage(bufferViewStr, json, arrayBuffer, mimeType) {
-      let arrayBufferSliced = this._sliceBufferViewToArrayBuffer(json, bufferViewStr, arrayBuffer);
+      let arrayBufferSliced = this._sliceBufferViewToArrayBuffer(
+        json,
+        bufferViewStr,
+        arrayBuffer
+      );
       return this._accessArrayBufferAsImage(arrayBufferSliced, mimeType);
     }
 
     _getImageType(imageType) {
       let imgSrc = null;
-      if (imageType === 'image/jpeg' || imageType.toLowerCase() === 'jpg' || imageType.toLowerCase() === 'jpeg') {
+      if (
+        imageType === "image/jpeg" ||
+        imageType.toLowerCase() === "jpg" ||
+        imageType.toLowerCase() === "jpeg"
+      ) {
         imgSrc = "data:image/jpeg;base64,";
-      }
-      else if (imageType == 'image/png' || imageType.toLowerCase() === 'png') {
+      } else if (imageType == "image/png" || imageType.toLowerCase() === "png") {
         imgSrc = "data:image/png;base64,";
-      }
-      else if (imageType == 'image/gif' || imageType.toLowerCase() === 'gif') {
+      } else if (imageType == "image/gif" || imageType.toLowerCase() === "gif") {
         imgSrc = "data:image/gif;base64,";
-      }
-      else if (imageType == 'image/bmp' || imageType.toLowerCase() === 'bmp') {
+      } else if (imageType == "image/bmp" || imageType.toLowerCase() === "bmp") {
         imgSrc = "data:image/bmp;base64,";
-      }
-      else {
+      } else {
         imgSrc = "data:image/unknown;base64,";
       }
       return imgSrc;
@@ -24937,7 +25023,7 @@ albedo.rgb *= (1.0 - metallic);
 
     _accessArrayBufferAsImage(arrayBuffer, imageType) {
       let bytes = new Uint8Array(arrayBuffer);
-      let binaryData = '';
+      let binaryData = "";
       for (let i = 0, len = bytes.byteLength; i < len; i++) {
         binaryData += String.fromCharCode(bytes[i]);
       }
@@ -24945,8 +25031,6 @@ albedo.rgb *= (1.0 - metallic);
       let dataUrl = imgSrc + DataUtil.btoa(binaryData);
       return dataUrl;
     }
-
-
   }
 
   GLBoost$1["GLTF2Loader"] = GLTF2Loader;
@@ -26823,4 +26907,4 @@ albedo.rgb *= (1.0 - metallic);
 
 })));
 
-(0,eval)('this').GLBoost.VERSION='version: 0.0.4-409-g7c04-mod branch: develop';
+(0,eval)('this').GLBoost.VERSION='version: 0.0.4-439-g275a-mod branch: master';
